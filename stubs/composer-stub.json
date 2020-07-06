@@ -1,0 +1,29 @@
+{
+	"name": "StubComposerName",
+	"type": "project",
+	"version": "1.0",
+	"license": "Copyright StubYear",
+	"require": {},
+	"autoload": {
+		"classmap": [
+			"database/seeds",
+			"database/factories"
+		],
+		"psr-4": {
+			"StubModuleNamespace\\StubClassNamePrefix\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"StubModuleNamespace\\StubClassNamePrefix\\Tests\\": "tests/"
+		}
+	},
+	"minimum-stability": "stable",
+	"extra": {
+		"laravel": {
+			"providers": [
+				"StubModuleNamespace\\StubClassNamePrefix\\Providers\\StubClassNamePrefixServiceProvider"
+			]
+		}
+	}
+}

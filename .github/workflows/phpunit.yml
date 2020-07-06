@@ -1,0 +1,56 @@
+name: PHPUnit
+
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  php-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php: [7.4, 7.3]
+        laravel: [^7.0]
+        dependency-version: [lowest, stable]
+        include:
+          - laravel: ^7.0
+            testbench: ^5.0
+            minimum-stability: stable
+            coverage: none
+
+    name: "${{ matrix.php }} / ${{ matrix.laravel }} (${{ matrix.dependency-version }})"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, bcmath, intl, iconv
+          coverage: ${{ matrix.coverage }}
+      
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.json') }}
+            
+      - name: Set minimum stability
+        run: composer config minimum-stability ${{ matrix.minimum-stability }}
+        
+      - name: Install dependencies
+        env:
+          COMPOSER_DISCARD_CHANGES: true
+        run: composer require --no-suggest --no-progress --no-interaction --prefer-dist --update-with-all-dependencies "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}"
+
+      - name: Set dependency version
+        env:
+          COMPOSER_DISCARD_CHANGES: true
+        run: composer update --no-suggest --no-progress --no-interaction --no-suggest --prefer-dist --with-all-dependencies --prefer-${{ matrix.dependency-version }}
+
+      - name: Execute tests
+        run: vendor/bin/phpunit --coverage-clover ${{ github.workspace }}/clover.xml

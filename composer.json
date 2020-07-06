@@ -7,7 +7,6 @@
         "modular",
         "module"
     ],
-    "version": "1.0",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -33,7 +32,7 @@
         }
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=7.3",
         "illuminate/support": "^7.0|^8.0"
     },
     "require-dev": {
