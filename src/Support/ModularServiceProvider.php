@@ -13,6 +13,12 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\View\Factory;
 use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
+use InterNACHI\Modular\Console\Commands\Make\MakeModule;
+use InterNACHI\Modular\Console\Commands\ModuleCache;
+use InterNACHI\Modular\Console\Commands\ModuleClear;
+use InterNACHI\Modular\Console\Commands\ModuleInit;
+use InterNACHI\Modular\Console\Commands\ModuleList;
+use InterNACHI\Modular\Console\Commands\UpdatePhpStormConfig;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
@@ -60,20 +66,23 @@ class ModularServiceProvider extends ServiceProvider
 			return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
 		});
 		
-		// Set up lazy registrations for things that only need to run if we're using
-		// that functionality (e.g. we only need to look for and register migrations
-		// if we're running the migrator)
-		$this->registerLazily(Migrator::class, [$this, 'registerMigrations']);
-		$this->registerLazily(EloquentFactory::class, [$this, 'registerFactories']);
-		$this->registerLazily(Gate::class, [$this, 'registerPolicies']);
-		
-		// Look for and register all our commands in the CLI context
-		Artisan::starting(Closure::fromCallable([$this, 'registerCommands']));
+		if ($this->modulesBasePathExists()) {
+			// Set up lazy registrations for things that only need to run if we're using
+			// that functionality (e.g. we only need to look for and register migrations
+			// if we're running the migrator)
+			$this->registerLazily(Migrator::class, [$this, 'registerMigrations']);
+			$this->registerLazily(EloquentFactory::class, [$this, 'registerFactories']);
+			$this->registerLazily(Gate::class, [$this, 'registerPolicies']);
+			
+			// Look for and register all our commands in the CLI context
+			Artisan::starting(Closure::fromCallable([$this, 'registerCommands']));
+		}
 	}
 	
 	public function boot(): void
 	{
 		$this->publishVendorFiles();
+		$this->bootPackageCommands();
 		
 		if ($this->modulesBasePathExists()) {
 			$this->bootRoutes();
@@ -96,6 +105,22 @@ class ModularServiceProvider extends ServiceProvider
 		$this->publishes([
 			"{$this->base_dir}/config.php" => $this->app->configPath('app-modules.php'),
 		], 'modular-config');
+	}
+	
+	protected function bootPackageCommands(): void 
+	{
+		if (!$this->app->runningInConsole()) {
+			return;
+		}
+		
+		$this->commands([
+			MakeModule::class,
+			ModuleCache::class,
+			ModuleClear::class,
+			ModuleInit::class,
+			ModuleList::class,
+			UpdatePhpStormConfig::class,
+		]);
 	}
 	
 	protected function bootRoutes(): void

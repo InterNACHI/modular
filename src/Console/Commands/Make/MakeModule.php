@@ -11,11 +11,12 @@ use Illuminate\Support\Str;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Terminal;
-use Tests\TestCase;
 
 class MakeModule extends Command
 {
-	protected $signature = 'make:module {name : The name of the module}';
+	protected $signature = 'make:module 
+		{name : The name of the module} 
+		{--accept-default-namespace=false : Skip default namespace confirmation}';
 	
 	protected $description = 'Create a new Laravel module';
 	
@@ -93,6 +94,8 @@ class MakeModule extends Command
 		
 		$this->newLine();
 		
+		$this->ensureModulesDirectoryExists();
+		
 		if ($this->shouldAbortToPublishConfig()) {
 			return 0;
 		}
@@ -112,6 +115,7 @@ class MakeModule extends Command
 	{
 		if (
 			'Modules' !== $this->module_namespace
+			|| $this->option('accept-default-namespace')
 			|| $this->module_registry->modules()->isNotEmpty()
 		) {
 			return false;
@@ -134,6 +138,14 @@ class MakeModule extends Command
 		}
 		
 		return $this->confirm('Would you like to cancel and configure your module namespace first?', true);
+	}
+	
+	protected function ensureModulesDirectoryExists()
+	{
+		if (!$this->filesystem->isDirectory($this->base_path)) {
+			$this->filesystem->makeDirectory($this->base_path, 0777, true);
+			$this->line(" - Created <info>{$this->base_path}</info>");
+		}
 	}
 	
 	protected function buildDirectoryStructure()
@@ -185,7 +197,7 @@ class MakeModule extends Command
 			'database/seeds/.gitkeep' => '.gitkeep',
 		];
 		
-		$tests_base = config('app-modules.tests_base', TestCase::class);
+		$tests_base = config('app-modules.tests_base', 'Tests\TestCase');
 		
 		$placeholders = [
 			'StubYear' => date('Y'),
@@ -229,6 +241,12 @@ class MakeModule extends Command
 	protected function updateCoreComposerConfig()
 	{
 		$this->title('Updating application composer.json file');
+		
+		// We're going to move into the Laravel base directory while
+		// we're updating the composer file so that we're sure we update
+		// the correct composer.json file (we'll restore CWD at the end)
+		$original_working_dir = getcwd();
+		chdir($this->laravel->basePath());
 		
 		$json_file = new JsonFile(Factory::getComposerFile());
 		$definition = $json_file->read();
@@ -281,6 +299,8 @@ class MakeModule extends Command
 		} else {
 			$this->line(' - Nothing to update (repository & require entry already exist)');
 		}
+		
+		chdir($original_working_dir);
 		
 		$this->newLine();
 	}
