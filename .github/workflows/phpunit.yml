@@ -18,7 +18,7 @@ jobs:
           - laravel: ^7.0
             testbench: ^5.0
             minimum-stability: stable
-            coverage: none
+            coverage: pcov
 
     name: "${{ matrix.php }} / ${{ matrix.laravel }} (${{ matrix.dependency-version }})"
 
@@ -52,5 +52,16 @@ jobs:
           COMPOSER_DISCARD_CHANGES: true
         run: composer update --no-suggest --no-progress --no-interaction --no-suggest --prefer-dist --with-all-dependencies --prefer-${{ matrix.dependency-version }}
 
-      - name: Execute tests
+      - if: matrix.coverage != 'pcov'
+        name: Execute tests (without coverage)
         run: vendor/bin/phpunit
+        
+      - if: matrix.coverage == 'pcov'
+        name: Execute tests with coverage
+        uses: paambaati/codeclimate-action@v2.4.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: vendor/bin/phpunit --coverage-clover ${{ github.workspace }}/clover.xml
+          coverageLocations:
+            "${{github.workspace}}/clover.xml:clover"
