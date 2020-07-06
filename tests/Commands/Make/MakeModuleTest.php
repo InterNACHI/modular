@@ -40,6 +40,18 @@ class MakeModuleTest extends TestCase
 		$this->assertEquals('src/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\']);
 		$this->assertEquals('tests/', $composer_contents['autoload-dev']['psr-4']['Modules\\TestModule\\Tests\\']);
 		$this->assertContains('Modules\\TestModule\\Providers\\TestModuleServiceProvider', $composer_contents['extra']['laravel']['providers']);
+		
+		$app_composer_file = $this->getBasePath().DIRECTORY_SEPARATOR.'composer.json';
+		$app_composer_contents = json_decode($fs->get($app_composer_file), true);
+		
+		$this->assertEquals('*', $app_composer_contents['require']["modules/{$module_name}"]);
+		
+		$repository = [
+			'type' => 'path',
+			'url' => "app-modules/{$module_name}",
+			'options' => ['symlink' => true],
+		];
+		$this->assertContains($repository, $app_composer_contents['repositories']);
 	}
 	
 	protected function getBasePath()
