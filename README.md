@@ -1,5 +1,7 @@
 # InterNACHI/Modular
 
+![PHPUnit](https://github.com/InterNACHI/modular/workflows/PHPUnit/badge.svg?event=release)
+
 `InterNACHI/Modular` is a module system for Laravel applications. It aims to re-create
 as little as possible, using Composer for module resolution and all the existing
 Laravel conventions and commands across the board.
