@@ -82,6 +82,19 @@ that now:
 composer update modules/my-module
 ```
 
+### Optional: Initialization
+
+You can run the initialization command to make sure that your project is set up
+for module support:
+
+```shell script
+php artisan module:init
+```
+
+This will add a `Modules` test suite to your `phpunit.xml` file (if one exists)
+and may, in the future, add other scaffolding as needed. It should be safe to run
+this command at any time, as it will only add missing configuration.
+
 ### Optional: Customize namespaces & paths
 
 By default, modules will be in the `Modules\` namespace and installed into the
@@ -127,6 +140,17 @@ expected in most cases:
 - Policies are auto-discovered for Models
 
 Most things *just work*.
+
+### Commands
+
+We provide a few helper commands:
+
+- `php artisan make:module` — scaffold a new module
+- `php artisan module:cache` — cache the loaded modules for slightly faster auto-discovery
+- `php artisan module:clear` — clear the module cache
+- `php artisan module:init` — initialize your project for modular
+- `php artisan module:list` — list all modules
+- `php artisan module:update-phpstorm-config` — update PhpStorm configs for module support
 
 We also add a `--module=` option to most Laravel `make:` commands so that you can
 use all the existing tooling that you know. The commands themselves are exactly the

@@ -1,0 +1,44 @@
+{
+    "name": "internachi/modular",
+    "description": "Modularize your Laravel apps",
+    "keywords": [
+        "laravel",
+        "modules",
+        "modular",
+        "module"
+    ],
+    "version": "1.0",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "InterNACHI\\Modular\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "InterNACHI\\Modular\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "InterNACHI\\Modular\\Support\\ModularServiceProvider",
+                "InterNACHI\\Modular\\Support\\ModularizedCommandsServiceProvider"
+            ],
+            "aliases": {
+                "Modules": "InterNACHI\\Modular\\Support\\Facades\\Modules"
+            }
+        }
+    },
+    "require": {
+        "php": ">=7.4",
+        "illuminate/support": "^7.0|^8.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.0",
+        "phpunit/phpunit": "^8.0",
+        "mockery/mockery": "^1.3"
+    }
+}
