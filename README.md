@@ -156,7 +156,7 @@ We also add a `--module=` option to most Laravel `make:` commands so that you ca
 use all the existing tooling that you know. The commands themselves are exactly the
 same, which means you can use your [custom stubs](https://laravel.com/docs/7.x/artisan#stub-customization)
 and everything else Laravel provides:
-                                                                                feature/int-326-internachi-modular ◼
+
 - `php artisan make:controller MyModuleController --module=my-module`
 - `php artisan make:command MyModuleCommand --module=my-module`
 - `php artisan make:channel MyModuleChannel --module=my-module`
