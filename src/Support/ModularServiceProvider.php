@@ -75,9 +75,11 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->publishVendorFiles();
 		
-		$this->bootRoutes();
-		$this->bootBreadcrumbs();
-		$this->bootViews();
+		if ($this->modulesBasePathExists()) {
+			$this->bootRoutes();
+			$this->bootBreadcrumbs();
+			$this->bootViews();
+		}
 	}
 	
 	protected function registry(): ModuleRegistry
@@ -245,7 +247,7 @@ class ModularServiceProvider extends ServiceProvider
 		throw new RuntimeException("Unable to infer qualified class name for '{$path}'");
 	}
 	
-	protected function getModulesBasePath(): string 
+	protected function getModulesBasePath() : string
 	{
 		if (null === $this->modules_path) {
 			$directory_name = $this->app->make('config')->get('app-modules.modules_directory', 'app-modules');
@@ -255,7 +257,12 @@ class ModularServiceProvider extends ServiceProvider
 		return $this->modules_path;
 	}
 	
-	protected function formatPathAsNamespace(string $path): string
+	protected function modulesBasePathExists() : bool
+	{
+		return $this->app->make('filesystem')->exists($this->getModulesBasePath());
+	}
+	
+	protected function formatPathAsNamespace(string $path) : string
 	{
 		$path = trim($path, DIRECTORY_SEPARATOR);
 		
