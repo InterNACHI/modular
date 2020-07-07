@@ -11,13 +11,13 @@ use Throwable;
 
 class ModuleCache extends Command
 {
-	protected $name = 'module:cache';
+	protected $signature = 'module:cache';
 	
 	protected $description = 'Create a cache file for faster module loading';
 	
 	public function handle(ModuleRegistry $registry, Filesystem $filesystem)
 	{
-		$this->call('module:clear');
+		$this->call(ModuleClear::class);
 		
 		$export = $registry->modules()
 			->map(function(ModuleConfig $module_config) {

@@ -18,7 +18,6 @@ use InterNACHI\Modular\Console\Commands\ModuleCache;
 use InterNACHI\Modular\Console\Commands\ModuleClear;
 use InterNACHI\Modular\Console\Commands\ModuleSync;
 use InterNACHI\Modular\Console\Commands\ModuleList;
-use InterNACHI\Modular\Console\Commands\UpdatePhpStormConfig;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
@@ -119,7 +118,6 @@ class ModularServiceProvider extends ServiceProvider
 			ModuleClear::class,
 			ModuleSync::class,
 			ModuleList::class,
-			UpdatePhpStormConfig::class,
 		]);
 	}
 	

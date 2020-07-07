@@ -8,7 +8,7 @@ use InterNACHI\Modular\Support\ModuleRegistry;
 
 class ModuleClear extends Command
 {
-	protected $name = 'module:clear';
+	protected $signature = 'module:clear';
 	
 	protected $description = 'Remove the module cache file';
 	

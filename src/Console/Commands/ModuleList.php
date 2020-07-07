@@ -9,7 +9,7 @@ use InterNACHI\Modular\Support\ModuleRegistry;
 
 class ModuleList extends Command
 {
-	protected $name = 'module:list';
+	protected $signature = 'module:list';
 	
 	protected $description = 'List all modules';
 	

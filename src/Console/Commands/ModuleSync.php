@@ -9,7 +9,7 @@ use InterNACHI\Modular\Support\PhpStormConfigWriter;
 
 class ModuleSync extends Command
 {
-	protected $name = 'module:sync {--no-phpstorm : Don\'t update PhpStorm config files}';
+	protected $signature = 'module:sync {--no-phpstorm : Do not update PhpStorm config files}';
 	
 	protected $description = 'Sync your project\'s configuration with your current modules';
 	
