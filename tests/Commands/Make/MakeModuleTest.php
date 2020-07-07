@@ -2,21 +2,14 @@
 
 namespace InterNACHI\Modular\Tests\Commands\Make;
 
-use Illuminate\Filesystem\Filesystem;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
 use InterNACHI\Modular\Support\Facades\Modules;
+use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use InterNACHI\Modular\Tests\TestCase;
 
 class MakeModuleTest extends TestCase
 {
-	protected $base_path;
-	
-	protected function setUp() : void
-	{
-		parent::setUp();
-		
-		Modules::reload();
-	}
+	use WritesToAppFilesystem;
 	
 	public function test_it_scaffolds_a_new_module() : void
 	{
@@ -27,7 +20,7 @@ class MakeModuleTest extends TestCase
 			'--accept-default-namespace' => true,
 		]);
 		
-		$fs = new Filesystem();
+		$fs = $this->filesystem();
 		$module_path = $this->getBasePath().DIRECTORY_SEPARATOR.'app-modules'.DIRECTORY_SEPARATOR.$module_name;
 		
 		$this->assertTrue($fs->isDirectory($module_path));
@@ -64,7 +57,7 @@ class MakeModuleTest extends TestCase
 	
 	public function test_it_prompts_on_first_module_if_no_custom_namespace_is_set() : void
 	{
-		$fs = new Filesystem();
+		$fs = $this->filesystem();
 		
 		$this->artisan(MakeModule::class, ['name' => 'test-module'])
 			->expectsQuestion('Would you like to cancel and configure your module namespace first?', false)
@@ -78,19 +71,5 @@ class MakeModuleTest extends TestCase
 			->assertExitCode(0);
 		
 		$this->assertTrue($fs->isDirectory($this->getBasePath().DIRECTORY_SEPARATOR.'app-modules'.DIRECTORY_SEPARATOR.'test-module-two'));
-	}
-	
-	protected function getBasePath()
-	{
-		if (null === $this->base_path) {
-			$fs = new Filesystem();
-			
-			$testbench_base_path = parent::getBasePath();
-			$this->base_path = sys_get_temp_dir().DIRECTORY_SEPARATOR.md5(__FILE__.microtime(true));
-			
-			$fs->copyDirectory($testbench_base_path, $this->base_path);
-		}
-		
-		return $this->base_path;
 	}
 }

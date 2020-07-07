@@ -2,6 +2,7 @@
 
 namespace InterNACHI\Modular\Tests;
 
+use Illuminate\Encryption\Encrypter;
 use InterNACHI\Modular\Support\Facades\Modules;
 use InterNACHI\Modular\Support\ModularizedCommandsServiceProvider;
 use InterNACHI\Modular\Support\ModularServiceProvider;
@@ -13,13 +14,15 @@ abstract class TestCase extends Orchestra
 	{
 		parent::setUp();
 		
+		Modules::reload();
+		
 		$config = $this->app['config'];
 		
 		// Add encryption key for HTTP tests
-		$config->set('app.key', 'base64:tfsezwCu4ZRixRLA/+yL/qoouX++Q3lPAPOAbtnBCG8=');
+		$config->set('app.key', 'base64:'.base64_encode(Encrypter::generateKey('AES-128-CBC')));
 		
-		// Add feature stubs to view
-		$this->app['view']->addLocation(__DIR__.'/Feature/stubs');
+		// Add stubs to view
+		// $this->app['view']->addLocation(__DIR__.'/Feature/stubs');
 	}
 	
 	protected function getPackageProviders($app)
