@@ -33,16 +33,22 @@ trait WritesToAppFilesystem
 	
 	protected function getModulePath(string $module_name, string $path = '/', string $modules_root = 'app-modules'): string 
 	{
-		$path = trim(str_replace('/', DIRECTORY_SEPARATOR, $path), DIRECTORY_SEPARATOR);
-		if ('' !== $path) {
-			$path = DIRECTORY_SEPARATOR.$path;
-		}
-		
 		return $this->getBasePath()
 			.DIRECTORY_SEPARATOR
 			.$modules_root
 			.DIRECTORY_SEPARATOR
 			.$module_name
-			.$path;
+			.$this->normalizeDirectorySeparators($path);
+	}
+	
+	protected function normalizeDirectorySeparators(string $path): string 
+	{
+		$path = trim(str_replace('/', DIRECTORY_SEPARATOR, $path), DIRECTORY_SEPARATOR);
+		
+		if ('' !== $path) {
+			$path = DIRECTORY_SEPARATOR.$path;
+		}
+		
+		return $path;
 	}
 }

@@ -6,7 +6,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeModule;
 
 trait TestsMakeCommands
 {
-	protected function assertMakeCommandResults(string $command, array $arguments, string $expected_path, array $expected_substrings)
+	protected function assertModuleCommandResults(string $command, array $arguments, string $expected_path, array $expected_substrings)
 	{
 		$module_name = 'test-module';
 		
@@ -20,6 +20,21 @@ trait TestsMakeCommands
 		], $arguments));
 		
 		$full_path = $this->getModulePath($module_name, $expected_path);
+		
+		$this->assertFileExists($full_path);
+		
+		$contents = $this->filesystem()->get($full_path);
+		
+		foreach ($expected_substrings as $substring) {
+			$this->assertStringContainsString($substring, $contents);
+		}
+	}
+	
+	protected function assertBaseCommandResults(string $command, array $arguments, string $expected_path, array $expected_substrings)
+	{
+		$this->artisan($command, $arguments);
+		
+		$full_path = $this->getBasePath().$this->normalizeDirectorySeparators($expected_path);
 		
 		$this->assertFileExists($full_path);
 		
