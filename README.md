@@ -2,9 +2,16 @@
 
 [![PHPUnit](https://github.com/InterNACHI/modular/workflows/PHPUnit/badge.svg)](https://github.com/InterNACHI/modular/actions?query=workflow%3APHPUnit) [![Test Coverage](https://api.codeclimate.com/v1/badges/dd927802d52f4f75ea6c/test_coverage)](https://codeclimate.com/github/InterNACHI/modular/test_coverage)
 
-`InterNACHI/Modular` is a module system for Laravel applications. It aims to re-create
-as little as possible, using Composer for module resolution and all the existing
-Laravel conventions and commands across the board.
+`InterNACHI/Modular` is a module system for Laravel applications. It uses
+[Composer path repositories](https://getcomposer.org/doc/05-repositories.md#path) for autoloading, 
+and [Laravel package discovery](https://laravel.com/docs/7.x/packages#package-discovery) for module
+initialization, and then provides minimal tooling to fill in any gaps.
+
+`InterNACHI/Modular` is as much a set of conventions as it is a package. The fundamental idea
+is that you can create “modules” in a separate `app-modules/` directory, which allows you to
+better organize large projects. These modules use the existing 
+[Laravel package system](https://laravel.com/docs/7.x/packages), and follow existing Laravel
+conventions.
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -17,8 +24,24 @@ To get started, run:
 composer require internachi/modular
 ``` 
 
-Laravel will auto-discover the package and everything will be automatically set up
-for you. The next step is to create your first module:
+Laravel will auto-discover the package and everything will be automatically set up for you.
+
+### Publish the config
+
+While not required, it's highly recommended that you customize your default namespace
+for modules. By default, this is set to `Modules\`, which works just fine but makes it
+harder to extract your module to a separate package should you ever choose to.
+
+We recommend configuring a organization namespace (we use `"InterNACHI"`, for example).
+To do this, you'll need to publish the package config:
+
+```shell script
+php artisan vendor:publish --tag=modular-config
+```
+
+### Create a module
+
+Next, let's create a module:
 
 ```shell script
 php artisan make:module my-module 
@@ -29,56 +52,19 @@ Modular will scaffold up a new module for you:
 ```
 app-modules/
   my-module/
+    composer.json
     src/
-      Providers/
-        MyModuleServiceProvider.php
-      Console/
-        Commands/
     tests/
-      MyModuleServiceProviderTest.php
     routes/
-      my-module-routes.php
     resources/
-      views/
-        index.blade.php
-        create.blade.php
-        show.blade.php
-        edit.blade.php
     database/
-      migrations/
-        2099_01_01_999999_set_up_my-module_module.php
-      factories/
-      seeds/
 ```
 
-It will also add two new entries to your `composer.json` file:
+It will also add two new entries to your `composer.json` file. The first entry registers
+`./app-modules/my-module/` as a [path repository](https://getcomposer.org/doc/05-repositories.md#path),
+and the second requires `modules/my-module:*` (like any other Composer dependency).
 
-```json5
-{
-  // ...
-  "repositories": [
-    {
-      "type": "path",
-      "url": "app-modules/my-module",
-      "options": {
-          "symlink": true
-      }
-    }
-  ],
-  "require": {
-    // ...
-    "modules/my-module": "*"
-    // ...
-  }
-}
-```
-
-The `repositories` entry tells Composer to symlink `app-modules/my-module` to
-the `vendor/` directory and treat it like any other Composer package. The
-`require` statement then tells Composer to install that package.
-
-Modular will helpfully remind you to perform a Composer update, so let's do
-that now:
+Modular will then remind you to perform a Composer update, so let's do that now:
 
 ```shell script
 composer update modules/my-module
@@ -94,25 +80,8 @@ php artisan module:init
 ```
 
 This will add a `Modules` test suite to your `phpunit.xml` file (if one exists)
-and may, in the future, add other scaffolding as needed. It should be safe to run
-this command at any time, as it will only add missing configuration.
-
-### Optional: Customize namespaces & paths
-
-By default, modules will be in the `Modules\` namespace and installed into the
-`app-modules/` directory (keeping it nice and close to your `app/` directory).
-
-If you want to change these defaults, you can publish a config by running:
-
-```shell script
-php artisan vendor:publish --tag=modular-config
-```
-
-The `app-modules/` convention is highly recommended, as it keeps your modules
-near the rest of your application in the filesystem tree. If you plan to extract
-modules into their own packages at some point in the future, you probably want to
-set a new default namespace. This will make it much simpler if you ever do decide
-to publish your package separately.
+and may, in the future, add other scaffolding as needed. It is safe to run
+this command at any time, as it will only add missing configurations.
 
 ### Optional: For PhpStorm users
 
@@ -124,34 +93,34 @@ a hook to your `post-autoload-dump` script in your `composer.json`:
 php artisan module:update-phpstorm-config
 ```
 
-This command will register all your installed modules with the Laravel plugin so that
+This command will register all your installed modules with the 
+[Laravel plugin](https://plugins.jetbrains.com/plugin/7532-laravel) so that
 your views are available for autocomplete.
 
 ## Usage
 
-`InterNACHI/Modular` is, for the most part, a set of conventions using existing
-Laravel and Composer features. Modules are loaded using the Composer autoloader,
-and are discovered using [Laravel package discovery](https://laravel.com/docs/7.x/packages#package-discovery).
+All modules follow existing Laravel conventions, and auto-discovery 
+should work as expected in most cases:
 
-All modules follow existing Laravel conventions, and auto-discovery should work as
-expected in most cases:
+- Commands are auto-registered with Artisan
+- Migrations will be run by the Migrator
+- Factories are auto-loaded for `factory()`
+- Policies are auto-discovered for your Models
 
-- Commands are auto-registered with `php artisan`
-- Migrations will be run by the migrator
-- Factories are auto-loaded for testing
-- Policies are auto-discovered for Models
+There is currently one exception:
 
-Most things *just work*.
+- [Event discovery](https://laravel.com/docs/7.x/events#event-discovery) (which is optional 
+  and disabled by default) is currently not supported.
 
 ### Commands
 
 We provide a few helper commands:
 
-- `php artisan make:module` — scaffold a new module
+- `php artisan make:module`  — scaffold a new module
 - `php artisan module:cache` — cache the loaded modules for slightly faster auto-discovery
 - `php artisan module:clear` — clear the module cache
-- `php artisan module:init` — initialize your project for modular
-- `php artisan module:list` — list all modules
+- `php artisan module:init`  — initialize your project for modular
+- `php artisan module:list`  — list all modules
 - `php artisan module:update-phpstorm-config` — update PhpStorm configs for module support
 
 We also add a `--module=` option to most Laravel `make:` commands so that you can
