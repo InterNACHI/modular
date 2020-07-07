@@ -67,7 +67,7 @@ class MakeModuleTest extends TestCase
 		$fs = new Filesystem();
 		
 		$this->artisan(MakeModule::class, ['name' => 'test-module'])
-			->expectsConfirmation('Would you like to cancel and configure your module namespace first?', 'no')
+			->expectsQuestion('Would you like to cancel and configure your module namespace first?', false)
 			->assertExitCode(0);
 		
 		Modules::reload();
