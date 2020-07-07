@@ -37,7 +37,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor
-          key: composer-${{ hashFiles('composer.json') }}
+          key: composer-${{ matrix.php }}-${{ matrix.dependency-version }}-${{ hashFiles('composer.json') }}
             
       - name: Set minimum stability
         run: composer config minimum-stability ${{ matrix.minimum-stability }}
