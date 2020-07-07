@@ -7,7 +7,7 @@
 and [Laravel package discovery](https://laravel.com/docs/7.x/packages#package-discovery) for module
 initialization, and then provides minimal tooling to fill in any gaps.
 
-`InterNACHI/Modular` is as much a set of conventions as it is a package. The fundamental idea
+This project is as much a set of conventions as it is a package. The fundamental idea
 is that you can create “modules” in a separate `app-modules/` directory, which allows you to
 better organize large projects. These modules use the existing 
 [Laravel package system](https://laravel.com/docs/7.x/packages), and follow existing Laravel
