@@ -63,20 +63,4 @@ class ModuleSyncTest extends TestCase
 		
 		$this->assertCount(2, $nodes);
 	}
-	
-	protected function copyStub(string $stub, string $destination): string
-	{
-		$destination = trim($destination, '/');
-		$destination = $this->getBasePath().$this->normalizeDirectorySeparators("/{$destination}");
-		
-		$stubs_directory = dirname(__FILE__, 2).'/stubs';
-		
-		$from = $this->normalizeDirectorySeparators("{$stubs_directory}/{$stub}");
-		$to = $this->normalizeDirectorySeparators("{$destination}/{$stub}");
-		
-		$this->filesystem()->ensureDirectoryExists($destination);
-		$this->filesystem()->copy($from, $to);
-		
-		return $to;
-	}
 }
