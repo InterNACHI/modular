@@ -63,6 +63,13 @@ class ModuleRegistry
 		return $this->modules;
 	}
 	
+	public function reload(): Collection
+	{
+		$this->modules = null;
+		
+		return $this->loadModules();
+	}
+	
 	protected function loadModules(): Collection
 	{
 		if (file_exists($this->cache_path)) {
@@ -71,6 +78,10 @@ class ModuleRegistry
 					$config = new ModuleConfig($cached['name'], $cached['base_path'], new Collection($cached['namespaces']));
 					return [$config->name => $config];
 				});
+		}
+		
+		if (!is_dir($this->modules_path)) {
+			return new Collection();
 		}
 		
 		return FinderCollection::forFiles()

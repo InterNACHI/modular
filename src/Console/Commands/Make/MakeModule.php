@@ -16,7 +16,7 @@ class MakeModule extends Command
 {
 	protected $signature = 'make:module 
 		{name : The name of the module} 
-		{--accept-default-namespace=false : Skip default namespace confirmation}';
+		{--accept-default-namespace : Skip default namespace confirmation}';
 	
 	protected $description = 'Create a new Laravel module';
 	
@@ -115,7 +115,7 @@ class MakeModule extends Command
 	{
 		if (
 			'Modules' !== $this->module_namespace
-			|| $this->option('accept-default-namespace')
+			|| true === $this->option('accept-default-namespace')
 			|| $this->module_registry->modules()->isNotEmpty()
 		) {
 			return false;
