@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\View\Factory;
@@ -282,7 +283,8 @@ class ModularServiceProvider extends ServiceProvider
 	
 	protected function modulesBasePathExists() : bool
 	{
-		return $this->app->make('filesystem')->exists($this->getModulesBasePath());
+		return $this->app->make(Filesystem::class)
+			->isDirectory($this->getModulesBasePath());
 	}
 	
 	protected function formatPathAsNamespace(string $path) : string
