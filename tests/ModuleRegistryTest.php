@@ -13,15 +13,8 @@ class ModuleRegistryTest extends TestCase
 	
 	public function test_it_resolves_modules() : void
 	{
-		$this->artisan(MakeModule::class, [
-			'name' => 'test-module',
-			'--accept-default-namespace' => true,
-		]);
-		
-		$this->artisan(MakeModule::class, [
-			'name' => 'test-module-two',
-			'--accept-default-namespace' => true,
-		]);
+		$this->makeModule('test-module');
+		$this->makeModule('test-module-two');
 		
 		$registry = $this->app->make(ModuleRegistry::class);
 		

@@ -13,15 +13,8 @@ class ModuleCacheTest extends TestCase
 	
 	public function test_it_writes_to_cache_file() : void
 	{
-		$this->artisan(MakeModule::class, [
-			'name' => 'test-module',
-			'--accept-default-namespace' => true,
-		]);
-		
-		$this->artisan(MakeModule::class, [
-			'name' => 'test-module-two',
-			'--accept-default-namespace' => true,
-		]);
+		$this->makeModule('test-module');
+		$this->makeModule('test-module-two');
 		
 		$this->artisan(ModuleCache::class);
 		

@@ -34,10 +34,7 @@ class ModuleSyncTest extends TestCase
 	{
 		$config_path = $this->copyStub('laravel-plugin.xml', '.idea');
 		
-		$this->artisan(MakeModule::class, [
-			'name' => 'test-module',
-			'--accept-default-namespace' => true,
-		]);
+		$this->makeModule('test-module');
 		
 		$config = simplexml_load_string($this->filesystem->get($config_path));
 		$nodes = $config->xpath('//component[@name="LaravelPluginSettings"]//option[@name="templatePaths"]//list//templatePath');
@@ -51,10 +48,7 @@ class ModuleSyncTest extends TestCase
 		
 		$this->assertCount(1, $nodes);
 		
-		$this->artisan(MakeModule::class, [
-			'name' => 'test-module-two',
-			'--accept-default-namespace' => true,
-		]);
+		$this->makeModule('test-module-two');
 		
 		$this->artisan(ModuleSync::class);
 		
