@@ -1,33 +1,45 @@
 <?php
 
-namespace InterNACHI\Modular\Console\Commands;
+namespace InterNACHI\Modular\Support;
 
 use DOMDocument;
-use Illuminate\Console\Command;
-use InterNACHI\Modular\Support\ModuleConfig;
-use InterNACHI\Modular\Support\ModuleRegistry;
 use SimpleXMLElement;
 
-class UpdatePhpStormConfig extends Command
+class PhpStormConfigWriter
 {
-	protected $signature = 'module:update-phpstorm-config {--dump}';
+	/**
+	 * @var string
+	 */
+	public $last_error;
 	
-	protected $description = 'Update the PhpStorm Laravel plugin config with module data.';
+	/**
+	 * @var string
+	 */
+	protected $config_path;
 	
-	public function handle(ModuleRegistry $module_registry): int
+	/**
+	 * @var \InterNACHI\Modular\Support\ModuleRegistry
+	 */
+	protected $module_registry;
+	
+	public function __construct($config_path, ModuleRegistry $module_registry)
 	{
-		$config_path = $this->getLaravel()->basePath('.idea/laravel-plugin.xml');
-		
-		if (!$this->checkConfigFilePermissions($config_path)) {
-			return 1;
+		$this->config_path = $config_path;
+		$this->module_registry = $module_registry;
+	}
+	
+	public function write(): bool
+	{
+		if (!$this->checkConfigFilePermissions()) {
+			return false;
 		}
 		
-		$plugin_config = $this->getNormalizedPluginConfig($config_path);
+		$plugin_config = $this->getNormalizedPluginConfig();
 		$template_paths = $plugin_config->xpath('//templatePath');
 		
 		// Clean up template paths to prevent duplicates
 		foreach ($template_paths as $template_path_key => $existing) {
-			if (null !== $module_registry->module((string) $existing['namespace'])) {
+			if (null !== $this->module_registry->module((string) $existing['namespace'])) {
 				unset($template_paths[$template_path_key][0]);
 			}
 		}
@@ -35,7 +47,7 @@ class UpdatePhpStormConfig extends Command
 		// Now add all modules to the config
 		$modules_directory = config('app-modules.modules_directory', 'app-modules');
 		$list = $plugin_config->xpath('//option[@name="templatePaths"]//list')[0];
-		$module_registry->modules()
+		$this->module_registry->modules()
 			->sortBy('name')
 			->each(function(ModuleConfig $module_config) use ($list, $modules_directory) {
 				$node = $list->addChild('templatePath');
@@ -43,18 +55,7 @@ class UpdatePhpStormConfig extends Command
 				$node->addAttribute('path', "{$modules_directory}/{$module_config->name}/resources/views");
 			});
 		
-		// Format the XML
-		$xml = $this->formatXml($plugin_config);
-		
-		if ($this->option('dump')) {
-			$this->info($xml);
-			return 1;
-		}
-		
-		$this->info('Writing PhpStorm Laravel plugin config file...');
-		file_put_contents($config_path, $xml);
-		
-		return 0;
+		return false !== file_put_contents($this->config_path, $this->formatXml($plugin_config));
 	}
 	
 	protected function formatXml(SimpleXMLElement $xml): string
@@ -70,9 +71,9 @@ class UpdatePhpStormConfig extends Command
 		return $xml;
 	}
 	
-	protected function getNormalizedPluginConfig($config_path): SimpleXMLElement
+	protected function getNormalizedPluginConfig(): SimpleXMLElement
 	{
-		$config = simplexml_load_string(file_get_contents($config_path));
+		$config = simplexml_load_string(file_get_contents($this->config_path));
 		
 		// Ensure that <component name="LaravelPluginSettings"> exists
 		$component = $config->xpath('//component[@name="LaravelPluginSettings"]');
@@ -101,18 +102,22 @@ class UpdatePhpStormConfig extends Command
 		return $config;
 	}
 	
-	protected function checkConfigFilePermissions(string $config_path): bool
+	protected function checkConfigFilePermissions(): bool
 	{
-		if (!is_readable($config_path) || !is_writable($config_path)) {
-			$this->error("Unable to find or read: '{$config_path}'");
-			return false;
+		if (!is_readable($this->config_path) || !is_writable($this->config_path)) {
+			return $this->error("Unable to find or read: '{$this->config_path}'");
 		}
 		
-		if (!is_writable($config_path)) {
-			$this->error("Config file is not writable: '{$config_path}'");
-			return false;
+		if (!is_writable($this->config_path)) {
+			return $this->error("Config file is not writable: '{$this->config_path}'");
 		}
 		
 		return true;
+	}
+	
+	protected function error(string $message): bool 
+	{
+		$this->last_error = $message;
+		return false;
 	}
 }

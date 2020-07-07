@@ -16,7 +16,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
 use InterNACHI\Modular\Console\Commands\ModuleCache;
 use InterNACHI\Modular\Console\Commands\ModuleClear;
-use InterNACHI\Modular\Console\Commands\ModuleInit;
+use InterNACHI\Modular\Console\Commands\ModuleSync;
 use InterNACHI\Modular\Console\Commands\ModuleList;
 use InterNACHI\Modular\Console\Commands\UpdatePhpStormConfig;
 use ReflectionClass;
@@ -117,7 +117,7 @@ class ModularServiceProvider extends ServiceProvider
 			MakeModule::class,
 			ModuleCache::class,
 			ModuleClear::class,
-			ModuleInit::class,
+			ModuleSync::class,
 			ModuleList::class,
 			UpdatePhpStormConfig::class,
 		]);

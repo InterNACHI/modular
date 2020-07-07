@@ -5,12 +5,13 @@ namespace InterNACHI\Modular\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use InterNACHI\Modular\Support\ModuleRegistry;
+use InterNACHI\Modular\Support\PhpStormConfigWriter;
 
-class ModuleInit extends Command
+class ModuleSync extends Command
 {
-	protected $name = 'module:init';
+	protected $name = 'module:sync {--no-phpstorm : Don\'t update PhpStorm config files}';
 	
-	protected $description = 'Initialize modular support in project';
+	protected $description = 'Sync your project\'s configuration with your current modules';
 	
 	/**
 	 * @var \Illuminate\Filesystem\Filesystem
@@ -28,6 +29,10 @@ class ModuleInit extends Command
 		$this->registry = $registry;
 		
 		$this->updatePhpUnit();
+		
+		if (true !== $this->option('no-phpstorm')) {
+			$this->updatePhpStormConfig();
+		}
 	}
 	
 	protected function updatePhpUnit(): void
@@ -67,5 +72,20 @@ class ModuleInit extends Command
 		
 		$this->filesystem->put($config_path, $config->asXML());
 		$this->info('Added "Modules" PHPUnit test suite.');
+	}
+	
+	protected function updatePhpStormConfig(): void
+	{
+		$config_path = $this->getLaravel()->basePath('.idea/laravel-plugin.xml');
+		$writer = new PhpStormConfigWriter($config_path, $this->registry);
+		
+		if ($writer->write()) {
+			$this->info('Updated PhpStorm/Laravel Plugin config file...');
+		} else {
+			$this->info('Did not find/update PhpStorm/Laravel Plugin config.');
+			if ($this->getOutput()->isVerbose()) {
+				$this->warn($writer->last_error);
+			}
+		}
 	}
 }

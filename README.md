@@ -70,32 +70,22 @@ Modular will then remind you to perform a Composer update, so let's do that now:
 composer update modules/my-module
 ```
 
-### Optional: Initialization
+### Optional: Config synchronization
 
-You can run the initialization command to make sure that your project is set up
+You can run the sync command to make sure that your project is set up
 for module support:
 
 ```shell script
-php artisan module:init
+php artisan module:sync
 ```
 
 This will add a `Modules` test suite to your `phpunit.xml` file (if one exists)
-and may, in the future, add other scaffolding as needed. It is safe to run
-this command at any time, as it will only add missing configurations.
+and update your [PhpStorm Laravel plugin](https://plugins.jetbrains.com/plugin/7532-laravel)
+configuration (if it exists) to properly find your module's views.
 
-### Optional: For PhpStorm users
-
-`InterNACHI/Modular` provides a useful command for keeping your PhpStorm template
-paths in sync with your modules. Either run this command as needed, or add it as
-a hook to your `post-autoload-dump` script in your `composer.json`:
-
-```shell script
-php artisan module:update-phpstorm-config
-```
-
-This command will register all your installed modules with the 
-[Laravel plugin](https://plugins.jetbrains.com/plugin/7532-laravel) so that
-your views are available for autocomplete.
+It is safe to run this command at any time, as it will only add missing configurations.
+You may even want to add it to your `post-autoload-dump` scripts in your application's
+`composer.json` file.
 
 ## Usage
 
@@ -119,9 +109,8 @@ We provide a few helper commands:
 - `php artisan make:module`  — scaffold a new module
 - `php artisan module:cache` — cache the loaded modules for slightly faster auto-discovery
 - `php artisan module:clear` — clear the module cache
-- `php artisan module:init`  — initialize your project for modular
+- `php artisan module:sync`  — update project configs (like `phpunit.xml`) with module settings
 - `php artisan module:list`  — list all modules
-- `php artisan module:update-phpstorm-config` — update PhpStorm configs for module support
 
 We also add a `--module=` option to most Laravel `make:` commands so that you can
 use all the existing tooling that you know. The commands themselves are exactly the
