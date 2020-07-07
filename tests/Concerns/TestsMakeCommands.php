@@ -13,11 +13,11 @@ trait TestsMakeCommands
 		$this->artisan(MakeModule::class, [
 			'name' => $module_name,
 			'--accept-default-namespace' => true,
-		]);
+		])->assertExitCode(0);
 		
 		$this->artisan($command, array_merge([
 			'--module' => $module_name,
-		], $arguments));
+		], $arguments))->assertExitCode(0);
 		
 		$full_path = $this->getModulePath($module_name, $expected_path);
 		
@@ -32,7 +32,7 @@ trait TestsMakeCommands
 	
 	protected function assertBaseCommandResults(string $command, array $arguments, string $expected_path, array $expected_substrings)
 	{
-		$this->artisan($command, $arguments);
+		$this->artisan($command, $arguments)->assertExitCode(0);
 		
 		$full_path = $this->getBasePath().$this->normalizeDirectorySeparators($expected_path);
 		
