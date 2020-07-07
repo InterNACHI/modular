@@ -60,7 +60,7 @@ app-modules/
     database/
 ```
 
-It will also add two new entries to your `composer.json` file. The first entry registers
+It will also add two new entries to your app's `composer.json` file. The first entry registers
 `./app-modules/my-module/` as a [path repository](https://getcomposer.org/doc/05-repositories.md#path),
 and the second requires `modules/my-module:*` (like any other Composer dependency).
 
@@ -110,7 +110,7 @@ should work as expected in most cases:
 There is currently one exception:
 
 - [Event discovery](https://laravel.com/docs/7.x/events#event-discovery) (which is optional 
-  and disabled by default) is currently not supported.
+  and disabled by default in Laravel) is currently not supported.
 
 ### Commands
 
