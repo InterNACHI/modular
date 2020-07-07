@@ -11,12 +11,5 @@ class ModularServiceProviderTest extends TestCase
 		$registry = $this->app->make(ModuleRegistry::class);
 		
 		$this->assertInstanceOf(ModuleRegistry::class, $registry);
-		
-		// TODO: This worked when modular was a module itself, but needs to be refactored
-		
-		// $core_module = $registry->module('modular');
-		//
-		// $this->assertInstanceOf(ModuleConfig::class, $core_module);
-		// $this->assertEquals('modular', $core_module->name);
 	}
 }
