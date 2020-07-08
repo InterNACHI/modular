@@ -11,7 +11,7 @@ trait Modularize
 {
 	protected function module(): ?ModuleConfig
 	{
-		$this->getLaravel()
+		return $this->getLaravel()
 			->make(ModuleRegistry::class)
 			->module($this->option('module'));
 	}

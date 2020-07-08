@@ -4,8 +4,8 @@ namespace InterNACHI\Modular\Tests;
 
 use Illuminate\Filesystem\Filesystem;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
+use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Support\AutoDiscoveryHelper;
-use InterNACHI\Modular\Support\Facades\Modules;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use Symfony\Component\Finder\SplFileInfo;
@@ -14,34 +14,114 @@ class AutoDiscoveryHelperTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
-	public function test_it_discovers_commands() : void
+	protected $module1;
+	
+	protected $module2;
+	
+	protected $helper;
+	
+	protected function setUp() : void
 	{
-		$test_module = $this->makeModule('test-module');
-		$test_module2 = $this->makeModule('test-module-two');
+		parent::setUp();
 		
-		$this->artisan(MakeCommand::class, [
-			'name' => 'TestCommand',
-			'--module' => 'test-module',
-		]);
-		
-		$this->artisan(MakeCommand::class, [
-			'name' => 'TestCommand',
-			'--module' => 'test-module-two',
-		]);
-		
-		$resolver = new AutoDiscoveryHelper(
+		$this->module1 = $this->makeModule('test-module');
+		$this->module2 = $this->makeModule('test-module-two');
+		$this->helper = new AutoDiscoveryHelper(
 			new ModuleRegistry($this->getBasePath().'/app-modules', ''),
 			new Filesystem(),
-			$this->getBasePath()
+			$this->getBasePath().'/app-modules'
 		);
+	}
+	
+	public function test_it_finds_commands() : void
+	{
+		$this->artisan(MakeCommand::class, [
+			'name' => 'TestCommand',
+			'--module' => $this->module1->name,
+		]);
+		
+		$this->artisan(MakeCommand::class, [
+			'name' => 'TestCommand',
+			'--module' => $this->module2->name,
+		]);
 		
 		$resolved = [];
 		
-		$resolver->commandFileFinder()->each(function(SplFileInfo $command) use (&$resolved) {
+		$this->helper->commandFileFinder()->each(function(SplFileInfo $command) use (&$resolved) {
 			$resolved[] = $command->getPathname();
 		});
 		
-		$this->assertContains($test_module->path('src/Console/Commands/TestCommand.php'), $resolved);
-		$this->assertContains($test_module2->path('src/Console/Commands/TestCommand.php'), $resolved);
+		$this->assertContains($this->module1->path('src/Console/Commands/TestCommand.php'), $resolved);
+		$this->assertContains($this->module2->path('src/Console/Commands/TestCommand.php'), $resolved);
+	}
+	
+	public function test_it_finds_factory_directories() : void
+	{
+		$resolved = [];
+		
+		$this->helper->factoryDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
+			$resolved[] = $directory->getPathname();
+		});
+		
+		$this->assertContains($this->module1->path('database/factories'), $resolved);
+		$this->assertContains($this->module2->path('database/factories'), $resolved);
+	}
+	
+	public function test_it_finds_migration_directories() : void
+	{
+		$resolved = [];
+		
+		$this->helper->migrationDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
+			$resolved[] = $directory->getPathname();
+		});
+		
+		$this->assertContains($this->module1->path('database/migrations'), $resolved);
+		$this->assertContains($this->module2->path('database/migrations'), $resolved);
+	}
+	
+	public function test_it_finds_models() : void
+	{
+		$this->artisan(MakeModel::class, [
+			'name' => 'TestModel',
+			'--module' => $this->module1->name,
+		]);
+		
+		$this->artisan(MakeModel::class, [
+			'name' => 'TestModel',
+			'--module' => $this->module2->name,
+		]);
+		
+		$resolved = [];
+		
+		$this->helper->modelFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
+			$resolved[] = $file->getPathname();
+		});
+		
+		$this->assertContains($this->module1->path('src/Models/TestModel.php'), $resolved);
+		$this->assertContains($this->module2->path('src/Models/TestModel.php'), $resolved);
+	}
+	
+	public function test_it_finds_routes() : void
+	{
+		$resolved = [];
+		
+		$this->helper->routeFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
+			$resolved[] = $file->getPathname();
+		});
+		
+		$this->assertContains($this->module1->path("routes/{$this->module1->name}-routes.php"), $resolved);
+		$this->assertContains($this->module2->path("routes/{$this->module2->name}-routes.php"), $resolved);
+	}
+	
+	public function test_it_finds_view_directories() : void
+	{
+		$resolved = [];
+		
+		$this->helper->viewDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
+			$resolved[] = $directory->getPathname();
+		});
+		
+		$this->assertContains($this->module1->path('resources/views'), $resolved);
+		$this->assertContains($this->module2->path('resources/views'), $resolved);
 	}
 }
