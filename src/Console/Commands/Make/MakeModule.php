@@ -84,10 +84,10 @@ class MakeModule extends Command
 	
 	public function handle()
 	{
-		$this->module_name = strtolower($this->argument('name'));
+		$this->module_name = Str::kebab($this->argument('name'));
 		$this->class_name_prefix = Str::studly($this->argument('name'));
 		$this->module_namespace = config('app-modules.modules_namespace', 'Modules');
-		$this->composer_namespace = strtolower($this->module_namespace);
+		$this->composer_namespace = config('app-modules.modules_vendor') ?? Str::kebab($this->module_namespace);
 		$this->composer_name = "{$this->composer_namespace}/{$this->module_name}";
 		$this->base_path = $this->module_registry->getModulesPath().DIRECTORY_SEPARATOR.$this->module_name;
 		
