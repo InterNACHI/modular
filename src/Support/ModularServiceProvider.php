@@ -167,6 +167,10 @@ class ModularServiceProvider extends ServiceProvider
 		});
 	}
 	
+	/**
+	 * This functionality is likely to go away at some point so don't rely
+	 * on it too much. The package has been abandoned.
+	 */
 	protected function bootBreadcrumbs(): void
 	{
 		$class_name = 'DaveJamesMiller\\Breadcrumbs\\BreadcrumbsManager';
@@ -208,7 +212,7 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->autoDiscoveryHelper()
 			->modelFileFinder()
-			->map(function(SplFileInfo $file) {
+			->each(function(SplFileInfo $file) use ($gate) {
 				if (!$module = $this->registry()->moduleForPath($file->getPath())) {
 					throw new RuntimeException("Unable to determine module for '{$file->getPath()}'");
 				}
@@ -220,7 +224,7 @@ class ModularServiceProvider extends ServiceProvider
 				$namespaced_model = Str::after($fully_qualified_model, 'Models\\');
 				$namespaced_policy = rtrim($module->namespaces->first(), '\\').'\\Policies\\'.$namespaced_model.'Policy';
 				if (class_exists($namespaced_policy)) {
-					return [$fully_qualified_model, $namespaced_policy];
+					$gate->policy($fully_qualified_model, $namespaced_policy);
 				}
 				
 				// If that doesn't match, try the simple mapping as well
@@ -230,15 +234,9 @@ class ModularServiceProvider extends ServiceProvider
 					$simple_policy = rtrim($module->namespaces->first(), '\\').'\\Policies\\'.$simple_model.'Policy';
 					
 					if (class_exists($simple_policy)) {
-						return [$fully_qualified_model, $simple_policy];
+						$gate->policy($fully_qualified_model, $simple_policy);
 					}
 				}
-				
-				return null;
-			})
-			->filter()
-			->eachSpread(function($class, $policy) use ($gate) {
-				$gate->policy($class, $policy);
 			});
 	}
 	
@@ -246,18 +244,15 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->autoDiscoveryHelper()
 			->commandFileFinder()
-			->map(function(SplFileInfo $file) {
+			->each(function(SplFileInfo $file) use ($artisan) {
 				if (!$module = $this->registry()->moduleForPath($file->getPath())) {
 					throw new RuntimeException("Unable to determine module for '{$file->getPath()}'");
 				}
 				
-				return $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
-			})
-			->filter(function($class_name) {
-				return $this->isInstantiableCommand($class_name);
-			})
-			->each(function($command) use ($artisan) {
-				$artisan->resolve($command);
+				$class_name = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
+				if ($this->isInstantiableCommand($class_name)) {
+					$artisan->resolve($class_name);
+				}
 			});
 	}
 	
