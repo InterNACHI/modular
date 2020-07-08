@@ -25,11 +25,11 @@ class AutoDiscoveryHelper
 	 */
 	protected $base_path;
 	
-	public function __construct(ModuleRegistry $module_registry, Filesystem $filesystem, string $base_path)
+	public function __construct(ModuleRegistry $module_registry, Filesystem $filesystem)
 	{
 		$this->module_registry = $module_registry;
 		$this->filesystem = $filesystem;
-		$this->base_path = $base_path;
+		$this->base_path = $module_registry->getModulesPath();
 	}
 	
 	public function commandFileFinder(): FinderCollection

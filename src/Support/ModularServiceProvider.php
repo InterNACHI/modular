@@ -70,8 +70,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->app->singleton(AutoDiscoveryHelper::class, function($app) {
 			return new AutoDiscoveryHelper(
 				$app->make(ModuleRegistry::class),
-				$app->make(Filesystem::class),
-				$this->getModulesBasePath()
+				$app->make(Filesystem::class)
 			);
 		});
 		

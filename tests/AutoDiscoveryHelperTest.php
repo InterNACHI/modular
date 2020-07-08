@@ -28,8 +28,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->module2 = $this->makeModule('test-module-two');
 		$this->helper = new AutoDiscoveryHelper(
 			new ModuleRegistry($this->getBasePath().'/app-modules', ''),
-			new Filesystem(),
-			$this->getBasePath().'/app-modules'
+			new Filesystem()
 		);
 	}
 	
