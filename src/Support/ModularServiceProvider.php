@@ -4,14 +4,12 @@ namespace InterNACHI\Modular\Support;
 
 use Closure;
 use Illuminate\Console\Application as Artisan;
-use Illuminate\Console\Command;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Illuminate\View\Factory;
 use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
@@ -19,8 +17,6 @@ use InterNACHI\Modular\Console\Commands\ModuleCache;
 use InterNACHI\Modular\Console\Commands\ModuleClear;
 use InterNACHI\Modular\Console\Commands\ModuleSync;
 use InterNACHI\Modular\Console\Commands\ModuleList;
-use ReflectionClass;
-use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
 
 class ModularServiceProvider extends ServiceProvider
@@ -29,6 +25,11 @@ class ModularServiceProvider extends ServiceProvider
 	 * @var \InterNACHI\Modular\Support\ModuleRegistry
 	 */
 	protected $registry;
+	
+	/**
+	 * @var \InterNACHI\Modular\Support\AutoDiscoveryResolver
+	 */
+	protected $resolver;
 	
 	/**
 	 * This is the base directory of the modular package
@@ -62,21 +63,27 @@ class ModularServiceProvider extends ServiceProvider
 			);
 		});
 		
+		$this->app->singleton(AutoDiscoveryResolver::class, function($app) {
+			return new AutoDiscoveryResolver(
+				$app->make(ModuleRegistry::class),
+				$app->make(Filesystem::class),
+				$this->getModulesBasePath()
+			);
+		});
+		
 		$this->app->singleton(MakeMigration::class, function($app) {
 			return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
 		});
 		
-		if ($this->modulesBasePathExists()) {
-			// Set up lazy registrations for things that only need to run if we're using
-			// that functionality (e.g. we only need to look for and register migrations
-			// if we're running the migrator)
-			$this->registerLazily(Migrator::class, [$this, 'registerMigrations']);
-			$this->registerLazily(EloquentFactory::class, [$this, 'registerFactories']);
-			$this->registerLazily(Gate::class, [$this, 'registerPolicies']);
-			
-			// Look for and register all our commands in the CLI context
-			Artisan::starting(Closure::fromCallable([$this, 'registerCommands']));
-		}
+		// Set up lazy registrations for things that only need to run if we're using
+		// that functionality (e.g. we only need to look for and register migrations
+		// if we're running the migrator)
+		$this->registerLazily(Migrator::class, [$this, 'registerMigrations']);
+		$this->registerLazily(EloquentFactory::class, [$this, 'registerFactories']);
+		$this->registerLazily(Gate::class, [$this, 'registerPolicies']);
+		
+		// Look for and register all our commands in the CLI context
+		Artisan::starting(Closure::fromCallable([$this, 'registerCommands']));
 	}
 	
 	public function boot(): void
@@ -84,11 +91,9 @@ class ModularServiceProvider extends ServiceProvider
 		$this->publishVendorFiles();
 		$this->bootPackageCommands();
 		
-		if ($this->modulesBasePathExists()) {
-			$this->bootRoutes();
-			$this->bootBreadcrumbs();
-			$this->bootViews();
-		}
+		$this->bootRoutes();
+		$this->bootBreadcrumbs();
+		$this->bootViews();
 	}
 	
 	protected function registry(): ModuleRegistry
@@ -98,6 +103,15 @@ class ModularServiceProvider extends ServiceProvider
 		}
 		
 		return $this->registry;
+	}
+	
+	protected function resolver(): AutoDiscoveryResolver
+	{
+		if (null === $this->resolver) {
+			$this->resolver = $this->app->make(AutoDiscoveryResolver::class);
+		}
+		
+		return $this->resolver;
 	}
 	
 	protected function publishVendorFiles(): void
@@ -128,28 +142,20 @@ class ModularServiceProvider extends ServiceProvider
 			return;
 		}
 		
-		FinderCollection::forFiles()
-			->depth(2)
-			->path('routes/')
-			->name('*.php')
-			->in($this->getModulesBasePath())
-			->each(function(SplFileInfo $file) {
-				require $file->getRealPath();
-			});
+		$this->resolver()->discoverRoutes(function(SplFileInfo $file) {
+			require $file->getRealPath();
+		});
 	}
 	
 	protected function bootViews(): void
 	{
 		$this->callAfterResolving('view', function(Factory $view_factory) {
-			FinderCollection::forDirectories()
-				->depth(0)
-				->in($this->getModulesBasePath())
-				->each(function(SplFileInfo $directory) use ($view_factory) {
-					$view_factory->addNamespace(
-						$directory->getBasename(),
-						$directory->getRealPath().'/resources/views/'
-					);
-				});
+			$this->resolver()->discoverViewPaths(function(SplFileInfo $directory) use ($view_factory) {
+				$view_factory->addNamespace(
+					$directory->getBasename(),
+					$directory->getRealPath().'/resources/views/'
+				);
+			});
 		});
 	}
 	
@@ -174,82 +180,30 @@ class ModularServiceProvider extends ServiceProvider
 	
 	protected function registerMigrations(Migrator $migrator): void
 	{
-		FinderCollection::forDirectories()
-			->depth('== 2')
-			->path('database/')
-			->name('migrations')
-			->in($this->getModulesBasePath())
-			->each(function(SplFileInfo $path) use ($migrator) {
-				$migrator->path($path->getRealPath());
-			});
+		$this->resolver()->discoverMigrations(function(SplFileInfo $path) use ($migrator) {
+			$migrator->path($path->getRealPath());
+		});
 	}
 	
 	protected function registerFactories(EloquentFactory $factory): void
 	{
-		FinderCollection::forDirectories()
-			->depth('== 2')
-			->path('database/')
-			->name('factories')
-			->in($this->getModulesBasePath())
-			->each(function(SplFileInfo $path) use ($factory) {
-				$factory->load($path->getRealPath());
-			});
+		$this->resolver()->discoverFactories(function(SplFileInfo $path) use ($factory) {
+			$factory->load($path->getRealPath());
+		});
 	}
 	
 	protected function registerPolicies(Gate $gate): void
 	{
-		FinderCollection::forFiles()
-			->depth('> 2')
-			->path('src/Models')
-			->name('*.php')
-			->in($this->getModulesBasePath())
-			->each(function(SplFileInfo $file) use ($gate) {
-				if (!$module = $this->registry()->moduleForPath($file->getPath())) {
-					throw new RuntimeException("Unable to determine module for '{$file->getPath()}'");
-				}
-				
-				$fully_qualified_model = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
-				
-				// First, check for a policy that maps to the full namespace of the model
-				// i.e. Models/Foo/Bar -> Policies/Foo/BarPolicy
-				$namespaced_model = Str::after($fully_qualified_model, 'Models\\');
-				$namespaced_policy = rtrim($module->namespaces->first(), '\\').'\\Policies\\'.$namespaced_model.'Policy';
-				if (class_exists($namespaced_policy)) {
-					$gate->policy($fully_qualified_model, $namespaced_policy);
-					return;
-				}
-				
-				// If that doesn't match, try the simple mapping as well
-				// i.e. Models/Foo/Bar -> Policies/BarPolicy
-				if (false !== strpos($namespaced_model, '\\')) {
-					$simple_model = Str::afterLast($fully_qualified_model, '\\');
-					$simple_policy = rtrim($module->namespaces->first(), '\\').'\\Policies\\'.$simple_model.'Policy';
-					
-					if (class_exists($simple_policy)) {
-						$gate->policy($fully_qualified_model, $simple_policy);
-						return;
-					}
-				}
-			});
+		$this->resolver()->discoverPolicies(function($class, $policy) use ($gate) {
+			$gate->policy($class, $policy);
+		});
 	}
 	
 	protected function registerCommands(Artisan $artisan): void
 	{
-		FinderCollection::forFiles()
-			->depth('> 3')
-			->path('src/Console/Commands')
-			->name('*.php')
-			->in($this->getModulesBasePath())
-			->each(function(SplFileInfo $file) use ($artisan) {
-				if (!$module = $this->registry()->moduleForPath($file->getPath())) {
-					throw new RuntimeException("Unable to determine module for '{$file->getPath()}'");
-				}
-				
-				$command = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
-				if ($this->isInstantiableCommand($command)) {
-					$artisan->resolve($command);
-				}
-			});
+		$this->resolver()->discoverCommands(function($command) use ($artisan) {
+			$artisan->resolve($command);
+		});
 	}
 	
 	protected function registerLazily(string $class_name, callable $callback): self
@@ -257,18 +211,6 @@ class ModularServiceProvider extends ServiceProvider
 		$this->app->resolving($class_name, Closure::fromCallable($callback));
 		
 		return $this;
-	}
-	
-	protected function pathToFullyQualifiedClassName($path, ModuleConfig $module_config): string
-	{
-		foreach ($module_config->namespaces as $namespace_path => $namespace) {
-			if (0 === strpos($path, $namespace_path)) {
-				$relative_path = Str::after($path, $namespace_path);
-				return $namespace.$this->formatPathAsNamespace($relative_path);
-			}
-		}
-		
-		throw new RuntimeException("Unable to infer qualified class name for '{$path}'");
 	}
 	
 	protected function getModulesBasePath() : string
@@ -279,33 +221,5 @@ class ModularServiceProvider extends ServiceProvider
 		}
 		
 		return $this->modules_path;
-	}
-	
-	protected function modulesBasePathExists() : bool
-	{
-		return $this->app->make(Filesystem::class)
-			->isDirectory($this->getModulesBasePath());
-	}
-	
-	protected function formatPathAsNamespace(string $path) : string
-	{
-		$path = trim($path, DIRECTORY_SEPARATOR);
-		
-		$replacements = [
-			'/' => '\\',
-			'.php' => '',
-		];
-		
-		return str_replace(
-			array_keys($replacements),
-			array_values($replacements),
-			$path
-		);
-	}
-	
-	protected function isInstantiableCommand($command): bool
-	{
-		return is_subclass_of($command, Command::class)
-			&& !(new ReflectionClass($command))->isAbstract();
 	}
 }
