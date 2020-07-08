@@ -9,15 +9,15 @@ use InterNACHI\Modular\Support\ModuleRegistry;
 use LogicException;
 use Throwable;
 
-class ModuleCache extends Command
+class ModulesCache extends Command
 {
-	protected $signature = 'module:cache';
+	protected $signature = 'modules:cache';
 	
 	protected $description = 'Create a cache file for faster module loading';
 	
 	public function handle(ModuleRegistry $registry, Filesystem $filesystem)
 	{
-		$this->call(ModuleClear::class);
+		$this->call(ModulesClear::class);
 		
 		$export = $registry->modules()
 			->map(function(ModuleConfig $module_config) {

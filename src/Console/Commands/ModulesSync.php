@@ -7,9 +7,9 @@ use Illuminate\Filesystem\Filesystem;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Support\PhpStormConfigWriter;
 
-class ModuleSync extends Command
+class ModulesSync extends Command
 {
-	protected $signature = 'module:sync {--no-phpstorm : Do not update PhpStorm config files}';
+	protected $signature = 'modules:sync {--no-phpstorm : Do not update PhpStorm config files}';
 	
 	protected $description = 'Sync your project\'s configuration with your current modules';
 	

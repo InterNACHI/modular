@@ -15,10 +15,10 @@ use Illuminate\Support\Str;
 use Illuminate\View\Factory;
 use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
-use InterNACHI\Modular\Console\Commands\ModuleCache;
-use InterNACHI\Modular\Console\Commands\ModuleClear;
-use InterNACHI\Modular\Console\Commands\ModuleSync;
-use InterNACHI\Modular\Console\Commands\ModuleList;
+use InterNACHI\Modular\Console\Commands\ModulesCache;
+use InterNACHI\Modular\Console\Commands\ModulesClear;
+use InterNACHI\Modular\Console\Commands\ModulesSync;
+use InterNACHI\Modular\Console\Commands\ModulesList;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
@@ -132,10 +132,10 @@ class ModularServiceProvider extends ServiceProvider
 		
 		$this->commands([
 			MakeModule::class,
-			ModuleCache::class,
-			ModuleClear::class,
-			ModuleSync::class,
-			ModuleList::class,
+			ModulesCache::class,
+			ModulesClear::class,
+			ModulesSync::class,
+			ModulesList::class,
 		]);
 	}
 	

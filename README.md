@@ -76,7 +76,7 @@ You can run the sync command to make sure that your project is set up
 for module support:
 
 ```shell script
-php artisan module:sync
+php artisan modules:sync
 ```
 
 This will add a `Modules` test suite to your `phpunit.xml` file (if one exists)
@@ -107,10 +107,10 @@ There is **currently one exception**:
 We provide a few helper commands:
 
 - `php artisan make:module`  — scaffold a new module
-- `php artisan module:cache` — cache the loaded modules for slightly faster auto-discovery
-- `php artisan module:clear` — clear the module cache
-- `php artisan module:sync`  — update project configs (like `phpunit.xml`) with module settings
-- `php artisan module:list`  — list all modules
+- `php artisan modules:cache` — cache the loaded modules for slightly faster auto-discovery
+- `php artisan modules:clear` — clear the module cache
+- `php artisan modules:sync`  — update project configs (like `phpunit.xml`) with module settings
+- `php artisan modules:list`  — list all modules
 
 We also add a `--module=` option to most Laravel `make:` commands so that you can
 use all the existing tooling that you know. The commands themselves are exactly the

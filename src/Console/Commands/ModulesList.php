@@ -7,9 +7,9 @@ use Illuminate\Support\Str;
 use InterNACHI\Modular\Support\ModuleConfig;
 use InterNACHI\Modular\Support\ModuleRegistry;
 
-class ModuleList extends Command
+class ModulesList extends Command
 {
-	protected $signature = 'module:list';
+	protected $signature = 'modules:list';
 	
 	protected $description = 'List all modules';
 	

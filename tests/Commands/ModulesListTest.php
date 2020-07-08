@@ -2,14 +2,11 @@
 
 namespace InterNACHI\Modular\Tests\Commands;
 
-use InterNACHI\Modular\Console\Commands\Make\MakeModule;
-use InterNACHI\Modular\Console\Commands\ModuleCache;
-use InterNACHI\Modular\Console\Commands\ModuleClear;
-use InterNACHI\Modular\Console\Commands\ModuleList;
+use InterNACHI\Modular\Console\Commands\ModulesList;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use InterNACHI\Modular\Tests\TestCase;
 
-class ModuleListTest extends TestCase
+class ModulesListTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
@@ -17,13 +14,13 @@ class ModuleListTest extends TestCase
 	{
 		$this->makeModule('test-module');
 		
-		$this->artisan(ModuleList::class)
+		$this->artisan(ModulesList::class)
 			->expectsOutput('You have 1 module installed.')
 			->assertExitCode(0);
 		
 		$this->makeModule('test-module-two');
 		
-		$this->artisan(ModuleList::class)
+		$this->artisan(ModulesList::class)
 			->expectsOutput('You have 2 modules installed.')
 			->assertExitCode(0);
 	}

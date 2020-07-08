@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use InterNACHI\Modular\Console\Commands\ModuleClear;
+use InterNACHI\Modular\Console\Commands\ModulesClear;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Terminal;
@@ -105,7 +105,7 @@ class MakeModule extends Command
 		$this->writeStubs();
 		$this->updateCoreComposerConfig();
 		
-		$this->call(ModuleClear::class);
+		$this->call(ModulesClear::class);
 		
 		$this->newLine();
 		$this->line("Please run <kbd>composer update {$this->composer_name}</kbd>");

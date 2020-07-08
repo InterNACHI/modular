@@ -6,9 +6,9 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use InterNACHI\Modular\Support\ModuleRegistry;
 
-class ModuleClear extends Command
+class ModulesClear extends Command
 {
-	protected $signature = 'module:clear';
+	protected $signature = 'modules:clear';
 	
 	protected $description = 'Remove the module cache file';
 	

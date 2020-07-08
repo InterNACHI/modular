@@ -2,14 +2,11 @@
 
 namespace InterNACHI\Modular\Tests\Commands;
 
-use InterNACHI\Modular\Console\Commands\Make\MakeModule;
-use InterNACHI\Modular\Console\Commands\ModuleCache;
-use InterNACHI\Modular\Console\Commands\ModuleClear;
-use InterNACHI\Modular\Console\Commands\ModuleSync;
+use InterNACHI\Modular\Console\Commands\ModulesSync;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use InterNACHI\Modular\Tests\TestCase;
 
-class ModuleSyncTest extends TestCase
+class ModulesSyncTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
@@ -22,7 +19,7 @@ class ModuleSyncTest extends TestCase
 		
 		$this->assertCount(0, $nodes);
 		
-		$this->artisan(ModuleSync::class);
+		$this->artisan(ModulesSync::class);
 		
 		$config = simplexml_load_string($this->filesystem->get($config_path));
 		$nodes = $config->xpath("//phpunit//testsuites//testsuite//directory[text()='./app-modules/*/tests']");
@@ -41,7 +38,7 @@ class ModuleSyncTest extends TestCase
 		
 		$this->assertCount(0, $nodes);
 		
-		$this->artisan(ModuleSync::class);
+		$this->artisan(ModulesSync::class);
 		
 		$config = simplexml_load_string($this->filesystem->get($config_path));
 		$nodes = $config->xpath('//component[@name="LaravelPluginSettings"]//option[@name="templatePaths"]//list//templatePath');
@@ -50,7 +47,7 @@ class ModuleSyncTest extends TestCase
 		
 		$this->makeModule('test-module-two');
 		
-		$this->artisan(ModuleSync::class);
+		$this->artisan(ModulesSync::class);
 		
 		$config = simplexml_load_string($this->filesystem->get($config_path));
 		$nodes = $config->xpath('//component[@name="LaravelPluginSettings"]//option[@name="templatePaths"]//list//templatePath');
