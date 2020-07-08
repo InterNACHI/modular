@@ -10,7 +10,7 @@ return [
 	| example, a module called "Helpers" will be placed in \Modules\Helpers
 	| by default.
 	|
-	| It his *highly recommended* that you configure this to your organization
+	| It is *highly recommended* that you configure this to your organization
 	| name to make extracting modules to their own package easier (should you
 	| choose to ever do so).
 	|
