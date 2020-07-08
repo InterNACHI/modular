@@ -9,20 +9,11 @@ use Symfony\Component\Console\Input\InputOption;
 
 trait Modularize
 {
-	/**
-	 * @var ModuleConfig|null|false
-	 */
-	protected $module = false;
-	
 	protected function module(): ?ModuleConfig
 	{
-		if (false === $this->module) {
-			$this->module = $this->getLaravel()
-				->make(ModuleRegistry::class)
-				->module($this->option('module'));
-		}
-		
-		return $this->module;
+		$this->getLaravel()
+			->make(ModuleRegistry::class)
+			->module($this->option('module'));
 	}
 	
 	protected function configure()

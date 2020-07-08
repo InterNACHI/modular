@@ -14,6 +14,8 @@ class FinderCollection
 {
 	use ForwardsCalls;
 	
+	protected static $prefer_collection_methods = ['filter', 'each'];
+	
 	/**
 	 * @var \Symfony\Component\Finder\Finder
 	 */
@@ -34,6 +36,15 @@ class FinderCollection
 		return (new static())->directories();
 	}
 	
+	public static function empty(): self 
+	{
+		$collection = new static();
+		
+		$collection->finder = [];
+		
+		return $collection;
+	}
+	
 	public function __construct(Finder $finder = null)
 	{
 		$this->finder = $finder ?? new Finder();
@@ -43,8 +54,8 @@ class FinderCollection
 	public function __call($name, $arguments)
 	{
 		// Forward the call either to the Finder or the LazyCollection depending
-		// on the method (always giving precedence to the Finder class)
-		if (is_callable([$this->finder, $name])) {
+		// on the method (always giving precedence to the Finder class unless otherwise configured)
+		if (is_callable([$this->finder, $name]) && !in_array($name, static::$prefer_collection_methods)) {
 			$result = $this->forwardCallTo($this->finder, $name, $arguments);
 		} else {
 			$this->collection->source = $this->finder;
