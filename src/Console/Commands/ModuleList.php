@@ -35,6 +35,10 @@ class ModuleList extends Command
 			})
 			->toArray();
 		
+		$count = $registry->modules()->count();
+		$this->line('You have '.$count.' '.Str::plural('module', $count).' installed.');
+		$this->line('');
+		
 		$this->table(['Module', 'Path', $namespace_title], $table);
 	}
 }
