@@ -13,6 +13,8 @@ better organize large projects. These modules use the existing
 [Laravel package system](https://laravel.com/docs/7.x/packages), and follow existing Laravel
 conventions.
 
+[![Intro video](https://embed-ssl.wistia.com/deliveries/b13c29238d7b1cbb9a29e552ff24b4714037222f.jpg?image_crop_resized=1600x900&image_play_button=true&image_play_button_size=2x&image_play_button_color=1e71e7e0)](https://github.com/InterNACHI/modular/actions?query=workflow%3APHPUnit) [![Test Coverage](https://api.codeclimate.com/v1/badges/dd927802d52f4f75ea6c/test_coverage)](https://internachi.wistia.com/medias/pivaxithl7?wvideo=pivaxithl7)
+
 - [Installation](#installation)
 - [Usage](#usage)
 
