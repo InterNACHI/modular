@@ -16,6 +16,7 @@ conventions.
 - [Walkthrough Video](#walkthrough-video)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Comparison to `nwidart/laravel-modules`](#comparison-to-nwidartlaravel-modules)
 
 ## Walkthrough Video
 
@@ -142,3 +143,19 @@ and everything else Laravel provides:
 - `php artisan make:rule MyModuleRule --module=my-module`
 - `php artisan make:seeder MyModuleSeeder --module=my-module`
 - `php artisan make:test MyModuleTest --module=my-module`
+
+## Comparison to `nwidart/laravel-modules`
+
+[Laravel Modules](https://nwidart.com/laravel-modules) is a great package that’s been
+around since 2016 and is used by 1000's of projects. The main reason we decided to build
+our own module system rather than using `laravel-modules` comes down to two decisions:
+
+1. We wanted something that followed Laravel conventions rather than using its own
+   directory structure/etc.
+2. We wanted something that felt “lighter weight”
+
+If you are building a CMS that needs to support 3rd-party modules that can be dynamically
+enabled and disabled, Laravel Modules will be a better fit.
+
+On the other hand, if you're mostly interested in modules for organization, and want to
+stick closely to Laravel conventions, we’d highly recommend giving InterNACHI/Modular a try! 
