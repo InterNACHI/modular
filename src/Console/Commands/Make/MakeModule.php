@@ -205,7 +205,6 @@ class MakeModule extends Command
 		$tests_base = config('app-modules.tests_base', 'Tests\TestCase');
 		
 		$placeholders = [
-			'StubYear' => date('Y'),
 			'StubBasePath' => $this->base_path,
 			'StubModuleNamespace' => $this->module_namespace,
 			'StubComposerNamespace' => $this->composer_namespace,

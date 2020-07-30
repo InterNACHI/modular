@@ -2,7 +2,7 @@
 	"name": "StubComposerName",
 	"type": "project",
 	"version": "1.0",
-	"license": "Copyright StubYear",
+	"license": "proprietary",
 	"require": {},
 	"autoload": {
 		"classmap": [
