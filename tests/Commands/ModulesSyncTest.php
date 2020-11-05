@@ -73,4 +73,32 @@ class ModulesSyncTest extends TestCase
 		
 		$this->assertCount(0, $nodes);
 	}
+	
+	public function test_it_updates_phpstorm_iml_file() : void
+	{
+		$config_path = $this->copyStub('project.iml', '.idea');
+		
+		$this->makeModule('test-module');
+		
+		$config = simplexml_load_string($this->filesystem->get($config_path));
+		$nodes = $config->xpath('//component[@name="NewModuleRootManager"]//content[@url="file://$MODULE_DIR$"]//sourceFolder');
+		
+		$this->assertCount(4, $nodes);
+		
+		$this->artisan(ModulesSync::class);
+		
+		$config = simplexml_load_string($this->filesystem->get($config_path));
+		$nodes = $config->xpath('//component[@name="NewModuleRootManager"]//content[@url="file://$MODULE_DIR$"]//sourceFolder');
+		
+		$this->assertCount(4, $nodes);
+		
+		$this->makeModule('test-module-two');
+		
+		$this->artisan(ModulesSync::class);
+		
+		$config = simplexml_load_string($this->filesystem->get($config_path));
+		$nodes = $config->xpath('//component[@name="NewModuleRootManager"]//content[@url="file://$MODULE_DIR$"]//sourceFolder');
+		
+		$this->assertCount(6, $nodes);
+	}
 }

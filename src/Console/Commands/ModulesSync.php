@@ -4,9 +4,12 @@ namespace InterNACHI\Modular\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use InterNACHI\Modular\Support\FinderCollection;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Support\PhpStorm\LaravelConfigWriter;
 use InterNACHI\Modular\Support\PhpStorm\PhpFrameworkWriter;
+use InterNACHI\Modular\Support\PhpStorm\ProjectImlWriter;
+use Symfony\Component\Finder\SplFileInfo;
 
 class ModulesSync extends Command
 {
@@ -79,6 +82,7 @@ class ModulesSync extends Command
 	{
 		$this->updatePhpStormLaravelPlugin();
 		$this->updatePhpStormPhpConfig();
+		$this->updatePhpStormProjectIml();
 	}
 	
 	protected function updatePhpStormLaravelPlugin(): void
@@ -109,5 +113,29 @@ class ModulesSync extends Command
 				$this->warn($writer->last_error);
 			}
 		}
+	}
+	
+	protected function updatePhpStormProjectIml() : void
+	{
+		FinderCollection::forFiles()
+			->in($this->getLaravel()->basePath('.idea/'))
+			->name('*.iml')
+			->first(function(SplFileInfo $file) {
+				$config_path = $file->getPathname();
+				$writer = new ProjectImlWriter($config_path, $this->registry);
+				
+				if ($writer->handle()) {
+					$this->info("Updated PhpStorm project source folders in '{$file->getBasename()}'");
+					return true;
+				}
+				
+				$this->info("Could not update PhpStorm project source folders in '{$file->getBasename()}'");
+				
+				if ($this->getOutput()->isVerbose()) {
+					$this->warn($writer->last_error);
+				}
+				
+				return false;
+			});
 	}
 }
