@@ -117,8 +117,13 @@ class ModulesSync extends Command
 	
 	protected function updatePhpStormProjectIml() : void
 	{
+		$idea_directory = $this->getLaravel()->basePath('.idea/');
+		if (!$this->filesystem->isDirectory($idea_directory)) {
+			return;
+		}
+		
 		FinderCollection::forFiles()
-			->in($this->getLaravel()->basePath('.idea/'))
+			->in($idea_directory)
 			->name('*.iml')
 			->first(function(SplFileInfo $file) {
 				$config_path = $file->getPathname();
