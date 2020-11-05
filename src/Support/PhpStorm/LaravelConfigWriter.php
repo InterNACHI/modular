@@ -1,39 +1,15 @@
 <?php
 
-namespace InterNACHI\Modular\Support;
+namespace InterNACHI\Modular\Support\PhpStorm;
 
 use DOMDocument;
+use InterNACHI\Modular\Support\ModuleConfig;
 use SimpleXMLElement;
 
-class PhpStormConfigWriter
+class LaravelConfigWriter extends ConfigWriter
 {
-	/**
-	 * @var string
-	 */
-	public $last_error;
-	
-	/**
-	 * @var string
-	 */
-	protected $config_path;
-	
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry
-	 */
-	protected $module_registry;
-	
-	public function __construct($config_path, ModuleRegistry $module_registry)
+	public function write() : bool
 	{
-		$this->config_path = $config_path;
-		$this->module_registry = $module_registry;
-	}
-	
-	public function write(): bool
-	{
-		if (!$this->checkConfigFilePermissions()) {
-			return false;
-		}
-		
 		$plugin_config = $this->getNormalizedPluginConfig();
 		$template_paths = $plugin_config->xpath('//templatePath');
 		

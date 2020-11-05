@@ -5,7 +5,8 @@ namespace InterNACHI\Modular\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use InterNACHI\Modular\Support\ModuleRegistry;
-use InterNACHI\Modular\Support\PhpStormConfigWriter;
+use InterNACHI\Modular\Support\PhpStorm\LaravelConfigWriter;
+use InterNACHI\Modular\Support\PhpStorm\PhpFrameworkWriter;
 
 class ModulesSync extends Command
 {
@@ -76,13 +77,34 @@ class ModulesSync extends Command
 	
 	protected function updatePhpStormConfig(): void
 	{
+		$this->updatePhpStormLaravelPlugin();
+		$this->updatePhpStormPhpConfig();
+	}
+	
+	protected function updatePhpStormLaravelPlugin(): void
+	{
 		$config_path = $this->getLaravel()->basePath('.idea/laravel-plugin.xml');
-		$writer = new PhpStormConfigWriter($config_path, $this->registry);
+		$writer = new LaravelConfigWriter($config_path, $this->registry);
 		
-		if ($writer->write()) {
+		if ($writer->handle()) {
 			$this->info('Updated PhpStorm/Laravel Plugin config file...');
 		} else {
 			$this->info('Did not find/update PhpStorm/Laravel Plugin config.');
+			if ($this->getOutput()->isVerbose()) {
+				$this->warn($writer->last_error);
+			}
+		}
+	}
+	
+	protected function updatePhpStormPhpConfig() : void
+	{
+		$config_path = $this->getLaravel()->basePath('.idea/php.xml');
+		$writer = new PhpFrameworkWriter($config_path, $this->registry);
+		
+		if ($writer->handle()) {
+			$this->info('Updated PhpStorm library roots config file...');
+		} else {
+			$this->info('Did not find/update PhpStorm library roots config.');
 			if ($this->getOutput()->isVerbose()) {
 				$this->warn($writer->last_error);
 			}

@@ -33,6 +33,8 @@
     },
     "require": {
         "php": ">=7.3",
+        "ext-simplexml": "*",
+        "ext-dom": "*",
         "composer/composer": "^1.10",
         "illuminate/support": "^7.0|^8.0"
     },

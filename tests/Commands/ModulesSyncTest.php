@@ -54,4 +54,23 @@ class ModulesSyncTest extends TestCase
 		
 		$this->assertCount(2, $nodes);
 	}
+	
+	public function test_it_updates_phpstorm_library_roots() : void
+	{
+		$config_path = $this->copyStub('php.xml', '.idea');
+		
+		$this->makeModule('test-module');
+		
+		$config = simplexml_load_string($this->filesystem->get($config_path));
+		$nodes = $config->xpath('//component[@name="PhpIncludePathManager"]//include_path//path[@value="$PROJECT_DIR$/vendor/modules/test-module"]');
+		
+		$this->assertCount(1, $nodes);
+		
+		$this->artisan(ModulesSync::class);
+		
+		$config = simplexml_load_string($this->filesystem->get($config_path));
+		$nodes = $config->xpath('//component[@name="PhpIncludePathManager"]//include_path//path[@value="$PROJECT_DIR$/vendor/modules/test-module"]');
+		
+		$this->assertCount(0, $nodes);
+	}
 }
