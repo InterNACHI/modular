@@ -87,4 +87,17 @@ trait Modularize
 		
 		return $path;
 	}
+	
+	public function call($command, array $arguments = [])
+	{
+		if (
+			!isset($arguments['--module'])
+			&& Str::startsWith($command, 'make:')
+			&& $module = $this->module()
+		) {
+			$arguments['--module'] = $module->name;
+		}
+		
+		return parent::call($command, $arguments);
+	}
 }
