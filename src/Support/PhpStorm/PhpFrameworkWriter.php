@@ -4,7 +4,6 @@ namespace InterNACHI\Modular\Support\PhpStorm;
 
 use Illuminate\Support\Str;
 use InterNACHI\Modular\Support\ModuleConfig;
-use SimpleXMLElement;
 
 class PhpFrameworkWriter extends ConfigWriter
 {
