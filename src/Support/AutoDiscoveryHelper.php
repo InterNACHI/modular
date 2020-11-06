@@ -2,11 +2,7 @@
 
 namespace InterNACHI\Modular\Support;
 
-use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Str;
-use ReflectionClass;
-use RuntimeException;
 
 class AutoDiscoveryHelper
 {

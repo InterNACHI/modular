@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adds support for `php artisan make:component`
 - `php artisan modules:sync` will now update additional PhpStorm config files
 - Partial support for `--all` on `make:model`
-- Laying some groundwork for component auto-discovery
+- Initial support for component auto-discovery
 
 ## [1.0.1]
 

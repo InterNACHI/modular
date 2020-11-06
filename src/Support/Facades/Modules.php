@@ -12,6 +12,8 @@ use InterNACHI\Modular\Support\ModuleRegistry;
  * @method static ModuleConfig|null moduleForPath(string $path)
  * @method static Collection modules()
  * @method static Collection reload()
+ * 
+ * @see \InterNACHI\Modular\Support\ModuleRegistry
  */
 class Modules extends Facade
 {

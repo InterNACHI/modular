@@ -12,13 +12,14 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Factory;
 use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
 use InterNACHI\Modular\Console\Commands\ModulesCache;
 use InterNACHI\Modular\Console\Commands\ModulesClear;
-use InterNACHI\Modular\Console\Commands\ModulesSync;
 use InterNACHI\Modular\Console\Commands\ModulesList;
+use InterNACHI\Modular\Console\Commands\ModulesSync;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
@@ -97,6 +98,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->bootRoutes();
 		$this->bootBreadcrumbs();
 		$this->bootViews();
+		$this->bootBladeComponents();
 	}
 	
 	protected function registry(): ModuleRegistry
@@ -167,11 +169,27 @@ class ModularServiceProvider extends ServiceProvider
 		});
 	}
 	
+	protected function bootBladeComponents() : void
+	{
+		$this->callAfterResolving(BladeCompiler::class, function(BladeCompiler $blade) {
+			$this->autoDiscoveryHelper()
+				->bladeComponentFileFinder()
+				->each(function(SplFileInfo $component) use ($blade) {
+					if (!$module = $this->registry()->moduleForPath($component->getPath())) {
+						throw new RuntimeException("Unable to determine module for '{$component->getPath()}'");
+					}
+					
+					$fully_qualified_component = $this->pathToFullyQualifiedClassName($component->getPathname(), $module);
+					$blade->component($fully_qualified_component, null, $module->name);
+				});
+		});
+	}
+	
 	/**
 	 * This functionality is likely to go away at some point so don't rely
 	 * on it too much. The package has been abandoned.
 	 */
-	protected function bootBreadcrumbs(): void
+	protected function bootBreadcrumbs() : void
 	{
 		$class_name = 'DaveJamesMiller\\Breadcrumbs\\BreadcrumbsManager';
 		
