@@ -112,11 +112,11 @@ There is **currently one exception**:
 
 We provide a few helper commands:
 
-- `php artisan make:module`  — scaffold a new module
-- `php artisan modules:cache` — cache the loaded modules for slightly faster auto-discovery
-- `php artisan modules:clear` — clear the module cache
-- `php artisan modules:sync`  — update project configs (like `phpunit.xml`) with module settings
-- `php artisan modules:list`  — list all modules
+- `php artisan make:module`  — scaffold a new module
+- `php artisan modules:cache` — cache the loaded modules for slightly faster auto-discovery
+- `php artisan modules:clear` — clear the module cache
+- `php artisan modules:sync`  — update project configs (like `phpunit.xml`) with module settings
+- `php artisan modules:list`  — list all modules
 
 We also add a `--module=` option to most Laravel `make:` commands so that you can
 use all the existing tooling that you know. The commands themselves are exactly the
@@ -125,6 +125,7 @@ and everything else Laravel provides:
 
 - `php artisan make:controller MyModuleController --module=my-module`
 - `php artisan make:command MyModuleCommand --module=my-module`
+- `php artisan make:component MyModuleComponent --module=my-module`
 - `php artisan make:channel MyModuleChannel --module=my-module`
 - `php artisan make:event MyModuleEvent --module=my-module`
 - `php artisan make:exception MyModuleException --module=my-module`
