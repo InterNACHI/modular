@@ -4,6 +4,7 @@ namespace InterNACHI\Modular\Tests;
 
 use Illuminate\Filesystem\Filesystem;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
+use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Support\AutoDiscoveryHelper;
 use InterNACHI\Modular\Support\ModuleRegistry;
@@ -98,6 +99,28 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$this->assertContains($this->module1->path('src/Models/TestModel.php'), $resolved);
 		$this->assertContains($this->module2->path('src/Models/TestModel.php'), $resolved);
+	}
+	
+	public function test_it_finds_blade_components() : void
+	{
+		$this->artisan(MakeComponent::class, [
+			'name' => 'TestComponent',
+			'--module' => $this->module1->name,
+		]);
+		
+		$this->artisan(MakeComponent::class, [
+			'name' => 'TestComponent',
+			'--module' => $this->module2->name,
+		]);
+		
+		$resolved = [];
+		
+		$this->helper->bladeComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
+			$resolved[] = $file->getPathname();
+		});
+		
+		$this->assertContains($this->module1->path('src/View/Components/TestComponent.php'), $resolved);
+		$this->assertContains($this->module2->path('src/View/Components/TestComponent.php'), $resolved);
 	}
 	
 	public function test_it_finds_routes() : void

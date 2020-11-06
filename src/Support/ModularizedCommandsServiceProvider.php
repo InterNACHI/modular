@@ -6,6 +6,7 @@ use Illuminate\Console\Application as Artisan;
 use Illuminate\Support\ServiceProvider;
 use InterNACHI\Modular\Console\Commands\Make\MakeChannel;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
+use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeController;
 use InterNACHI\Modular\Console\Commands\Make\MakeEvent;
 use InterNACHI\Modular\Console\Commands\Make\MakeException;
@@ -49,6 +50,7 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 		'command.rule.make' => MakeRule::class,
 		'command.seeder.make' => MakeSeeder::class,
 		'command.test.make' => MakeTest::class,
+		'command.component.make' => MakeComponent::class,
 	];
 	
 	public function register(): void

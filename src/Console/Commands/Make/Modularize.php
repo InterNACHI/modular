@@ -87,4 +87,14 @@ trait Modularize
 		
 		return $path;
 	}
+	
+	public function call($command, array $arguments = [])
+	{
+		// Pass the --module flag on to subsequent commands
+		if ($module = $this->option('module')) {
+			$arguments['--module'] = $module;
+		}
+		
+		return $this->runCommand($command, $arguments, $this->output);
+	}
 }

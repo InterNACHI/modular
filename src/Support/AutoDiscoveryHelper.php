@@ -84,6 +84,19 @@ class AutoDiscoveryHelper
 			->in($this->base_path);
 	}
 	
+	public function bladeComponentFileFinder() : FinderCollection
+	{
+		if ($this->basePathMissing()) {
+			return FinderCollection::empty();
+		}
+		
+		return FinderCollection::forFiles()
+			->depth('> 3')
+			->path('src/View/Components')
+			->name('*.php')
+			->in($this->base_path);
+	}
+	
 	public function routeFileFinder(): FinderCollection
 	{
 		if ($this->basePathMissing()) {
