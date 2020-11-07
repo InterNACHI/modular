@@ -16,11 +16,16 @@ class MakeSeederTest extends TestCase
 	{
 		$command = MakeSeeder::class;
 		$arguments = ['name' => 'TestSeeder'];
-		$expected_path = 'database/seeds/TestSeeder.php';
+		$expected_path = version_compare($this->app->version(), '8.0.0', '>=')
+			? 'database/seeders/TestSeeder.php'
+			: 'database/seeds/TestSeeder.php';
 		$expected_substrings = [
 			'use Illuminate\Database\Seeder',
 			'class TestSeeder extends Seeder',
 		];
+		
+		$this->filesystem()->deleteDirectory($this->getBasePath().$this->normalizeDirectorySeparators('database/seeds'));
+		$this->filesystem()->deleteDirectory($this->getModulePath('test-module', 'database/seeds'));
 		
 		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);
 	}
@@ -29,11 +34,15 @@ class MakeSeederTest extends TestCase
 	{
 		$command = MakeSeeder::class;
 		$arguments = ['name' => 'TestSeeder'];
-		$expected_path = 'database/seeds/TestSeeder.php';
+		$expected_path = version_compare($this->app->version(), '8.0.0', '>=')
+			? 'database/seeders/TestSeeder.php'
+			: 'database/seeds/TestSeeder.php';
 		$expected_substrings = [
 			'use Illuminate\Database\Seeder',
 			'class TestSeeder extends Seeder',
 		];
+		
+		$this->filesystem()->deleteDirectory($this->getBasePath().$this->normalizeDirectorySeparators('database/seeds'));
 		
 		$this->assertBaseCommandResults($command, $arguments, $expected_path, $expected_substrings);
 	}
