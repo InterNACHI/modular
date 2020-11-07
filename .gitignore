@@ -2,6 +2,7 @@
 .rnd
 .cache
 .php_cs.cache
+.composer-history
 
 /vendor
 /node_modules

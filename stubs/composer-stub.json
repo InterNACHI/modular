@@ -1,5 +1,6 @@
 {
 	"name": "StubComposerName",
+	"description": "",
 	"type": "library",
 	"version": "1.0",
 	"license": "proprietary",
@@ -10,11 +11,7 @@
 			"database/factories"
 		],
 		"psr-4": {
-			"StubModuleNamespace\\StubClassNamePrefix\\": "src/"
-		}
-	},
-	"autoload-dev": {
-		"psr-4": {
+			"StubModuleNamespace\\StubClassNamePrefix\\": "src/",
 			"StubModuleNamespace\\StubClassNamePrefix\\Tests\\": "tests/"
 		}
 	},
