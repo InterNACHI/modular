@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `php artisan modules:sync` will now update additional PhpStorm config files
 - Partial support for `--all` on `make:model`
 - Initial support for component auto-discovery
+- Switched to single `app-modules/*` composer repository rather than new repositories for each module 
 
 ## [1.0.1]
 
