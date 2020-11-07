@@ -49,7 +49,7 @@ class MakeModuleTest extends TestCase
 		
 		$repository = [
 			'type' => 'path',
-			'url' => "app-modules/{$module_name}",
+			'url' => 'app-modules/*',
 			'options' => ['symlink' => true],
 		];
 		$this->assertContains($repository, $app_composer_contents['repositories']);
