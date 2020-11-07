@@ -36,7 +36,7 @@
         "ext-simplexml": "*",
         "ext-dom": "*",
         "composer/composer": "^1.10",
-        "illuminate/support": "^7.0|^8.0"
+        "illuminate/support": "^7.27.0|^8.0"
     },
     "require-dev": {
         "orchestra/testbench": "^5.0",
