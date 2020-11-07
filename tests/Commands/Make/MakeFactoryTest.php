@@ -20,7 +20,6 @@ class MakeFactoryTest extends TestCase
 		
 		if (version_compare($this->app->version(), '8.0.0', '>=')) {
 			$expected_substrings = [
-				'class TestFactory extends Factory',
 				'Illuminate\Database\Eloquent\Factories\Factory',
 			];
 		} else {
@@ -40,7 +39,6 @@ class MakeFactoryTest extends TestCase
 		
 		if (version_compare($this->app->version(), '8.0.0', '>=')) {
 			$expected_substrings = [
-				'class TestFactory extends Factory',
 				'Illuminate\Database\Eloquent\Factories\Factory',
 			];
 		} else {
