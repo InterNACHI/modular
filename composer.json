@@ -39,7 +39,7 @@
         "illuminate/support": "^7.27.0|^8.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^5.0",
+        "orchestra/testbench": "^5.0|^6.0",
         "phpunit/phpunit": "^8.0",
         "mockery/mockery": "^1.3"
     }
