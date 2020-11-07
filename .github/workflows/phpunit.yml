@@ -12,11 +12,14 @@ jobs:
     strategy:
       matrix:
         php: [7.4, 7.3]
-        laravel: [^7.0]
+        laravel: [^7.27.0, ^8.0]
         dependency-version: [lowest, stable]
         include:
-          - laravel: ^7.0
+          - laravel: ^7.27.0
             testbench: ^5.0
+            minimum-stability: stable
+          - laravel: ^8.0
+            testbench: ^6.0
             minimum-stability: stable
             coverage: pcov
 
