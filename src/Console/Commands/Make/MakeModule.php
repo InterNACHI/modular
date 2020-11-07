@@ -166,7 +166,7 @@ class MakeModule extends Command
 			'resources/views',
 			'database/migrations',
 			'database/factories',
-			'database/seeds',
+			'database/'.$this->seedersDirectory(),
 		];
 		
 		foreach ($directories as $directory) {
@@ -188,7 +188,7 @@ class MakeModule extends Command
 		$this->title('Creating initial module files');
 		
 		$stubs = [
-			'composer.json' => 'composer-stub.json',
+			'composer.json' => 'composer-stub-v'.substr($this->getLaravel()->version(), 0, 1).'.json',
 			'src/Providers/StubClassNamePrefixServiceProvider.php' => 'ServiceProvider.php',
 			'tests/StubClassNamePrefixServiceProviderTest.php' => 'ServiceProviderTest.php',
 			'database/migrations/StubMigrationPrefix_set_up_StubModuleName_module.php' => 'migration.php',
@@ -199,7 +199,7 @@ class MakeModule extends Command
 			'resources/views/edit.blade.php' => 'view.blade.php',
 			'database/factories/.gitkeep' => '.gitkeep',
 			'database/migrations/.gitkeep' => '.gitkeep',
-			'database/seeds/.gitkeep' => '.gitkeep',
+			'database/'.$this->seedersDirectory().'/.gitkeep' => '.gitkeep',
 		];
 		
 		$tests_base = config('app-modules.tests_base', 'Tests\TestCase');
@@ -240,6 +240,13 @@ class MakeModule extends Command
 		}
 		
 		$this->newLine();
+	}
+	
+	protected function seedersDirectory(): string
+	{
+		return version_compare($this->getLaravel()->version(), '8.0.0', '>=')
+			? 'seeders'
+			: 'seeds';
 	}
 	
 	protected function updateCoreComposerConfig()

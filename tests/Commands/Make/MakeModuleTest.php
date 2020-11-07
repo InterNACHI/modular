@@ -36,11 +36,17 @@ class MakeModuleTest extends TestCase
 		$composer_contents = json_decode($fs->get($composer_file), true);
 		
 		$this->assertEquals("modules/{$module_name}", $composer_contents['name']);
-		$this->assertContains('database/factories', $composer_contents['autoload']['classmap']);
-		$this->assertContains('database/seeds', $composer_contents['autoload']['classmap']);
 		$this->assertEquals('src/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\']);
 		$this->assertEquals('tests/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Tests\\']);
 		$this->assertContains('Modules\\TestModule\\Providers\\TestModuleServiceProvider', $composer_contents['extra']['laravel']['providers']);
+		
+		if (version_compare($this->app->version(), '8.0.0', '>=')) {
+			$this->assertEquals('database/factories/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Database\\Factories\\']);
+			$this->assertEquals('database/seeders/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Database\\Seeders\\']);
+		} else {
+			$this->assertContains('database/factories', $composer_contents['autoload']['classmap']);
+			$this->assertContains('database/seeds', $composer_contents['autoload']['classmap']);
+		}
 		
 		$app_composer_file = $this->getBasePath().DIRECTORY_SEPARATOR.'composer.json';
 		$app_composer_contents = json_decode($fs->get($app_composer_file), true);
