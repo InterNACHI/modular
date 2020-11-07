@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Switched to single `app-modules/*` composer repository rather than new repositories for each module
 - Added description field to generated `composer.json` file
 - Moved tests from `autoload-dev` to `autoload` because composer doesn't support 
-  `autoload-dev` for non-root configs  
+  `autoload-dev` for non-root configs
+- Added improved support for Laravel 8 factory classes  
 
 ## [1.0.1]
 
