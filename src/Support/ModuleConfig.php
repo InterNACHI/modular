@@ -33,6 +33,7 @@ class ModuleConfig implements Arrayable
 		
 		$namespaces = Collection::make($composer_config['autoload']['psr-4'] ?? [])
 			->mapWithKeys(function($src, $namespace) use ($base_path) {
+				$src = str_replace('/', DIRECTORY_SEPARATOR, $src);
 				$path = $base_path.DIRECTORY_SEPARATOR.$src;
 				return [$path => $namespace];
 			});
