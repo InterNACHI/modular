@@ -35,10 +35,8 @@ class AutoDiscoveryHelper
 		}
 		
 		return FinderCollection::forFiles()
-			->depth('> 3')
-			->path('src/Console/Commands')
 			->name('*.php')
-			->in($this->base_path);
+			->in($this->base_path.'/*/src/Console/Commands');
 	}
 	
 	public function factoryDirectoryFinder(): FinderCollection
@@ -48,10 +46,9 @@ class AutoDiscoveryHelper
 		}
 		
 		return FinderCollection::forDirectories()
-			->depth('== 2')
-			->path('database/')
+			->depth(0)
 			->name('factories')
-			->in($this->base_path);
+			->in($this->base_path.'/*/database/');
 	}
 	
 	public function migrationDirectoryFinder(): FinderCollection
@@ -61,10 +58,9 @@ class AutoDiscoveryHelper
 		}
 		
 		return FinderCollection::forDirectories()
-			->depth('== 2')
-			->path('database/')
+			->depth(0)
 			->name('migrations')
-			->in($this->base_path);
+			->in($this->base_path.'/*/database/');
 	}
 	
 	public function modelFileFinder(): FinderCollection
@@ -74,10 +70,8 @@ class AutoDiscoveryHelper
 		}
 		
 		return FinderCollection::forFiles()
-			->depth('> 2')
-			->path('src/Models')
 			->name('*.php')
-			->in($this->base_path);
+			->in($this->base_path.'/*/src/Models');
 	}
 	
 	public function bladeComponentFileFinder() : FinderCollection
@@ -87,10 +81,8 @@ class AutoDiscoveryHelper
 		}
 		
 		return FinderCollection::forFiles()
-			->depth('> 3')
-			->path('src/View/Components')
 			->name('*.php')
-			->in($this->base_path);
+			->in($this->base_path.'/*/src/View/Components');
 	}
 	
 	public function routeFileFinder(): FinderCollection
@@ -100,10 +92,9 @@ class AutoDiscoveryHelper
 		}
 		
 		return FinderCollection::forFiles()
-			->depth(2)
-			->path('routes/')
+			->depth(0)
 			->name('*.php')
-			->in($this->base_path);
+			->in($this->base_path.'/*/routes');
 	}
 	
 	public function viewDirectoryFinder(): FinderCollection
@@ -113,10 +104,9 @@ class AutoDiscoveryHelper
 		}
 		
 		return FinderCollection::forDirectories()
-			->depth('== 2')
-			->path('resources/')
+			->depth(0)
 			->name('views')
-			->in($this->base_path);
+			->in($this->base_path.'/*/resources/');
 	}
 	
 	protected function basePathMissing(): bool
