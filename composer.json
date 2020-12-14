@@ -35,7 +35,7 @@
         "php": ">=7.3",
         "ext-simplexml": "*",
         "ext-dom": "*",
-        "composer/composer": "^1.10",
+        "composer/composer": "^1.10|^2.0",
         "illuminate/support": "^7.27.0|^8.0"
     },
     "require-dev": {
