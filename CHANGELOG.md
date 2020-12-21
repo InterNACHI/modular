@@ -5,6 +5,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Support for auto-registering Laravel 8 factory classes
+
+### Fixed
+- Better Windows support
+- Support for composer 2.0
+- Improves the file scanning efficiency of the `AutoDiscoveryHelper`
+
 ## [1.1.0]
 
 ### Added

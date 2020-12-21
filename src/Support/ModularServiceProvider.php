@@ -7,13 +7,14 @@ use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
-use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
+use Illuminate\Database\Eloquent\Factory as LegacyEloquentFactory;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\View\Compilers\BladeCompiler;
-use Illuminate\View\Factory;
+use Illuminate\View\Factory as ViewFactory;
 use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
 use InterNACHI\Modular\Console\Commands\ModulesCache;
@@ -21,6 +22,7 @@ use InterNACHI\Modular\Console\Commands\ModulesClear;
 use InterNACHI\Modular\Console\Commands\ModulesList;
 use InterNACHI\Modular\Console\Commands\ModulesSync;
 use ReflectionClass;
+use ReflectionProperty;
 use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -83,8 +85,14 @@ class ModularServiceProvider extends ServiceProvider
 		// that functionality (e.g. we only need to look for and register migrations
 		// if we're running the migrator)
 		$this->registerLazily(Migrator::class, [$this, 'registerMigrations']);
-		$this->registerLazily(EloquentFactory::class, [$this, 'registerFactories']);
 		$this->registerLazily(Gate::class, [$this, 'registerPolicies']);
+		$this->registerLazily(LegacyEloquentFactory::class, [$this, 'registerLegacyFactories']);
+		
+		// If we're running Laravel 8 or higher, set up the Eloquent Factory to resolve
+		// module factories as well as App factories.
+		if (class_exists(EloquentFactory::class)) {
+			$this->registerEloquentFactories();
+		}
 		
 		// Look for and register all our commands in the CLI context
 		Artisan::starting(Closure::fromCallable([$this, 'registerCommands']));
@@ -156,7 +164,7 @@ class ModularServiceProvider extends ServiceProvider
 	
 	protected function bootViews(): void
 	{
-		$this->callAfterResolving('view', function(Factory $view_factory) {
+		$this->callAfterResolving('view', function(ViewFactory $view_factory) {
 			$this->autoDiscoveryHelper()
 				->viewDirectoryFinder()
 				->each(function(SplFileInfo $directory) use ($view_factory) {
@@ -208,7 +216,7 @@ class ModularServiceProvider extends ServiceProvider
 		}
 	}
 	
-	protected function registerMigrations(Migrator $migrator): void
+	protected function registerMigrations(Migrator $migrator) : void
 	{
 		$this->autoDiscoveryHelper()
 			->migrationDirectoryFinder()
@@ -217,7 +225,37 @@ class ModularServiceProvider extends ServiceProvider
 			});
 	}
 	
-	protected function registerFactories(EloquentFactory $factory): void
+	protected function registerEloquentFactories() : void
+	{
+		EloquentFactory::guessFactoryNamesUsing(function($model_name) {
+			// Because Factory::$namespace is protected, we need to access it via reflection.
+			// Hopefully we can PR something into Laravel to make this less hacky.
+			$reflection = new ReflectionProperty(EloquentFactory::class, 'namespace');
+			$reflection->setAccessible(true);
+			$factory_namespace = $reflection->getValue();
+			
+			$modules_namespace = config('app-modules.modules_namespace', 'Modules');
+			
+			if (
+				Str::startsWith($model_name, $modules_namespace)
+				&& $module = $this->registry()->moduleForClass($model_name)
+			) {
+				$model_name = Str::startsWith($model_name, $module->qualify('Models\\'))
+					? Str::after($model_name, $module->qualify('Models\\'))
+					: Str::after($model_name, $module->namespace());
+				
+				return $module->qualify($factory_namespace.$model_name.'Factory');
+			}
+			
+			$model_name = Str::startsWith($model_name, 'App\\Models\\')
+				? Str::after($model_name, 'App\\Models\\')
+				: Str::after($model_name, 'App\\');
+			
+			return $factory_namespace.$model_name.'Factory';
+		});
+	}
+	
+	protected function registerLegacyFactories(LegacyEloquentFactory $factory) : void
 	{
 		$this->autoDiscoveryHelper()
 			->factoryDirectoryFinder()
@@ -226,7 +264,7 @@ class ModularServiceProvider extends ServiceProvider
 			});
 	}
 	
-	protected function registerPolicies(Gate $gate): void
+	protected function registerPolicies(Gate $gate) : void
 	{
 		$this->autoDiscoveryHelper()
 			->modelFileFinder()

@@ -54,6 +54,19 @@ class ModuleRegistry
 		return $this->module($this->extractModuleNameFromPath($path));
 	}
 	
+	public function moduleForClass(string $fqcn): ?ModuleConfig
+	{
+		return $this->modules()->first(function(ModuleConfig $module) use ($fqcn) {
+			foreach ($module->namespaces as $namespace) {
+				if (Str::startsWith($fqcn, $namespace)) {
+					return true;
+				}
+			}
+			
+			return false;
+		});
+	}
+	
 	public function modules(): Collection
 	{
 		if (null === $this->modules) {

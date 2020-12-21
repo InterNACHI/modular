@@ -53,6 +53,16 @@ class ModuleConfig implements Arrayable
 		return rtrim($this->base_path.DIRECTORY_SEPARATOR.$to, DIRECTORY_SEPARATOR);
 	}
 	
+	public function namespace(): string
+	{
+		return $this->namespaces->first();
+	}
+	
+	public function qualify(string $class_name): string
+	{
+		return $this->namespace().ltrim($class_name, '\\');
+	}
+	
 	public function toArray(): array
 	{
 		return [
