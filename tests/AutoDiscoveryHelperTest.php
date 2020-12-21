@@ -7,6 +7,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Support\AutoDiscoveryHelper;
+use InterNACHI\Modular\Support\CacheHelper;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use Symfony\Component\Finder\SplFileInfo;
@@ -29,7 +30,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->module2 = $this->makeModule('test-module-two');
 		$this->helper = new AutoDiscoveryHelper(
 			new ModuleRegistry($this->getBasePath().'/app-modules', ''),
-			new Filesystem()
+			new CacheHelper(tempnam(sys_get_temp_dir(), 'modular-cache'))
 		);
 	}
 	

@@ -40,7 +40,7 @@ class FinderCollection
 	{
 		$collection = new static();
 		
-		$collection->finder = [];
+		$collection->finder = null;
 		
 		return $collection;
 	}
@@ -53,6 +53,11 @@ class FinderCollection
 	
 	public function __call($name, $arguments)
 	{
+		// If we're working with an empty instance, don't do anything with calls
+		if (null === $this->finder) {
+			return $this;
+		}
+		
 		// Forward the call either to the Finder or the LazyCollection depending
 		// on the method (always giving precedence to the Finder class unless otherwise configured)
 		if (is_callable([$this->finder, $name]) && !in_array($name, static::$prefer_collection_methods)) {

@@ -2,115 +2,105 @@
 
 namespace InterNACHI\Modular\Support;
 
-use Illuminate\Filesystem\Filesystem;
-
 class AutoDiscoveryHelper
 {
 	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry 
+	 * @var \InterNACHI\Modular\Support\ModuleRegistry
 	 */
 	protected $module_registry;
 	
 	/**
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $filesystem;
-	
-	/**
 	 * @var string
 	 */
-	protected $base_path;
+	protected $modules_path;
 	
-	public function __construct(ModuleRegistry $module_registry, Filesystem $filesystem)
+	/**
+	 * @var \InterNACHI\Modular\Support\CacheHelper
+	 */
+	protected $cache;
+	
+	public function __construct(ModuleRegistry $module_registry, CacheHelper $cache)
 	{
 		$this->module_registry = $module_registry;
-		$this->filesystem = $filesystem;
-		$this->base_path = $module_registry->getModulesPath();
+		$this->modules_path = rtrim($module_registry->getModulesPath(), DIRECTORY_SEPARATOR);
+		$this->cache = $cache;
 	}
 	
-	public function commandFileFinder(): FinderCollection
+	public function modulesFinder() : FinderCollection
 	{
-		if ($this->basePathMissing()) {
-			return FinderCollection::empty();
-		}
-		
-		return FinderCollection::forFiles()
-			->name('*.php')
-			->in($this->base_path.'/*/src/Console/Commands');
+		return $this->fileFinder()
+			->depth('== 1')
+			->name('composer.json');
 	}
 	
-	public function factoryDirectoryFinder(): FinderCollection
+	public function commandFileFinder() : FinderCollection
 	{
-		if ($this->basePathMissing()) {
-			return FinderCollection::empty();
-		}
-		
-		return FinderCollection::forDirectories()
+		return $this->fileFinder('*/src/Console/Commands/')
+			->name('*.php');
+	}
+	
+	public function factoryDirectoryFinder() : FinderCollection
+	{
+		return $this->directoryFinder('*/database/')
 			->depth(0)
-			->name('factories')
-			->in($this->base_path.'/*/database/');
+			->name('factories');
 	}
 	
 	public function migrationDirectoryFinder(): FinderCollection
 	{
-		if ($this->basePathMissing()) {
-			return FinderCollection::empty();
-		}
-		
-		return FinderCollection::forDirectories()
+		return $this->directoryFinder('*/database/')
 			->depth(0)
-			->name('migrations')
-			->in($this->base_path.'/*/database/');
+			->name('migrations');
 	}
 	
 	public function modelFileFinder(): FinderCollection
 	{
-		if ($this->basePathMissing()) {
-			return FinderCollection::empty();
-		}
-		
-		return FinderCollection::forFiles()
-			->name('*.php')
-			->in($this->base_path.'/*/src/Models');
+		return $this->fileFinder('*/src/Models/')
+			->name('*.php');
 	}
 	
 	public function bladeComponentFileFinder() : FinderCollection
 	{
-		if ($this->basePathMissing()) {
-			return FinderCollection::empty();
-		}
-		
-		return FinderCollection::forFiles()
-			->name('*.php')
-			->in($this->base_path.'/*/src/View/Components');
+		return $this->fileFinder('*/src/View/Components/')
+			->name('*.php');
 	}
 	
 	public function routeFileFinder(): FinderCollection
 	{
-		if ($this->basePathMissing()) {
+		return $this->fileFinder('*/routes/')
+			->depth(0)
+			->name('*.php');
+	}
+	
+	public function viewDirectoryFinder() : FinderCollection
+	{
+		return $this->directoryFinder('*/resources/')
+			->depth(0)
+			->name('views');
+	}
+	
+	protected function fileFinder(string $in = '') : FinderCollection
+	{
+		if ($this->modulesPathIsMissing()) {
 			return FinderCollection::empty();
 		}
 		
 		return FinderCollection::forFiles()
-			->depth(0)
-			->name('*.php')
-			->in($this->base_path.'/*/routes');
+			->in($this->modules_path.DIRECTORY_SEPARATOR.$in);
 	}
 	
-	public function viewDirectoryFinder(): FinderCollection
+	protected function directoryFinder(string $in = '') : FinderCollection
 	{
-		if ($this->basePathMissing()) {
+		if ($this->modulesPathIsMissing()) {
 			return FinderCollection::empty();
 		}
 		
 		return FinderCollection::forDirectories()
-			->depth(0)
-			->name('views')
-			->in($this->base_path.'/*/resources/');
+			->in($this->modules_path.DIRECTORY_SEPARATOR.$in);
 	}
 	
-	protected function basePathMissing(): bool
+	protected function modulesPathIsMissing() : bool
 	{
-		return false === $this->filesystem->isDirectory($this->base_path);
+		return false === is_dir($this->modules_path);
 	}
 }

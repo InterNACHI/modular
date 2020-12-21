@@ -70,10 +70,16 @@ class ModularServiceProvider extends ServiceProvider
 			);
 		});
 		
+		$this->app->singleton(CacheHelper::class, function() {
+			return new CacheHelper(
+				$this->app->bootstrapPath('cache/modules.php')
+			);
+		});
+		
 		$this->app->singleton(AutoDiscoveryHelper::class, function($app) {
 			return new AutoDiscoveryHelper(
 				$app->make(ModuleRegistry::class),
-				$app->make(Filesystem::class)
+				$app->make(CacheHelper::class)
 			);
 		});
 		
