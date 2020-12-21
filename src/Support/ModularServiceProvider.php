@@ -187,13 +187,13 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->callAfterResolving(BladeCompiler::class, function(BladeCompiler $blade) {
 			$this->autoDiscoveryHelper()
-				->bladeComponentFileFinder()
-				->each(function(SplFileInfo $component) use ($blade) {
-					if (!$module = $this->registry()->moduleForPath($component->getPath())) {
-						throw new RuntimeException("Unable to determine module for '{$component->getPath()}'");
+				->bladeComponents()
+				->each(function($filename) use ($blade) {
+					if (!$module = $this->registry()->moduleForPath($filename)) {
+						throw new RuntimeException("Unable to determine module for '{$filename}'");
 					}
 					
-					$fully_qualified_component = $this->pathToFullyQualifiedClassName($component->getPathname(), $module);
+					$fully_qualified_component = $this->pathToFullyQualifiedClassName($filename, $module);
 					$blade->component($fully_qualified_component, null, $module->name);
 				});
 		});

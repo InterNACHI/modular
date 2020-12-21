@@ -95,10 +95,15 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function bladeComponentFileFinder() : FinderCollection
+	public function bladeComponents() : Collection
 	{
-		return $this->fileFinder('*/src/View/Components/')
-			->name('*.php');
+		return $this->load('blade_components', function() {
+			return $this->fileFinder('*/src/View/Components/')
+				->name('*.php')
+				->map(function(SplFileInfo $path) {
+					return $path->getPathname();
+				});
+		});
 	}
 	
 	public function routeFileFinder(): FinderCollection

@@ -95,11 +95,7 @@ class AutoDiscoveryHelperTest extends TestCase
 			'--module' => $this->module2->name,
 		]);
 		
-		$resolved = [];
-		
-		$this->helper->bladeComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = $file->getPathname();
-		});
+		$resolved = $this->helper->bladeComponents();
 		
 		$this->assertContains($this->module1->path('src/View/Components/TestComponent.php'), $resolved);
 		$this->assertContains($this->module2->path('src/View/Components/TestComponent.php'), $resolved);

@@ -19,6 +19,7 @@ class CacheHelper
 		'legacy_factories',
 		'migrations',
 		'models',
+		'blade_components',
 	];
 	
 	/**
