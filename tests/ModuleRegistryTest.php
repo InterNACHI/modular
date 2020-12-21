@@ -27,5 +27,17 @@ class ModuleRegistryTest extends TestCase
 		$module = $registry->moduleForPath($this->getModulePath('test-module', 'foo/bar'));
 		$this->assertInstanceOf(ModuleConfig::class, $module);
 		$this->assertEquals('test-module', $module->name);
+		
+		$module = $registry->moduleForPath($this->getModulePath('test-module-two', 'foo/bar'));
+		$this->assertInstanceOf(ModuleConfig::class, $module);
+		$this->assertEquals('test-module-two', $module->name);
+		
+		$module = $registry->moduleForClass('Modules\\TestModule\\Foo');
+		$this->assertInstanceOf(ModuleConfig::class, $module);
+		$this->assertEquals('test-module', $module->name);
+		
+		$module = $registry->moduleForClass('Modules\\TestModuleTwo\\Foo');
+		$this->assertInstanceOf(ModuleConfig::class, $module);
+		$this->assertEquals('test-module-two', $module->name);
 	}
 }
