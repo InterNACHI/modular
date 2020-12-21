@@ -65,7 +65,12 @@ class ModuleRegistry
 	public function modules(): Collection
 	{
 		if (null === $this->modules) {
-			$this->modules = $this->auto_discovery->modules();
+			$this->modules = $this->auto_discovery->modules()
+				->mapWithKeys(function(array $module) {
+					return [
+						$module['name'] => new ModuleConfig($module['name'], $module['base_path'], new Collection($module['namespaces']))
+					];
+				});
 		}
 		
 		return $this->modules;

@@ -43,11 +43,7 @@ class AutoDiscoveryHelperTest extends TestCase
 			'--module' => $this->module2->name,
 		]);
 		
-		$resolved = [];
-		
-		$this->helper->commandFileFinder()->each(function(SplFileInfo $command) use (&$resolved) {
-			$resolved[] = $command->getPathname();
-		});
+		$resolved = $this->helper->commands();
 		
 		$this->assertContains($this->module1->path('src/Console/Commands/TestCommand.php'), $resolved);
 		$this->assertContains($this->module2->path('src/Console/Commands/TestCommand.php'), $resolved);

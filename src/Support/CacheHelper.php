@@ -2,6 +2,7 @@
 
 namespace InterNACHI\Modular\Support;
 
+use BadMethodCallException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Throwable;
@@ -12,7 +13,10 @@ class CacheHelper
 	
 	protected const CACHE_VERSION = 1;
 	
-	protected const MODULES_KEY = 'modules';
+	protected static $keys = [
+		'modules',
+		'commands',
+	];
 	
 	/**
 	 * @var string
@@ -45,48 +49,17 @@ class CacheHelper
 		return $this->filename;
 	}
 	
-	public function modules(array $modules = null) : ?array
+	public function __call($name, $arguments)
 	{
-		if ($modules) {
-			$this->cache[static::MODULES_KEY] = $modules;
+		if (in_array($name, static::$keys, true)) {
+			if (count($arguments)) {
+				$this->cache[$name] = $arguments[0];
+			}
+			
+			return $this->cache[$name] ?? null;
 		}
 		
-		return $this->cache[static::MODULES_KEY] ?? null;
-	}
-	
-	public function commandFiles(): Collection
-	{
-		// FIXME
-	}
-	
-	public function factoryDirectories(): Collection
-	{
-		// FIXME
-	}
-	
-	public function migrationDirectories(): Collection
-	{
-		// FIXME
-	}
-	
-	public function modelFiles(): Collection
-	{
-		// FIXME
-	}
-	
-	public function bladeComponentFiles(): Collection
-	{
-		// FIXME
-	}
-	
-	public function routeFiles(): Collection
-	{
-		// FIXME
-	}
-	
-	public function viewDirectories(): Collection
-	{
-		// FIXME
+		throw new BadMethodCallException("There is no '{$name}' in the cache.");
 	}
 	
 	protected function load(): array

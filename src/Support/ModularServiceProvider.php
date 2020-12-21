@@ -305,13 +305,13 @@ class ModularServiceProvider extends ServiceProvider
 	protected function registerCommands(Artisan $artisan): void
 	{
 		$this->autoDiscoveryHelper()
-			->commandFileFinder()
-			->each(function(SplFileInfo $file) use ($artisan) {
-				if (!$module = $this->registry()->moduleForPath($file->getPath())) {
-					throw new RuntimeException("Unable to determine module for '{$file->getPath()}'");
+			->commands()
+			->each(function($filename) use ($artisan) {
+				if (!$module = $this->registry()->moduleForPath($filename)) {
+					throw new RuntimeException("Unable to determine module for '{$filename}'");
 				}
 				
-				$class_name = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
+				$class_name = $this->pathToFullyQualifiedClassName($filename, $module);
 				if ($this->isInstantiableCommand($class_name)) {
 					$artisan->resolve($class_name);
 				}

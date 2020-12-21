@@ -3,7 +3,11 @@
 namespace InterNACHI\Modular\Support;
 
 use Closure;
+use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use ReflectionClass;
+use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
 
 class AutoDiscoveryHelper
@@ -26,7 +30,7 @@ class AutoDiscoveryHelper
 	
 	public function modules() : Collection
 	{
-		$loader = function() {
+		return $this->load('modules', function() {
 			return $this->fileFinder()
 				->depth('== 1')
 				->name('composer.json')
@@ -46,19 +50,18 @@ class AutoDiscoveryHelper
 					
 					return [$name => compact('name', 'base_path', 'namespaces')];
 				});
-		};
-		
-		return $this->load('modules', $loader)
-			->mapWithKeys(function(array $cached) {
-				$config = new ModuleConfig($cached['name'], $cached['base_path'], new Collection($cached['namespaces']));
-				return [$config->name => $config];
-			});
+		});
 	}
 	
-	public function commandFileFinder() : FinderCollection
+	public function commands() : Collection
 	{
-		return $this->fileFinder('*/src/Console/Commands/')
-			->name('*.php');
+		return $this->load('commands', function() {
+			return $this->fileFinder('*/src/Console/Commands/')
+				->name('*.php')
+				->map(function(SplFileInfo $file) {
+					return $file->getPathname();
+				});
+		});
 	}
 	
 	public function factoryDirectoryFinder() : FinderCollection
