@@ -69,7 +69,7 @@ class MakeModuleTest extends TestCase
 			->expectsQuestion('Would you like to cancel and configure your module namespace first?', false)
 			->assertExitCode(0);
 		
-		Modules::reload();
+		Modules::clear();
 		
 		$this->assertTrue($fs->isDirectory($this->getBasePath().DIRECTORY_SEPARATOR.'app-modules'.DIRECTORY_SEPARATOR.'test-module'));
 		

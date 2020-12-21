@@ -4,6 +4,7 @@ namespace InterNACHI\Modular\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use InterNACHI\Modular\Support\CacheHelper;
 use InterNACHI\Modular\Support\ModuleConfig;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use LogicException;
@@ -15,7 +16,7 @@ class ModulesCache extends Command
 	
 	protected $description = 'Create a cache file for faster module loading';
 	
-	public function handle(ModuleRegistry $registry, Filesystem $filesystem)
+	public function handle(ModuleRegistry $registry, Filesystem $filesystem, CacheHelper $helper)
 	{
 		$this->call(ModulesClear::class);
 		
@@ -25,7 +26,7 @@ class ModulesCache extends Command
 			})
 			->toArray();
 		
-		$cache_path = $registry->getCachePath();
+		$cache_path = $helper->getFilename();
 		$cache_contents = '<?php return '.var_export($export, true).';'.PHP_EOL;
 		
 		$filesystem->put($cache_path, $cache_contents);

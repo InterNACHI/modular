@@ -40,6 +40,11 @@ class CacheHelper
 		return false;
 	}
 	
+	public function getFilename(): string
+	{
+		return $this->filename;
+	}
+	
 	public function modules(array $modules = null) : ?array
 	{
 		if ($modules) {

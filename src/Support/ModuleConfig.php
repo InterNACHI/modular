@@ -23,24 +23,6 @@ class ModuleConfig implements Arrayable
 	 */
 	public $namespaces;
 	
-	public static function fromComposerFile(SplFileInfo $composer_file): self
-	{
-		$composer_config = json_decode($composer_file->getContents(), true, 16, JSON_THROW_ON_ERROR);
-		
-		$base_path = rtrim($composer_file->getPath(), DIRECTORY_SEPARATOR);
-		
-		$name = basename($base_path);
-		
-		$namespaces = Collection::make($composer_config['autoload']['psr-4'] ?? [])
-			->mapWithKeys(function($src, $namespace) use ($base_path) {
-				$src = str_replace('/', DIRECTORY_SEPARATOR, $src);
-				$path = $base_path.DIRECTORY_SEPARATOR.$src;
-				return [$path => $namespace];
-			});
-		
-		return new static($name, $base_path, $namespaces);
-	}
-	
 	public function __construct($name, $base_path, Collection $namespaces = null)
 	{
 		$this->name = $name;
@@ -55,7 +37,9 @@ class ModuleConfig implements Arrayable
 	
 	public function namespace(): string
 	{
-		return $this->namespaces->first();
+		return $this->namespaces->first(function($namespace, $path) {
+			return false !== stripos($path, 'src'.DIRECTORY_SEPARATOR);
+		});
 	}
 	
 	public function qualify(string $class_name): string

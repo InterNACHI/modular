@@ -28,10 +28,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$this->module1 = $this->makeModule('test-module');
 		$this->module2 = $this->makeModule('test-module-two');
-		$this->helper = new AutoDiscoveryHelper(
-			new ModuleRegistry($this->getBasePath().'/app-modules', ''),
-			new CacheHelper(tempnam(sys_get_temp_dir(), 'modular-cache'))
-		);
+		$this->helper = new AutoDiscoveryHelper($this->getBasePath().'/app-modules');
 	}
 	
 	public function test_it_finds_commands() : void

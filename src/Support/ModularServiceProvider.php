@@ -63,10 +63,10 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->mergeConfigFrom("{$this->base_dir}/config.php", 'app-modules');
 		
-		$this->app->singleton(ModuleRegistry::class, function() {
+		$this->app->singleton(ModuleRegistry::class, function($app) {
 			return new ModuleRegistry(
 				$this->getModulesBasePath(),
-				$this->app->bootstrapPath('cache/modules.php')
+				$app->make(AutoDiscoveryHelper::class)
 			);
 		});
 		
@@ -78,7 +78,7 @@ class ModularServiceProvider extends ServiceProvider
 		
 		$this->app->singleton(AutoDiscoveryHelper::class, function($app) {
 			return new AutoDiscoveryHelper(
-				$app->make(ModuleRegistry::class),
+				$this->getModulesBasePath(),
 				$app->make(CacheHelper::class)
 			);
 		});

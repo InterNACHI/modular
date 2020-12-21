@@ -2,35 +2,57 @@
 
 namespace InterNACHI\Modular\Support;
 
+use Closure;
+use Illuminate\Support\Collection;
+use Symfony\Component\Finder\SplFileInfo;
+
 class AutoDiscoveryHelper
 {
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry
-	 */
-	protected $module_registry;
-	
 	/**
 	 * @var string
 	 */
 	protected $modules_path;
 	
 	/**
-	 * @var \InterNACHI\Modular\Support\CacheHelper
+	 * @var \InterNACHI\Modular\Support\CacheHelper|null
 	 */
 	protected $cache;
 	
-	public function __construct(ModuleRegistry $module_registry, CacheHelper $cache)
+	public function __construct(string $modules_path, CacheHelper $cache = null)
 	{
-		$this->module_registry = $module_registry;
-		$this->modules_path = rtrim($module_registry->getModulesPath(), DIRECTORY_SEPARATOR);
+		$this->modules_path = rtrim($modules_path, DIRECTORY_SEPARATOR);
 		$this->cache = $cache;
 	}
 	
-	public function modulesFinder() : FinderCollection
+	public function modules() : Collection
 	{
-		return $this->fileFinder()
-			->depth('== 1')
-			->name('composer.json');
+		$loader = function() {
+			return $this->fileFinder()
+				->depth('== 1')
+				->name('composer.json')
+				->mapWithKeys(function(SplFileInfo $composer_file) {
+					$composer_config = json_decode($composer_file->getContents(), true, 16, JSON_THROW_ON_ERROR);
+					
+					$base_path = rtrim($composer_file->getPath(), DIRECTORY_SEPARATOR);
+					
+					$name = basename($base_path);
+					
+					$namespaces = Collection::make($composer_config['autoload']['psr-4'] ?? [])
+						->mapWithKeys(function($src, $namespace) use ($base_path) {
+							$src = str_replace('/', DIRECTORY_SEPARATOR, $src);
+							$path = $base_path.DIRECTORY_SEPARATOR.$src;
+							return [$path => $namespace];
+						});
+					
+					return [$name => compact('name', 'base_path', 'namespaces')];
+				});
+		};
+		
+		return $this->load('modules', $loader)
+			->mapWithKeys(function(array $cached) {
+				$config = new ModuleConfig($cached['name'], $cached['base_path'], new Collection($cached['namespaces']));
+				return [$config->name => $config];
+			});
 	}
 	
 	public function commandFileFinder() : FinderCollection
@@ -77,6 +99,15 @@ class AutoDiscoveryHelper
 		return $this->directoryFinder('*/resources/')
 			->depth(0)
 			->name('views');
+	}
+	
+	protected function load(string $name, Closure $loader) : Collection
+	{
+		$cached = $this->cache
+			? call_user_func([$this->cache, $name])
+			: null;
+		
+		return new Collection($cached ?? $loader());
 	}
 	
 	protected function fileFinder(string $in = '') : FinderCollection

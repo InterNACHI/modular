@@ -2,22 +2,26 @@
 
 namespace InterNACHI\Modular\Support;
 
+use ArrayIterator;
+use Exception;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
+use IteratorAggregate;
 use Symfony\Component\Finder\Finder;
+use Traversable;
 
 /**
  * @mixin \Illuminate\Support\LazyCollection
  * @mixin \Symfony\Component\Finder\Finder
  */
-class FinderCollection
+class FinderCollection implements IteratorAggregate
 {
 	use ForwardsCalls;
 	
 	protected static $prefer_collection_methods = ['filter', 'each'];
 	
 	/**
-	 * @var \Symfony\Component\Finder\Finder
+	 * @var \Symfony\Component\Finder\Finder|Traversable
 	 */
 	protected $finder;
 	
@@ -40,7 +44,7 @@ class FinderCollection
 	{
 		$collection = new static();
 		
-		$collection->finder = null;
+		$collection->finder = new ArrayIterator([]);
 		
 		return $collection;
 	}
@@ -51,10 +55,15 @@ class FinderCollection
 		$this->collection = new LazyCollection();
 	}
 	
+	public function getIterator()
+	{
+		return $this->collection->getIterator();
+	}
+	
 	public function __call($name, $arguments)
 	{
 		// If we're working with an empty instance, don't do anything with calls
-		if (null === $this->finder) {
+		if ($this->finder instanceof ArrayIterator) {
 			return $this;
 		}
 		
