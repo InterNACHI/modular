@@ -59,11 +59,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	
 	public function test_it_finds_migration_directories() : void
 	{
-		$resolved = [];
-		
-		$this->helper->migrationDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = $directory->getPathname();
-		});
+		$resolved = $this->helper->migrations();
 		
 		$this->assertContains($this->module1->path('database/migrations'), $resolved);
 		$this->assertContains($this->module2->path('database/migrations'), $resolved);

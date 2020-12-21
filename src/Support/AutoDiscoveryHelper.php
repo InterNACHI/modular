@@ -72,11 +72,16 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function migrationDirectoryFinder() : FinderCollection
+	public function migrations() : Collection
 	{
-		return $this->directoryFinder('*/database/')
-			->depth(0)
-			->name('migrations');
+		return $this->load('migrations', function() {
+			return $this->directoryFinder('*/database/')
+				->depth(0)
+				->name('migrations')
+				->map(function(SplFileInfo $path) {
+					return $path->getPathname();
+				});
+		});
 	}
 	
 	public function modelFileFinder(): FinderCollection

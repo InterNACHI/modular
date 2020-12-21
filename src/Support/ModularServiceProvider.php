@@ -225,9 +225,9 @@ class ModularServiceProvider extends ServiceProvider
 	protected function registerMigrations(Migrator $migrator) : void
 	{
 		$this->autoDiscoveryHelper()
-			->migrationDirectoryFinder()
-			->each(function(SplFileInfo $path) use ($migrator) {
-				$migrator->path($path->getRealPath());
+			->migrations()
+			->each(function($path) use ($migrator) {
+				$migrator->path($path);
 			});
 	}
 	

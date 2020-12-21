@@ -17,6 +17,7 @@ class CacheHelper
 		'modules',
 		'commands',
 		'legacy_factories',
+		'migrations',
 	];
 	
 	/**
