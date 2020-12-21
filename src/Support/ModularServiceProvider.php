@@ -273,13 +273,13 @@ class ModularServiceProvider extends ServiceProvider
 	protected function registerPolicies(Gate $gate) : void
 	{
 		$this->autoDiscoveryHelper()
-			->modelFileFinder()
-			->each(function(SplFileInfo $file) use ($gate) {
-				if (!$module = $this->registry()->moduleForPath($file->getPath())) {
-					throw new RuntimeException("Unable to determine module for '{$file->getPath()}'");
+			->models()
+			->each(function($filename) use ($gate) {
+				if (!$module = $this->registry()->moduleForPath($filename)) {
+					throw new RuntimeException("Unable to determine module for '{$filename}'");
 				}
 				
-				$fully_qualified_model = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
+				$fully_qualified_model = $this->pathToFullyQualifiedClassName($filename, $module);
 				
 				// First, check for a policy that maps to the full namespace of the model
 				// i.e. Models/Foo/Bar -> Policies/Foo/BarPolicy

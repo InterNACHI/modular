@@ -84,10 +84,15 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function modelFileFinder(): FinderCollection
+	public function models(): Collection
 	{
-		return $this->fileFinder('*/src/Models/')
-			->name('*.php');
+		return $this->load('models', function() {
+			return $this->fileFinder('*/src/Models/')
+				->name('*.php')
+				->map(function(SplFileInfo $path) {
+					return $path->getPathname();
+				});
+		});
 	}
 	
 	public function bladeComponentFileFinder() : FinderCollection

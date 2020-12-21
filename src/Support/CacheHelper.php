@@ -18,6 +18,7 @@ class CacheHelper
 		'commands',
 		'legacy_factories',
 		'migrations',
+		'models',
 	];
 	
 	/**

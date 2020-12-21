@@ -77,11 +77,7 @@ class AutoDiscoveryHelperTest extends TestCase
 			'--module' => $this->module2->name,
 		]);
 		
-		$resolved = [];
-		
-		$this->helper->modelFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = $file->getPathname();
-		});
+		$resolved = $this->helper->models();
 		
 		$this->assertContains($this->module1->path('src/Models/TestModel.php'), $resolved);
 		$this->assertContains($this->module2->path('src/Models/TestModel.php'), $resolved);
