@@ -20,6 +20,7 @@ class CacheHelper
 		'migrations',
 		'models',
 		'blade_components',
+		'routes',
 	];
 	
 	/**

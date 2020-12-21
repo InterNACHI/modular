@@ -106,11 +106,16 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function routeFileFinder(): FinderCollection
+	public function routes(): Collection
 	{
-		return $this->fileFinder('*/routes/')
-			->depth(0)
-			->name('*.php');
+		return $this->load('routes', function() {
+			return $this->fileFinder('*/routes/')
+				->depth(0)
+				->name('*.php')
+				->map(function(SplFileInfo $path) {
+					return $path->getPathname();
+				});
+		});
 	}
 	
 	public function viewDirectoryFinder() : FinderCollection

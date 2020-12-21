@@ -162,9 +162,9 @@ class ModularServiceProvider extends ServiceProvider
 		}
 		
 		$this->autoDiscoveryHelper()
-			->routeFileFinder()
-			->each(function(SplFileInfo $file) {
-				require $file->getRealPath();
+			->routes()
+			->each(function($filename) {
+				require $filename;
 			});
 	}
 	

@@ -103,11 +103,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	
 	public function test_it_finds_routes() : void
 	{
-		$resolved = [];
-		
-		$this->helper->routeFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = $file->getPathname();
-		});
+		$resolved = $this->helper->routes();
 		
 		$this->assertContains($this->module1->path("routes/{$this->module1->name}-routes.php"), $resolved);
 		$this->assertContains($this->module2->path("routes/{$this->module2->name}-routes.php"), $resolved);
