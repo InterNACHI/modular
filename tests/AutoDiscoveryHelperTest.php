@@ -111,11 +111,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	
 	public function test_it_finds_view_directories() : void
 	{
-		$resolved = [];
-		
-		$this->helper->viewDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = $directory->getPathname();
-		});
+		$resolved = $this->helper->viewDirectories();
 		
 		$this->assertContains($this->module1->path('resources/views'), $resolved);
 		$this->assertContains($this->module2->path('resources/views'), $resolved);

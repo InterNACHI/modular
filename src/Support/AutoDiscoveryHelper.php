@@ -118,11 +118,16 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function viewDirectoryFinder() : FinderCollection
+	public function viewDirectories() : Collection
 	{
-		return $this->directoryFinder('*/resources/')
-			->depth(0)
-			->name('views');
+		return $this->load('routes', function() {
+			return $this->directoryFinder('*/resources/')
+				->depth(0)
+				->name('views')
+				->map(function(SplFileInfo $path) {
+					return $path->getPathname();
+				});
+		});
 	}
 	
 	protected function load(string $name, Closure $loader) : Collection

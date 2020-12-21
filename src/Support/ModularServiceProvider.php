@@ -172,13 +172,13 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->callAfterResolving('view', function(ViewFactory $view_factory) {
 			$this->autoDiscoveryHelper()
-				->viewDirectoryFinder()
-				->each(function(SplFileInfo $directory) use ($view_factory) {
-					if (!$module = $this->registry()->moduleForPath($directory->getPath())) {
-						throw new RuntimeException("Unable to determine module for '{$directory->getPath()}'");
+				->viewDirectories()
+				->each(function($directory) use ($view_factory) {
+					if (!$module = $this->registry()->moduleForPath($directory)) {
+						throw new RuntimeException("Unable to determine module for '{$directory}'");
 					}
 					
-					$view_factory->addNamespace($module->name, $directory->getRealPath());
+					$view_factory->addNamespace($module->name, $directory);
 				});
 		});
 	}
