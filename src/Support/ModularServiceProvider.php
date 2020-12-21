@@ -264,9 +264,9 @@ class ModularServiceProvider extends ServiceProvider
 	protected function registerLegacyFactories(LegacyEloquentFactory $factory) : void
 	{
 		$this->autoDiscoveryHelper()
-			->factoryDirectoryFinder()
-			->each(function(SplFileInfo $path) use ($factory) {
-				$factory->load($path->getRealPath());
+			->legacyFactoryPaths()
+			->each(function($path) use ($factory) {
+				$factory->load($path);
 			});
 	}
 	

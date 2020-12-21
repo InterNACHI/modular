@@ -3,11 +3,7 @@
 namespace InterNACHI\Modular\Support;
 
 use Closure;
-use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use ReflectionClass;
-use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
 
 class AutoDiscoveryHelper
@@ -64,14 +60,19 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function factoryDirectoryFinder() : FinderCollection
+	public function legacyFactoryPaths() : Collection
 	{
-		return $this->directoryFinder('*/database/')
-			->depth(0)
-			->name('factories');
+		return $this->load('legacy_factories', function() {
+			return $this->directoryFinder('*/database')
+				->depth(0)
+				->name('factories')
+				->map(function(SplFileInfo $path) {
+					return $path->getPathname();
+				});
+		});
 	}
 	
-	public function migrationDirectoryFinder(): FinderCollection
+	public function migrationDirectoryFinder() : FinderCollection
 	{
 		return $this->directoryFinder('*/database/')
 			->depth(0)

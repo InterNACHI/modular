@@ -16,6 +16,7 @@ class CacheHelper
 	protected static $keys = [
 		'modules',
 		'commands',
+		'legacy_factories',
 	];
 	
 	/**

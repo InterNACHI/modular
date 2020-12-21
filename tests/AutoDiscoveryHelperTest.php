@@ -51,11 +51,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	
 	public function test_it_finds_factory_directories() : void
 	{
-		$resolved = [];
-		
-		$this->helper->factoryDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = $directory->getPathname();
-		});
+		$resolved = $this->helper->legacyFactoryPaths();
 		
 		$this->assertContains($this->module1->path('database/factories'), $resolved);
 		$this->assertContains($this->module2->path('database/factories'), $resolved);
