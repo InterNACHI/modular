@@ -21,6 +21,7 @@ class CacheHelper
 		'models',
 		'blade_components',
 		'routes',
+		'view_directories',
 	];
 	
 	/**

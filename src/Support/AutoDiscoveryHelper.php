@@ -120,7 +120,7 @@ class AutoDiscoveryHelper
 	
 	public function viewDirectories() : Collection
 	{
-		return $this->load('routes', function() {
+		return $this->load('view_directories', function() {
 			return $this->directoryFinder('*/resources/')
 				->depth(0)
 				->name('views')
