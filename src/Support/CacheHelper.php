@@ -2,9 +2,8 @@
 
 namespace InterNACHI\Modular\Support;
 
-use BadMethodCallException;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use RuntimeException;
 use Throwable;
 
 class CacheHelper
@@ -12,17 +11,6 @@ class CacheHelper
 	protected const VERSION_KEY = '__cache_version';
 	
 	protected const CACHE_VERSION = 1;
-	
-	protected static $keys = [
-		'modules',
-		'commands',
-		'legacy_factories',
-		'migrations',
-		'models',
-		'blade_components',
-		'routes',
-		'view_directories',
-	];
 	
 	/**
 	 * @var string
@@ -46,46 +34,66 @@ class CacheHelper
 	
 	public function write(): bool
 	{
-		// FIXME
-		return false;
+		$export = Collection::make($this->cache)->toArray();
+		
+		$contents = '<?php return '.var_export($export, true).';'.PHP_EOL;
+		
+		return file_put_contents($this->filename, $contents);
 	}
 	
-	public function getFilename(): string
+	public function getFilename() : string
 	{
 		return $this->filename;
 	}
 	
-	public function __call($name, $arguments)
+	public function get(string $name)
 	{
-		if (in_array($name, static::$keys, true)) {
-			if (count($arguments)) {
-				$this->cache[$name] = $arguments[0];
-			}
-			
-			return $this->cache[$name] ?? null;
-		}
-		
-		throw new BadMethodCallException("There is no '{$name}' in the cache.");
+		return $this->cache[$name] ?? null;
 	}
 	
-	protected function load(): array
+	public function set(string $name, array $value) : self
+	{
+		$this->cache[$name] = $value;
+		
+		return $this;
+	}
+	
+	public function forget(string $name) : self
+	{
+		unset($this->cache[$name]);
+		
+		return $this;
+	}
+	
+	protected function load() : array
 	{
 		try {
 			$cache = include $this->filename;
-			
-			if (!is_array($cache)) {
-				return [];
-			}
-			
-			// Convert version-less cache to version "0"
-			if (!isset($cache[static::VERSION_KEY])) {
-				$cache = [
-					static::VERSION_KEY => 0,
-					static::MODULES_KEY => $cache,
-				];
-			}
 		} catch (Throwable $exception) {
-			return [];
+			return $this->cache;
+		}
+		
+		if (!is_array($cache)) {
+			return $this->cache;
+		}
+		
+		$cache = $this->migrate($cache);
+		
+		if ($cache[static::VERSION_KEY] !== static::CACHE_VERSION) {
+			throw new RuntimeException("Unrecognized modular cache version: {$cache[static::VERSION_KEY]}");
+		}
+		
+		return $cache;
+	}
+	
+	protected function migrate(array $cache) : array
+	{
+		// Migrate from version-less array to v1
+		if (!isset($cache[static::VERSION_KEY])) {
+			$cache = [
+				static::VERSION_KEY => static::CACHE_VERSION,
+				'modules' => $cache,
+			];
 		}
 		
 		return $cache;

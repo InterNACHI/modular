@@ -4,6 +4,7 @@ namespace InterNACHI\Modular\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use InterNACHI\Modular\Support\AutoDiscoveryHelper;
 use InterNACHI\Modular\Support\CacheHelper;
 use InterNACHI\Modular\Support\ModuleConfig;
 use InterNACHI\Modular\Support\ModuleRegistry;
@@ -16,25 +17,26 @@ class ModulesCache extends Command
 	
 	protected $description = 'Create a cache file for faster module loading';
 	
-	public function handle(ModuleRegistry $registry, Filesystem $filesystem, CacheHelper $helper)
+	public function handle(AutoDiscoveryHelper $helper, CacheHelper $cache)
 	{
 		$this->call(ModulesClear::class);
 		
-		$export = $registry->modules()
-			->map(function(ModuleConfig $module_config) {
-				return $module_config->toArray();
-			})
-			->toArray();
+		foreach ($helper->toArray() as $key => $value) {
+			$cache->set($key, $value);
+		}
 		
-		$cache_path = $helper->getFilename();
-		$cache_contents = '<?php return '.var_export($export, true).';'.PHP_EOL;
+		$filename = $cache->getFilename();
 		
-		$filesystem->put($cache_path, $cache_contents);
+		if (!$cache->write()) {
+			throw new LogicException("Unable to write to '{$filename}'.");
+		}
 		
 		try {
-			require $cache_path;
+			require $filename;
 		} catch (Throwable $e) {
-			$filesystem->delete($cache_path);
+			if (file_exists($filename)) {
+				@unlink($filename);
+			}
 			throw new LogicException('Unable to cache module configuration.', 0, $e);
 		}
 		

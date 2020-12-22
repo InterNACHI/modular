@@ -23,7 +23,11 @@ class ModulesCacheTest extends TestCase
 		
 		$cache = include $expected_path;
 		
-		$this->assertArrayHasKey('test-module', $cache);
-		$this->assertArrayHasKey('test-module-two', $cache);
+		$this->assertIsArray($cache);
+		$this->assertArrayHasKey('__cache_version', $cache);
+		$this->assertArrayHasKey('modules', $cache);
+		$this->assertIsArray($cache['modules']);
+		$this->assertArrayHasKey('test-module', $cache['modules']);
+		$this->assertArrayHasKey('test-module-two', $cache['modules']);
 	}
 }

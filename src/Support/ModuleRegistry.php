@@ -4,7 +4,6 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Symfony\Component\Finder\SplFileInfo;
 
 class ModuleRegistry
 {
@@ -64,13 +63,12 @@ class ModuleRegistry
 	
 	public function modules(): Collection
 	{
-		if (null === $this->modules) {
-			$this->modules = $this->auto_discovery->modules()
-				->mapWithKeys(function(array $module) {
-					return [
-						$module['name'] => new ModuleConfig($module['name'], $module['base_path'], new Collection($module['namespaces']))
-					];
-				});
+		if (null === $this->modules && ($modules = $this->auto_discovery->modules())) {
+			$this->modules = $modules->mapWithKeys(function(array $module) {
+				return [
+					$module['name'] => new ModuleConfig($module['name'], $module['base_path'], new Collection($module['namespaces'])),
+				];
+			});
 		}
 		
 		return $this->modules;

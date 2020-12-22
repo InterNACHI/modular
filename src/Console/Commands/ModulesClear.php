@@ -16,6 +16,7 @@ class ModulesClear extends Command
 	public function handle(Filesystem $filesystem, CacheHelper $helper)
 	{
 		$filesystem->delete($helper->getFilename());
+		
 		$this->info('Module cache cleared!');
 	}
 }

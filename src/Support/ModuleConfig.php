@@ -52,7 +52,7 @@ class ModuleConfig implements Arrayable
 		return [
 			'name' => $this->name,
 			'base_path' => $this->base_path,
-			'namespaces' => $this->namespaces->toArray(),
+			'namespaces' => $this->namespaces->all(),
 		];
 	}
 }
