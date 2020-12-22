@@ -21,6 +21,10 @@ class ModularServiceProviderTest extends TestCase
 	
 	public function test_model_factory_classes_are_resolved_correctly() : void
 	{
+		if (version_compare($this->app->version(), '8.0.0', '<')) {
+			$this->markTestSkipped('Factory classes are not supported before Laravel 8.');
+		}
+		
 		$module = $this->makeModule();
 		
 		$this->assertEquals(
@@ -66,6 +70,10 @@ class ModularServiceProviderTest extends TestCase
 	
 	public function test_model_factory_classes_are_resolved_correctly_with_custom_namespace() : void
 	{
+		if (version_compare($this->app->version(), '8.0.0', '<')) {
+			$this->markTestSkipped('Factory classes are not supported before Laravel 8.');
+		}
+		
 		Factory::useNamespace('Something\\');
 		
 		$module = $this->makeModule();

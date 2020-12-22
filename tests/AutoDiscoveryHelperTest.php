@@ -7,6 +7,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Support\AutoDiscoveryHelper;
+use InterNACHI\Modular\Support\CacheHelper;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use Symfony\Component\Finder\SplFileInfo;
@@ -27,10 +28,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$this->module1 = $this->makeModule('test-module');
 		$this->module2 = $this->makeModule('test-module-two');
-		$this->helper = new AutoDiscoveryHelper(
-			new ModuleRegistry($this->getBasePath().'/app-modules', ''),
-			new Filesystem()
-		);
+		$this->helper = new AutoDiscoveryHelper($this->getBasePath().'/app-modules');
 	}
 	
 	public function test_it_finds_commands() : void
@@ -45,11 +43,7 @@ class AutoDiscoveryHelperTest extends TestCase
 			'--module' => $this->module2->name,
 		]);
 		
-		$resolved = [];
-		
-		$this->helper->commandFileFinder()->each(function(SplFileInfo $command) use (&$resolved) {
-			$resolved[] = $command->getPathname();
-		});
+		$resolved = $this->helper->commands();
 		
 		$this->assertContains($this->module1->path('src/Console/Commands/TestCommand.php'), $resolved);
 		$this->assertContains($this->module2->path('src/Console/Commands/TestCommand.php'), $resolved);
@@ -57,11 +51,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	
 	public function test_it_finds_factory_directories() : void
 	{
-		$resolved = [];
-		
-		$this->helper->factoryDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = $directory->getPathname();
-		});
+		$resolved = $this->helper->legacyFactoryPaths();
 		
 		$this->assertContains($this->module1->path('database/factories'), $resolved);
 		$this->assertContains($this->module2->path('database/factories'), $resolved);
@@ -69,11 +59,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	
 	public function test_it_finds_migration_directories() : void
 	{
-		$resolved = [];
-		
-		$this->helper->migrationDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = $directory->getPathname();
-		});
+		$resolved = $this->helper->migrations();
 		
 		$this->assertContains($this->module1->path('database/migrations'), $resolved);
 		$this->assertContains($this->module2->path('database/migrations'), $resolved);
@@ -91,11 +77,7 @@ class AutoDiscoveryHelperTest extends TestCase
 			'--module' => $this->module2->name,
 		]);
 		
-		$resolved = [];
-		
-		$this->helper->modelFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = $file->getPathname();
-		});
+		$resolved = $this->helper->models();
 		
 		$this->assertContains($this->module1->path('src/Models/TestModel.php'), $resolved);
 		$this->assertContains($this->module2->path('src/Models/TestModel.php'), $resolved);
@@ -113,11 +95,7 @@ class AutoDiscoveryHelperTest extends TestCase
 			'--module' => $this->module2->name,
 		]);
 		
-		$resolved = [];
-		
-		$this->helper->bladeComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = $file->getPathname();
-		});
+		$resolved = $this->helper->bladeComponents();
 		
 		$this->assertContains($this->module1->path('src/View/Components/TestComponent.php'), $resolved);
 		$this->assertContains($this->module2->path('src/View/Components/TestComponent.php'), $resolved);
@@ -125,11 +103,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	
 	public function test_it_finds_routes() : void
 	{
-		$resolved = [];
-		
-		$this->helper->routeFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = $file->getPathname();
-		});
+		$resolved = $this->helper->routes();
 		
 		$this->assertContains($this->module1->path("routes/{$this->module1->name}-routes.php"), $resolved);
 		$this->assertContains($this->module2->path("routes/{$this->module2->name}-routes.php"), $resolved);
@@ -137,11 +111,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	
 	public function test_it_finds_view_directories() : void
 	{
-		$resolved = [];
-		
-		$this->helper->viewDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = $directory->getPathname();
-		});
+		$resolved = $this->helper->viewDirectories();
 		
 		$this->assertContains($this->module1->path('resources/views'), $resolved);
 		$this->assertContains($this->module2->path('resources/views'), $resolved);

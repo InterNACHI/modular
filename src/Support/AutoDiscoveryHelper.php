@@ -2,115 +2,208 @@
 
 namespace InterNACHI\Modular\Support;
 
-use Illuminate\Filesystem\Filesystem;
+use Closure;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
+use Symfony\Component\Finder\SplFileInfo;
 
-class AutoDiscoveryHelper
+class AutoDiscoveryHelper implements Arrayable
 {
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry 
-	 */
-	protected $module_registry;
-	
-	/**
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $filesystem;
-	
 	/**
 	 * @var string
 	 */
-	protected $base_path;
+	protected $modules_path;
 	
-	public function __construct(ModuleRegistry $module_registry, Filesystem $filesystem)
+	/**
+	 * @var \InterNACHI\Modular\Support\CacheHelper|null
+	 */
+	protected $cache;
+	
+	/**
+	 * @var \Closure[] 
+	 */
+	protected $loaders;
+	
+	public function __construct(string $modules_path, CacheHelper $cache = null)
 	{
-		$this->module_registry = $module_registry;
-		$this->filesystem = $filesystem;
-		$this->base_path = $module_registry->getModulesPath();
+		$this->modules_path = rtrim($modules_path, DIRECTORY_SEPARATOR);
+		$this->cache = $cache;
+		
+		$this->loaders = $this->getLoaders();
 	}
 	
-	public function commandFileFinder(): FinderCollection
+	public function toArray()
 	{
-		if ($this->basePathMissing()) {
-			return FinderCollection::empty();
+		return Collection::make($this->loaders)
+			->map(function(Closure $loader) {
+				return $loader();
+			})
+			->toArray();
+	}
+	
+	public function modules() : ?Collection
+	{
+		return $this->load('modules');
+	}
+	
+	public function commands() : ?Collection
+	{
+		return $this->load('commands');
+	}
+	
+	public function legacyFactoryPaths() : ?Collection
+	{
+		return $this->load('legacy_factories');
+	}
+	
+	public function migrations() : ?Collection
+	{
+		return $this->load('migrations');
+	}
+	
+	public function models(): ?Collection
+	{
+		return $this->load('models');
+	}
+	
+	public function bladeComponents() : ?Collection
+	{
+		return $this->load('blade_components');
+	}
+	
+	public function routes(): ?Collection
+	{
+		return $this->load('routes');
+	}
+	
+	public function viewDirectories() : ?Collection
+	{
+		return $this->load('view_directories');
+	}
+	
+	protected function load(string $name) : ?Collection
+	{
+		$result = $this->cache
+			? $this->cache->get($name)
+			: null;
+		
+		if (!$result) {
+			$result = $this->loaders[$name]();
 		}
 		
-		return FinderCollection::forFiles()
-			->name('*.php')
-			->in($this->base_path.'/*/src/Console/Commands');
-	}
-	
-	public function factoryDirectoryFinder(): FinderCollection
-	{
-		if ($this->basePathMissing()) {
-			return FinderCollection::empty();
+		if ($result instanceof EmptyFinderCollection) {
+			return null;
 		}
 		
-		return FinderCollection::forDirectories()
-			->depth(0)
-			->name('factories')
-			->in($this->base_path.'/*/database/');
+		return new Collection($result);
 	}
 	
-	public function migrationDirectoryFinder(): FinderCollection
+	protected function fileFinder(string $in = '') : FinderCollection
 	{
-		if ($this->basePathMissing()) {
+		try {
+			return FinderCollection::forFiles()
+				->in($this->modules_path.DIRECTORY_SEPARATOR.$in);
+		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
 		}
-		
-		return FinderCollection::forDirectories()
-			->depth(0)
-			->name('migrations')
-			->in($this->base_path.'/*/database/');
 	}
 	
-	public function modelFileFinder(): FinderCollection
+	protected function directoryFinder(string $in = '') : FinderCollection
 	{
-		if ($this->basePathMissing()) {
+		try {
+			return FinderCollection::forDirectories()
+				->in($this->modules_path.DIRECTORY_SEPARATOR.$in);
+		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
 		}
-		
-		return FinderCollection::forFiles()
-			->name('*.php')
-			->in($this->base_path.'/*/src/Models');
 	}
 	
-	public function bladeComponentFileFinder() : FinderCollection
+	/**
+	 * These loaders are meant to build data that can be manipulated by
+	 * modular or cached in production. They should return a Collection
+	 * of data that contains only PHP primitive values (arrays, strings, etc).
+	 * 
+	 * @return \Closure[]
+	 */
+	protected function getLoaders(): array
 	{
-		if ($this->basePathMissing()) {
-			return FinderCollection::empty();
-		}
-		
-		return FinderCollection::forFiles()
-			->name('*.php')
-			->in($this->base_path.'/*/src/View/Components');
-	}
-	
-	public function routeFileFinder(): FinderCollection
-	{
-		if ($this->basePathMissing()) {
-			return FinderCollection::empty();
-		}
-		
-		return FinderCollection::forFiles()
-			->depth(0)
-			->name('*.php')
-			->in($this->base_path.'/*/routes');
-	}
-	
-	public function viewDirectoryFinder(): FinderCollection
-	{
-		if ($this->basePathMissing()) {
-			return FinderCollection::empty();
-		}
-		
-		return FinderCollection::forDirectories()
-			->depth(0)
-			->name('views')
-			->in($this->base_path.'/*/resources/');
-	}
-	
-	protected function basePathMissing(): bool
-	{
-		return false === $this->filesystem->isDirectory($this->base_path);
+		return [
+			'blade_components' => function() {
+				return $this->fileFinder('*/src/View/Components/')
+					->name('*.php')
+					->map(function(SplFileInfo $path) {
+						return $path->getPathname();
+					});
+			},
+			'commands' => function() {
+				return $this->fileFinder('*/src/Console/Commands/')
+					->name('*.php')
+					->map(function(SplFileInfo $file) {
+						return $file->getPathname();
+					});
+			},
+			'legacy_factories' => function() {
+				return $this->directoryFinder('*/database')
+					->depth(0)
+					->name('factories')
+					->map(function(SplFileInfo $path) {
+						return $path->getPathname();
+					});
+			},
+			'migrations' => function() {
+				return $this->directoryFinder('*/database/')
+					->depth(0)
+					->name('migrations')
+					->map(function(SplFileInfo $path) {
+						return $path->getPathname();
+					});
+			},
+			'models' => function() {
+				return $this->fileFinder('*/src/Models/')
+					->name('*.php')
+					->map(function(SplFileInfo $path) {
+						return $path->getPathname();
+					});
+			},
+			'modules' => function() {
+				return $this->fileFinder()
+					->depth('== 1')
+					->name('composer.json')
+					->mapWithKeys(function(SplFileInfo $composer_file) {
+						$composer_config = json_decode($composer_file->getContents(), true, 16, JSON_THROW_ON_ERROR);
+						
+						$base_path = rtrim($composer_file->getPath(), DIRECTORY_SEPARATOR);
+						
+						$name = basename($base_path);
+						
+						$namespaces = Collection::make($composer_config['autoload']['psr-4'] ?? [])
+							->mapWithKeys(function($src, $namespace) use ($base_path) {
+								$src = str_replace('/', DIRECTORY_SEPARATOR, $src);
+								$path = $base_path.DIRECTORY_SEPARATOR.$src;
+								return [$path => $namespace];
+							})
+							->all();
+						
+						return [$name => compact('name', 'base_path', 'namespaces')];
+					});
+			},
+			'routes' => function() {
+				return $this->fileFinder('*/routes/')
+					->depth(0)
+					->name('*.php')
+					->map(function(SplFileInfo $path) {
+						return $path->getPathname();
+					});
+			},
+			'view_directories' => function() {
+				return $this->directoryFinder('*/resources/')
+					->depth(0)
+					->name('views')
+					->map(function(SplFileInfo $path) {
+						return $path->getPathname();
+					});
+			},
+		];
 	}
 }

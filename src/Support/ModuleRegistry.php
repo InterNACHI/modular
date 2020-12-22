@@ -4,7 +4,6 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Symfony\Component\Finder\SplFileInfo;
 
 class ModuleRegistry
 {
@@ -14,31 +13,26 @@ class ModuleRegistry
 	protected $modules;
 	
 	/**
-	 * @var string
-	 */
-	protected $cache_path;
-	
-	/**
 	 * This is the base path that all modules are installed in
 	 *
 	 * @var string
 	 */
 	protected $modules_path;
 	
-	public function __construct(string $modules_path, string $cache_path)
+	/**
+	 * @var \InterNACHI\Modular\Support\AutoDiscoveryHelper
+	 */
+	protected $auto_discovery;
+	
+	public function __construct(string $modules_path, AutoDiscoveryHelper $auto_discovery)
 	{
 		$this->modules_path = $modules_path;
-		$this->cache_path = $cache_path;
+		$this->auto_discovery = $auto_discovery;
 	}
 	
 	public function getModulesPath(): string
 	{
 		return $this->modules_path;
-	}
-	
-	public function getCachePath(): string
-	{
-		return $this->cache_path;
 	}
 	
 	public function module(string $name = null): ?ModuleConfig
@@ -69,8 +63,12 @@ class ModuleRegistry
 	
 	public function modules(): Collection
 	{
-		if (null === $this->modules) {
-			$this->modules = $this->loadModules();
+		if (null === $this->modules && ($modules = $this->auto_discovery->modules())) {
+			$this->modules = $modules->mapWithKeys(function(array $module) {
+				return [
+					$module['name'] => new ModuleConfig($module['name'], $module['base_path'], new Collection($module['namespaces'])),
+				];
+			});
 		}
 		
 		return $this->modules;
@@ -78,41 +76,21 @@ class ModuleRegistry
 	
 	public function reload(): Collection
 	{
-		$this->modules = null;
-		
-		return $this->loadModules();
+		return $this->clear()->modules();
 	}
 	
-	protected function loadModules(): Collection
+	public function clear(): self
 	{
-		if (file_exists($this->cache_path)) {
-			return Collection::make(require $this->cache_path)
-				->mapWithKeys(function(array $cached) {
-					$config = new ModuleConfig($cached['name'], $cached['base_path'], new Collection($cached['namespaces']));
-					return [$config->name => $config];
-				});
-		}
+		$this->modules = null;
 		
-		if (!is_dir($this->modules_path)) {
-			return new Collection();
-		}
-		
-		return FinderCollection::forFiles()
-			->depth('== 1')
-			->name('composer.json')
-			->in($this->modules_path)
-			->collect()
-			->mapWithKeys(function(SplFileInfo $path) {
-				$config = ModuleConfig::fromComposerFile($path);
-				return [$config->name => $config];
-			});
+		return $this;
 	}
 	
 	protected function extractModuleNameFromPath(string $path): string
 	{
-		$relative_path = trim(Str::after($path, $this->modules_path), DIRECTORY_SEPARATOR);
-		
-		$segments = explode(DIRECTORY_SEPARATOR, $relative_path);
-		return $segments[0];
+		return (string) Str::of($path)
+			->after($this->modules_path)
+			->trim(DIRECTORY_SEPARATOR)
+			->before(DIRECTORY_SEPARATOR);
 	}
 }

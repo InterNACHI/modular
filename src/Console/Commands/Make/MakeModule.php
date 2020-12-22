@@ -111,7 +111,7 @@ class MakeModule extends Command
 		$this->line("Please run <kbd>composer update {$this->composer_name}</kbd>");
 		$this->newLine();
 		
-		$this->module_registry->reload();
+		$this->module_registry->clear();
 		
 		return 0;
 	}

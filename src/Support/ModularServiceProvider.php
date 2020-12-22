@@ -10,7 +10,6 @@ use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
 use Illuminate\Database\Eloquent\Factory as LegacyEloquentFactory;
 use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -24,7 +23,6 @@ use InterNACHI\Modular\Console\Commands\ModulesSync;
 use ReflectionClass;
 use ReflectionProperty;
 use RuntimeException;
-use Symfony\Component\Finder\SplFileInfo;
 
 class ModularServiceProvider extends ServiceProvider
 {
@@ -63,17 +61,23 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->mergeConfigFrom("{$this->base_dir}/config.php", 'app-modules');
 		
-		$this->app->singleton(ModuleRegistry::class, function() {
+		$this->app->singleton(ModuleRegistry::class, function($app) {
 			return new ModuleRegistry(
 				$this->getModulesBasePath(),
+				$app->make(AutoDiscoveryHelper::class)
+			);
+		});
+		
+		$this->app->singleton(CacheHelper::class, function() {
+			return new CacheHelper(
 				$this->app->bootstrapPath('cache/modules.php')
 			);
 		});
 		
 		$this->app->singleton(AutoDiscoveryHelper::class, function($app) {
 			return new AutoDiscoveryHelper(
-				$app->make(ModuleRegistry::class),
-				$app->make(Filesystem::class)
+				$this->getModulesBasePath(),
+				$app->make(CacheHelper::class)
 			);
 		});
 		
@@ -155,41 +159,47 @@ class ModularServiceProvider extends ServiceProvider
 			return;
 		}
 		
-		$this->autoDiscoveryHelper()
-			->routeFileFinder()
-			->each(function(SplFileInfo $file) {
-				require $file->getRealPath();
-			});
+		if (!$routes = $this->autoDiscoveryHelper()->routes()) {
+			return;
+		}
+		
+		$routes->each(function($filename) {
+			require $filename;
+		});
 	}
 	
 	protected function bootViews(): void
 	{
 		$this->callAfterResolving('view', function(ViewFactory $view_factory) {
-			$this->autoDiscoveryHelper()
-				->viewDirectoryFinder()
-				->each(function(SplFileInfo $directory) use ($view_factory) {
-					if (!$module = $this->registry()->moduleForPath($directory->getPath())) {
-						throw new RuntimeException("Unable to determine module for '{$directory->getPath()}'");
-					}
-					
-					$view_factory->addNamespace($module->name, $directory->getRealPath());
-				});
+			if (!$views = $this->autoDiscoveryHelper()->viewDirectories()) {
+				return;
+			}
+			
+			$views->each(function($directory) use ($view_factory) {
+				if (!$module = $this->registry()->moduleForPath($directory)) {
+					throw new RuntimeException("Unable to determine module for '{$directory}'");
+				}
+				
+				$view_factory->addNamespace($module->name, $directory);
+			});
 		});
 	}
 	
 	protected function bootBladeComponents() : void
 	{
 		$this->callAfterResolving(BladeCompiler::class, function(BladeCompiler $blade) {
-			$this->autoDiscoveryHelper()
-				->bladeComponentFileFinder()
-				->each(function(SplFileInfo $component) use ($blade) {
-					if (!$module = $this->registry()->moduleForPath($component->getPath())) {
-						throw new RuntimeException("Unable to determine module for '{$component->getPath()}'");
-					}
-					
-					$fully_qualified_component = $this->pathToFullyQualifiedClassName($component->getPathname(), $module);
-					$blade->component($fully_qualified_component, null, $module->name);
-				});
+			if (!$components = $this->autoDiscoveryHelper()->bladeComponents()) {
+				return;
+			}
+			
+			$components->each(function($filename) use ($blade) {
+				if (!$module = $this->registry()->moduleForPath($filename)) {
+					throw new RuntimeException("Unable to determine module for '{$filename}'");
+				}
+				
+				$fully_qualified_component = $this->pathToFullyQualifiedClassName($filename, $module);
+				$blade->component($fully_qualified_component, null, $module->name);
+			});
 		});
 	}
 	
@@ -218,11 +228,13 @@ class ModularServiceProvider extends ServiceProvider
 	
 	protected function registerMigrations(Migrator $migrator) : void
 	{
-		$this->autoDiscoveryHelper()
-			->migrationDirectoryFinder()
-			->each(function(SplFileInfo $path) use ($migrator) {
-				$migrator->path($path->getRealPath());
-			});
+		if (!$migrations = $this->autoDiscoveryHelper()->migrations()) {
+			return;
+		}
+		
+		$migrations->each(function($path) use ($migrator) {
+			$migrator->path($path);
+		});
 	}
 	
 	protected function registerEloquentFactories() : void
@@ -257,59 +269,65 @@ class ModularServiceProvider extends ServiceProvider
 	
 	protected function registerLegacyFactories(LegacyEloquentFactory $factory) : void
 	{
-		$this->autoDiscoveryHelper()
-			->factoryDirectoryFinder()
-			->each(function(SplFileInfo $path) use ($factory) {
-				$factory->load($path->getRealPath());
-			});
+		if (!$paths = $this->autoDiscoveryHelper()->legacyFactoryPaths()) {
+			return;
+		}
+		
+		$paths->each(function($path) use ($factory) {
+			$factory->load($path);
+		});
 	}
 	
 	protected function registerPolicies(Gate $gate) : void
 	{
-		$this->autoDiscoveryHelper()
-			->modelFileFinder()
-			->each(function(SplFileInfo $file) use ($gate) {
-				if (!$module = $this->registry()->moduleForPath($file->getPath())) {
-					throw new RuntimeException("Unable to determine module for '{$file->getPath()}'");
-				}
+		if (!$models = $this->autoDiscoveryHelper()->models()) {
+			return;
+		}
+		
+		$models->each(function($filename) use ($gate) {
+			if (!$module = $this->registry()->moduleForPath($filename)) {
+				throw new RuntimeException("Unable to determine module for '{$filename}'");
+			}
+			
+			$fully_qualified_model = $this->pathToFullyQualifiedClassName($filename, $module);
+			
+			// First, check for a policy that maps to the full namespace of the model
+			// i.e. Models/Foo/Bar -> Policies/Foo/BarPolicy
+			$namespaced_model = Str::after($fully_qualified_model, 'Models\\');
+			$namespaced_policy = rtrim($module->namespaces->first(), '\\').'\\Policies\\'.$namespaced_model.'Policy';
+			if (class_exists($namespaced_policy)) {
+				$gate->policy($fully_qualified_model, $namespaced_policy);
+			}
+			
+			// If that doesn't match, try the simple mapping as well
+			// i.e. Models/Foo/Bar -> Policies/BarPolicy
+			if (false !== strpos($namespaced_model, '\\')) {
+				$simple_model = Str::afterLast($fully_qualified_model, '\\');
+				$simple_policy = rtrim($module->namespaces->first(), '\\').'\\Policies\\'.$simple_model.'Policy';
 				
-				$fully_qualified_model = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
-				
-				// First, check for a policy that maps to the full namespace of the model
-				// i.e. Models/Foo/Bar -> Policies/Foo/BarPolicy
-				$namespaced_model = Str::after($fully_qualified_model, 'Models\\');
-				$namespaced_policy = rtrim($module->namespaces->first(), '\\').'\\Policies\\'.$namespaced_model.'Policy';
-				if (class_exists($namespaced_policy)) {
-					$gate->policy($fully_qualified_model, $namespaced_policy);
+				if (class_exists($simple_policy)) {
+					$gate->policy($fully_qualified_model, $simple_policy);
 				}
-				
-				// If that doesn't match, try the simple mapping as well
-				// i.e. Models/Foo/Bar -> Policies/BarPolicy
-				if (false !== strpos($namespaced_model, '\\')) {
-					$simple_model = Str::afterLast($fully_qualified_model, '\\');
-					$simple_policy = rtrim($module->namespaces->first(), '\\').'\\Policies\\'.$simple_model.'Policy';
-					
-					if (class_exists($simple_policy)) {
-						$gate->policy($fully_qualified_model, $simple_policy);
-					}
-				}
-			});
+			}
+		});
 	}
 	
 	protected function registerCommands(Artisan $artisan): void
 	{
-		$this->autoDiscoveryHelper()
-			->commandFileFinder()
-			->each(function(SplFileInfo $file) use ($artisan) {
-				if (!$module = $this->registry()->moduleForPath($file->getPath())) {
-					throw new RuntimeException("Unable to determine module for '{$file->getPath()}'");
-				}
-				
-				$class_name = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
-				if ($this->isInstantiableCommand($class_name)) {
-					$artisan->resolve($class_name);
-				}
-			});
+		if (!$commands = $this->autoDiscoveryHelper()->commands()) {
+			return;
+		}
+		
+		$commands->each(function($filename) use ($artisan) {
+			if (!$module = $this->registry()->moduleForPath($filename)) {
+				throw new RuntimeException("Unable to determine module for '{$filename}'");
+			}
+			
+			$class_name = $this->pathToFullyQualifiedClassName($filename, $module);
+			if ($this->isInstantiableCommand($class_name)) {
+				$artisan->resolve($class_name);
+			}
+		});
 	}
 	
 	protected function registerLazily(string $class_name, callable $callback): self

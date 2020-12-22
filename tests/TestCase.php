@@ -16,7 +16,7 @@ abstract class TestCase extends Orchestra
 	{
 		parent::setUp();
 		
-		Modules::reload();
+		Modules::clear();
 		
 		$config = $this->app['config'];
 		
