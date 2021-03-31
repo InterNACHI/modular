@@ -37,6 +37,15 @@ abstract class TestCase extends Orchestra
 		return Modules::module($name);
 	}
 	
+	protected function requiresLaravelVersion(string $minimum_version)
+	{
+		if (version_compare($this->app->version(), $minimum_version, '<')) {
+			$this->markTestSkipped("Only applies to Laravel {$minimum_version} and above.");
+		}
+		
+		return $this;
+	}
+	
 	protected function getPackageProviders($app)
 	{
 		return [

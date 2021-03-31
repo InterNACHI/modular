@@ -12,41 +12,33 @@ class ProjectImlWriter extends ConfigWriter
 	{
 		$modules_directory = config('app-modules.modules_directory', 'app-modules');
 		
-		$patterns = $this->module_registry->modules()
-			->sortBy('name')
-			->map(function(ModuleConfig $module_config) use ($modules_directory) {
-				return [
-					"file://\$MODULE_DIR\$/{$modules_directory}/{$module_config->name}/src",
-					"file://\$MODULE_DIR\$/{$modules_directory}/{$module_config->name}/tests",
-				];
-			})
-			->flatten()
-			->toArray();
-		
 		$iml = $this->getNormalizedPluginConfig();
 		$source_folders = $iml->xpath('//component[@name="NewModuleRootManager"]//content[@url="file://$MODULE_DIR$"]//sourceFolder');
+		$existing_urls = collect($source_folders)->map(function($node) {
+			return (string) $node['url'];
+		});
 		
-		// Clean up template paths to prevent duplicates
-		foreach ($source_folders as $key => $existing) {
-			if (Str::of($existing['url'])->is($patterns)) {
-				unset($source_folders[$key][0]);
-			}
-		}
-		
-		// Now add all modules to the config
+		// Now add all missing modules to the config
 		$content = $iml->xpath('//component[@name="NewModuleRootManager"]//content[@url="file://$MODULE_DIR$"]')[0];
 		$this->module_registry->modules()
 			->sortBy('name')
-			->each(function(ModuleConfig $module_config) use (&$content, $modules_directory) {
-				$src_node = $content->addChild('sourceFolder');
-				$src_node->addAttribute('url', "file://\$MODULE_DIR\$/{$modules_directory}/{$module_config->name}/src");
-				$src_node->addAttribute('isTestSource', 'false');
-				$src_node->addAttribute('packagePrefix', rtrim($module_config->namespaces->first(), '\\'));
+			->each(function(ModuleConfig $module_config) use (&$content, $modules_directory, $existing_urls) {
+				$src_url = "file://\$MODULE_DIR\$/{$modules_directory}/{$module_config->name}/src";
 				
-				$tests_node = $content->addChild('sourceFolder');
-				$tests_node->addAttribute('url', "file://\$MODULE_DIR\$/{$modules_directory}/{$module_config->name}/tests");
-				$tests_node->addAttribute('isTestSource', 'true');
-				$tests_node->addAttribute('packagePrefix', rtrim($module_config->namespaces->first(), '\\').'\\Tests');
+				if (!$existing_urls->contains($src_url)) {
+					$src_node = $content->addChild('sourceFolder');
+					$src_node->addAttribute('url', $src_url);
+					$src_node->addAttribute('isTestSource', 'false');
+					$src_node->addAttribute('packagePrefix', rtrim($module_config->namespaces->first(), '\\'));
+				}
+				
+				$tests_url = "file://\$MODULE_DIR\$/{$modules_directory}/{$module_config->name}/tests";
+				if (!$existing_urls->contains($tests_url)) {
+					$tests_node = $content->addChild('sourceFolder');
+					$tests_node->addAttribute('url', $tests_url);
+					$tests_node->addAttribute('isTestSource', 'true');
+					$tests_node->addAttribute('packagePrefix', rtrim($module_config->namespaces->first(), '\\').'\\Tests');
+				}
 			});
 		
 		return false !== file_put_contents($this->config_path, $this->formatXml($iml));
