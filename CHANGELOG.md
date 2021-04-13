@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0]
+
 ### Added
 
 - Added support for translations in modules
@@ -61,7 +63,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-[Unreleased]: https://github.com/InterNACHI/modular/compare/1.2.2...HEAD
+[Unreleased]: https://github.com/InterNACHI/modular/compare/1.3.0...HEAD
+[1.2.2]: https://github.com/InterNACHI/modular/compare/1.2.2...1.3.0
 [1.2.2]: https://github.com/InterNACHI/modular/compare/1.2.1...1.2.2
 [1.2.1]: https://github.com/InterNACHI/modular/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/InterNACHI/modular/compare/1.1.0...1.2.0
