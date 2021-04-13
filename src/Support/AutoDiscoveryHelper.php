@@ -109,6 +109,18 @@ class AutoDiscoveryHelper
 			->name('views')
 			->in($this->base_path.'/*/resources/');
 	}
+	
+	public function langDirectoryFinder() : FinderCollection
+	{
+		if ($this->basePathMissing()) {
+			return FinderCollection::empty();
+		}
+		
+		return FinderCollection::forDirectories()
+			->depth(0)
+			->name('lang')
+			->in($this->base_path.'/*/resources/');
+	}
 
 	protected function basePathMissing(): bool
 	{

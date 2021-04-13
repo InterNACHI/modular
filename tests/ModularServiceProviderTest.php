@@ -114,4 +114,28 @@ class ModularServiceProviderTest extends TestCase
 			Factory::resolveFactoryName('App\\Foo\\Bar')
 		);
 	}
+	
+	public function test_it_loads_translations_from_module() : void
+	{
+		$module = $this->makeModule();
+		
+		$this->filesystem()->ensureDirectoryExists($module->path('resources/lang'));
+		$this->filesystem()->ensureDirectoryExists($module->path('resources/lang/en'));
+		
+		$this->filesystem()->put($module->path('resources/lang/en.json'), json_encode([
+			'Test JSON string' => 'Test JSON translation',
+		], JSON_THROW_ON_ERROR));
+		
+		$this->filesystem()->put(
+			$module->path('resources/lang/en/foo.php'), 
+			'<?php return ["bar" => "Test PHP translation"];'
+		);
+		
+		$this->app->setLocale('en');
+		
+		$translator = $this->app->make('translator');
+		
+		$this->assertEquals('Test JSON translation', $translator->get('Test JSON string'));
+		$this->assertEquals('Test PHP translation', $translator->get('test-module::foo.bar'));
+	}
 }

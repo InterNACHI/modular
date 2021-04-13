@@ -146,4 +146,21 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->assertContains($this->module1->path('resources/views'), $resolved);
 		$this->assertContains($this->module2->path('resources/views'), $resolved);
 	}
+	
+	public function test_it_finds_lang_directories() : void
+	{
+		// These paths don't exist by default
+		$fs = new Filesystem();
+		$fs->makeDirectory($this->module1->path('resources/lang'));
+		$fs->makeDirectory($this->module2->path('resources/lang'));
+		
+		$resolved = [];
+		
+		$this->helper->langDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
+			$resolved[] = $directory->getPathname();
+		});
+		
+		$this->assertContains($this->module1->path('resources/lang'), $resolved);
+		$this->assertContains($this->module2->path('resources/lang'), $resolved);
+	}
 }

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
 use Illuminate\Database\Eloquent\Factory as LegacyEloquentFactory;
@@ -13,6 +14,7 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Translation\Translator;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Factory as ViewFactory;
 use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
@@ -107,6 +109,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->bootBreadcrumbs();
 		$this->bootViews();
 		$this->bootBladeComponents();
+		$this->bootTranslations();
 	}
 	
 	protected function registry(): ModuleRegistry
@@ -193,13 +196,35 @@ class ModularServiceProvider extends ServiceProvider
 		});
 	}
 	
+	protected function bootTranslations() : void
+	{
+		$this->callAfterResolving('translator', function(TranslatorContract $translator) {
+			if (!$translator instanceof Translator) {
+				return;
+			}
+			
+			$this->autoDiscoveryHelper()
+				->langDirectoryFinder()
+				->each(function(SplFileInfo $directory) use ($translator) {
+					if (!$module = $this->registry()->moduleForPath($directory->getPath())) {
+						throw new RuntimeException("Unable to determine module for '{$directory->getPath()}'");
+					}
+					
+					$path = $directory->getRealPath();
+					
+					$translator->addNamespace($module->name, $path);
+					$translator->addJsonPath($path);
+				});
+		});
+	}
+	
 	/**
 	 * This functionality is likely to go away at some point so don't rely
 	 * on it too much. The package has been abandoned.
 	 */
 	protected function bootBreadcrumbs() : void
 	{
-		$class_name = 'DaveJamesMiller\\Breadcrumbs\\BreadcrumbsManager';
+		$class_name = 'Diglactic\\Breadcrumbs\\Manager';
 		
 		if (!class_exists($class_name)) {
 			return;

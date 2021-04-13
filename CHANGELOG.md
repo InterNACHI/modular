@@ -5,6 +5,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added support for translations in modules
+
+### Changed
+
+- Switched to `diglactic/laravel-breadcrumbs` for breadcrumbs check
+
 ## [1.2.2]
 
 ### Added
