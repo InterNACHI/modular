@@ -171,10 +171,7 @@ class ModularServiceProvider extends ServiceProvider
 			$this->autoDiscoveryHelper()
 				->viewDirectoryFinder()
 				->each(function(SplFileInfo $directory) use ($view_factory) {
-					if (!$module = $this->registry()->moduleForPath($directory->getPath())) {
-						throw new RuntimeException("Unable to determine module for '{$directory->getPath()}'");
-					}
-					
+					$module = $this->registry()->moduleForPathOrFail($directory->getPath());
 					$view_factory->addNamespace($module->name, $directory->getRealPath());
 				});
 		});
@@ -186,10 +183,7 @@ class ModularServiceProvider extends ServiceProvider
 			$this->autoDiscoveryHelper()
 				->bladeComponentFileFinder()
 				->each(function(SplFileInfo $component) use ($blade) {
-					if (!$module = $this->registry()->moduleForPath($component->getPath())) {
-						throw new RuntimeException("Unable to determine module for '{$component->getPath()}'");
-					}
-					
+					$module = $this->registry()->moduleForPathOrFail($component->getPath());
 					$fully_qualified_component = $this->pathToFullyQualifiedClassName($component->getPathname(), $module);
 					$blade->component($fully_qualified_component, null, $module->name);
 				});
@@ -206,10 +200,7 @@ class ModularServiceProvider extends ServiceProvider
 			$this->autoDiscoveryHelper()
 				->langDirectoryFinder()
 				->each(function(SplFileInfo $directory) use ($translator) {
-					if (!$module = $this->registry()->moduleForPath($directory->getPath())) {
-						throw new RuntimeException("Unable to determine module for '{$directory->getPath()}'");
-					}
-					
+					$module = $this->registry()->moduleForPathOrFail($directory->getPath());
 					$path = $directory->getRealPath();
 					
 					$translator->addNamespace($module->name, $path);
@@ -294,10 +285,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->autoDiscoveryHelper()
 			->modelFileFinder()
 			->each(function(SplFileInfo $file) use ($gate) {
-				if (!$module = $this->registry()->moduleForPath($file->getPath())) {
-					throw new RuntimeException("Unable to determine module for '{$file->getPath()}'");
-				}
-				
+				$module = $this->registry()->moduleForPathOrFail($file->getPath());
 				$fully_qualified_model = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
 				
 				// First, check for a policy that maps to the full namespace of the model
@@ -326,10 +314,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->autoDiscoveryHelper()
 			->commandFileFinder()
 			->each(function(SplFileInfo $file) use ($artisan) {
-				if (!$module = $this->registry()->moduleForPath($file->getPath())) {
-					throw new RuntimeException("Unable to determine module for '{$file->getPath()}'");
-				}
-				
+				$module = $this->registry()->moduleForPathOrFail($file->getPath());
 				$class_name = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
 				if ($this->isInstantiableCommand($class_name)) {
 					$artisan->resolve($class_name);
