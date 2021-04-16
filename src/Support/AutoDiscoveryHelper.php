@@ -110,20 +110,20 @@ class AutoDiscoveryHelper
 			->in($this->base_path.'/*/resources/');
 	}
 	
-	protected function bootLivewireComponents(): void
-    	{
-        	if (class_exists('Livewire\\Livewire')) {
-		    $this->autoDiscoveryHelper()
-			->livewireComponentFileFinder()
-			->each(function (SplFileInfo $component) {
-			    if (!$module = $this->registry()->moduleForPath($component->getPath())) {
-				throw new RuntimeException("Unable to determine module for '{$component->getPath()}'");
-			    }
-			    $componentName = Str::of($component->getBasename('.php'))->kebab();
-			    \Livewire\Livewire::component($module->name . '::' . $componentName, $this->pathToFullyQualifiedClassName($component->getPathname(), $module));
-			});
-        	}
-    	}
+	public function livewireComponentFileFinder(): FinderCollection
+	{
+		if ($this->basePathMissing()) {
+		    return FinderCollection::empty();
+		}
+
+		try {
+		    return FinderCollection::forFiles()
+			->name('*.php')
+			->in($this->base_path . '/*/src/Http/Livewire');
+		} catch (\Exception $e) {
+		    return FinderCollection::empty();
+		}
+	}
 	
 	public function langDirectoryFinder() : FinderCollection
 	{
