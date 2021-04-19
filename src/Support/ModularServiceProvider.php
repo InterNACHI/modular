@@ -202,9 +202,7 @@ class ModularServiceProvider extends ServiceProvider
 		    $this->autoDiscoveryHelper()
 			->livewireComponentFileFinder()
 			->each(function (SplFileInfo $component) {
-			    if (!$module = $this->registry()->moduleForPath($component->getPath())) {
-				throw new RuntimeException("Unable to determine module for '{$component->getPath()}'");
-			    }
+			    $module = $this->registry()->moduleForPathOrFail($component->getPath());
 			    $componentName = Str::of($component->getBasename('.php'))->kebab();
 			    \Livewire\Livewire::component($module->name . '::' . $componentName, $this->pathToFullyQualifiedClassName($component->getPathname(), $module));
 			});
