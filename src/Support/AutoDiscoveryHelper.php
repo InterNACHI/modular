@@ -3,6 +3,7 @@
 namespace InterNACHI\Modular\Support;
 
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 
 class AutoDiscoveryHelper
 {
@@ -120,7 +121,7 @@ class AutoDiscoveryHelper
 		    return FinderCollection::forFiles()
 			->name('*.php')
 			->in($this->base_path . '/*/src/Http/Livewire');
-		} catch (\Exception $e) {
+		} catch (DirectoryNotFoundException $e) {
 		    return FinderCollection::empty();
 		}
 	}
