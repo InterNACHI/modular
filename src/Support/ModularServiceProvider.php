@@ -203,8 +203,12 @@ class ModularServiceProvider extends ServiceProvider
 			->livewireComponentFileFinder()
 			->each(function (SplFileInfo $component) {
 			    $module = $this->registry()->moduleForPathOrFail($component->getPath());
-			    $componentName = Str::of($component->getBasename('.php'))->kebab();
-			    \Livewire\Livewire::component($module->name . '::' . $componentName, $this->pathToFullyQualifiedClassName($component->getPathname(), $module));
+			    $componentPath = collect(explode('/', $component->getRelativePath()))->map(function ($item) {
+				return (string)Str::of($item)->kebab();
+			    })->reject(function ($item) {
+				return $item == null;
+			    })->push(Str::of($component->getBasename('.php'))->kebab())->implode('.');
+			    \Livewire\Livewire::component($module->name . '::' . $componentPath, $this->pathToFullyQualifiedClassName($component->getPathname(), $module));
 			});
 		}
     	}
