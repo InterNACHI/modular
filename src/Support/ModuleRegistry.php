@@ -4,6 +4,7 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InterNACHI\Modular\Exceptions\CannotFindModuleForPathException;
 use Symfony\Component\Finder\SplFileInfo;
 
 class ModuleRegistry
@@ -52,6 +53,15 @@ class ModuleRegistry
 	public function moduleForPath(string $path): ?ModuleConfig
 	{
 		return $this->module($this->extractModuleNameFromPath($path));
+	}
+	
+	public function moduleForPathOrFail(string $path) : ModuleConfig
+	{
+		if ($module = $this->moduleForPath($path)) {
+			return $module;
+		}
+		
+		throw new CannotFindModuleForPathException($path);
 	}
 	
 	public function moduleForClass(string $fqcn): ?ModuleConfig
