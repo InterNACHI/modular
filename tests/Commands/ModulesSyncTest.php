@@ -10,7 +10,7 @@ class ModulesSyncTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
-	public function test_it_updates_phpunit_config() : void
+	public function test_it_updates_phpunit_config(): void
 	{
 		$config_path = $this->copyStub('phpunit.xml', '/');
 		
@@ -27,7 +27,7 @@ class ModulesSyncTest extends TestCase
 		$this->assertCount(1, $nodes);
 	}
 	
-	public function test_it_updates_phpstorm_plugin_config() : void
+	public function test_it_updates_phpstorm_plugin_config(): void
 	{
 		$config_path = $this->copyStub('laravel-plugin.xml', '.idea');
 		
@@ -55,7 +55,7 @@ class ModulesSyncTest extends TestCase
 		$this->assertCount(2, $nodes);
 	}
 	
-	public function test_it_updates_phpstorm_library_roots() : void
+	public function test_it_updates_phpstorm_library_roots(): void
 	{
 		$config_path = $this->copyStub('php.xml', '.idea');
 		
@@ -74,7 +74,7 @@ class ModulesSyncTest extends TestCase
 		$this->assertCount(0, $nodes);
 	}
 	
-	public function test_it_updates_phpstorm_iml_file() : void
+	public function test_it_updates_phpstorm_iml_file(): void
 	{
 		$config_path = $this->copyStub('project.iml', '.idea');
 		

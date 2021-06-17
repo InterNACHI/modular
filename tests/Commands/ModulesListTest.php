@@ -10,7 +10,7 @@ class ModulesListTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
-	public function test_it_writes_to_cache_file() : void
+	public function test_it_writes_to_cache_file(): void
 	{
 		$this->makeModule('test-module');
 		

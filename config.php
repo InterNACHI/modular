@@ -41,7 +41,7 @@ return [
 	| If you want to install modules in a custom directory, you can do so here.
 	| Keeping the default `app-modules/` directory is highly recommended,
 	| though, as it keeps your modules near the rest of your application code
-	| in an alpha-sorted directory listing. 
+	| in an alpha-sorted directory listing.
 	|
 	*/
 	

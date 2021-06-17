@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/vendor/autoload.php';
 
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
 	->setRiskyAllowed(true)
 	->setIndent("\t")
 	->setLineEnding("\n")
@@ -115,18 +115,8 @@ return PhpCsFixer\Config::create()
 	->setFinder(
 		PhpCsFixer\Finder::create()
 			->exclude('.circleci')
-			->exclude('.generics')
-			->exclude('.tugboat')
 			->exclude('bin')
-			->exclude('bootstrap')
-			->exclude('docs')
 			->exclude('node_modules')
-			->exclude('js')
-			->exclude('public')
-			->exclude('resources/assets')
-			->exclude('resources/generators')
-			->exclude('resources/lang')
-			->exclude('storage')
 			->exclude('vendor')
 			->notPath('.phpstorm.meta.php')
 			->notPath('_ide_helper.php')

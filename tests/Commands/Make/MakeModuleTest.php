@@ -11,7 +11,7 @@ class MakeModuleTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
-	public function test_it_scaffolds_a_new_module() : void
+	public function test_it_scaffolds_a_new_module(): void
 	{
 		$module_name = 'test-module';
 		
@@ -61,7 +61,7 @@ class MakeModuleTest extends TestCase
 		$this->assertContains($repository, $app_composer_contents['repositories']);
 	}
 	
-	public function test_it_prompts_on_first_module_if_no_custom_namespace_is_set() : void
+	public function test_it_prompts_on_first_module_if_no_custom_namespace_is_set(): void
 	{
 		$fs = $this->filesystem();
 		

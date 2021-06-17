@@ -12,7 +12,7 @@ class MakeComponentTest extends TestCase
 	use WritesToAppFilesystem;
 	use TestsMakeCommands;
 	
-	public function test_it_scaffolds_a_component_in_the_module_when_module_option_is_set() : void
+	public function test_it_scaffolds_a_component_in_the_module_when_module_option_is_set(): void
 	{
 		$command = MakeComponent::class;
 		$arguments = ['name' => 'TestComponent'];
@@ -28,7 +28,7 @@ class MakeComponentTest extends TestCase
 		$this->assertModuleFile($expected_view_path);
 	}
 	
-	public function test_it_scaffolds_a_component_in_the_app_when_module_option_is_missing() : void
+	public function test_it_scaffolds_a_component_in_the_app_when_module_option_is_missing(): void
 	{
 		$command = MakeComponent::class;
 		$arguments = ['name' => 'TestComponent'];
