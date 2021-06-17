@@ -110,6 +110,7 @@ class ModularServiceProvider extends ServiceProvider
         $this->bootViews();
         $this->bootBladeComponents();
         $this->bootTranslations();
+        $this->bootLivewireComponents();
     }
 
     protected function registry(): ModuleRegistry
@@ -229,6 +230,28 @@ class ModularServiceProvider extends ServiceProvider
 
         foreach ($files as $file) {
             require_once $file;
+        }
+    }
+
+    protected function bootLivewireComponents(): void
+    {
+        if (class_exists('Livewire\\Livewire')) {
+
+            $this->autoDiscoveryHelper()
+                ->livewireComponentFileFinder()
+                ->each(function (SplFileInfo $component) {
+
+                    $module = $this->registry()->moduleForPathOrFail($component->getPath());
+
+                    $componentPath = collect(explode('/', $component->getRelativePath()))->map(function ($item) {
+                        return (string)Str::of($item)->kebab();
+                    })->reject(function ($item) {
+                        return $item == null;
+                    })->push(Str::of($component->getBasename('.php'))->kebab())->implode('.');
+
+
+                    \Livewire\Livewire::component($module->name . '::' . $componentPath, $this->pathToFullyQualifiedClassName($component->getPathname(), $module));
+                });
         }
     }
 

@@ -122,4 +122,15 @@ class AutoDiscoveryHelper
             return FinderCollection::empty();
         }
     }
+
+    public function livewireComponentFileFinder(): FinderCollection
+    {
+        try {
+            return FinderCollection::forFiles()
+                ->name('*.php')
+                ->in($this->base_path . '/*/src/Http/Livewire');
+        } catch (\Exception $e) {
+            return FinderCollection::empty();
+        }
+    }
 }
