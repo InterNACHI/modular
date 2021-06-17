@@ -7,7 +7,6 @@ use InterNACHI\Modular\Support\ModuleConfig;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use Symfony\Component\Console\Input\InputOption;
 
-
 trait Modularize
 {
     protected function module(): ?ModuleConfig

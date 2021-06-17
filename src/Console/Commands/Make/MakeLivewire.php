@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class MakeLivewire extends MakeCommand
 {
-    //use Modularize;
+    use Modularize;
 
     protected $signature = 'livewire:make {name} {--force} {--inline} {--test} {--stub=default}';
 
