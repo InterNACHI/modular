@@ -75,7 +75,7 @@ class AutoDiscoveryHelper
 		}
 	}
 
-	public function bladeComponentFileFinder() : FinderCollection
+	public function bladeComponentFileFinder(): FinderCollection
 	{
 		try {
 			return FinderCollection::forFiles()
@@ -111,7 +111,7 @@ class AutoDiscoveryHelper
 		}
 	}
 	
-	public function langDirectoryFinder() : FinderCollection
+	public function langDirectoryFinder(): FinderCollection
 	{
 		try {
 			return FinderCollection::forDirectories()
