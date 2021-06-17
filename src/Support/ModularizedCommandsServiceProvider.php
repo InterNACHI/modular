@@ -2,6 +2,7 @@
 
 namespace InterNACHI\Modular\Support;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Support\ServiceProvider;
 use InterNACHI\Modular\Console\Commands\Make\MakeChannel;
@@ -27,11 +28,11 @@ use InterNACHI\Modular\Console\Commands\Make\MakeResource;
 use InterNACHI\Modular\Console\Commands\Make\MakeRule;
 use InterNACHI\Modular\Console\Commands\Make\MakeSeeder;
 use InterNACHI\Modular\Console\Commands\Make\MakeTest;
+use Livewire\Commands\MakeCommand as OriginalLivewireCommand;
 
 class ModularizedCommandsServiceProvider extends ServiceProvider
 {
 	protected $overrides = [
-		'command.livewire.make' => MakeLivewire::class,
 		'command.controller.make' => MakeController::class,
 		'command.console.make' => MakeCommand::class,
 		'command.channel.make' => MakeChannel::class,
@@ -57,7 +58,7 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 	
 	public function register(): void
 	{
-		Artisan::starting(function() {
+		Artisan::starting(function(Application $artisan) {
 			foreach ($this->overrides as $alias => $class_name) {
 				$this->app->singleton($alias, $class_name);
 			}
@@ -65,6 +66,14 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 			$this->app->singleton('command.migrate.make', function($app) {
 				return new MakeMigration($app['migration.creator'], $app['composer']);
 			});
+			
+			// Register Livewire command only if Livewire is installed
+			if (class_exists(OriginalLivewireCommand::class)) {
+				$artisan->resolveCommands([MakeLivewire::class]);
+				$this->app->extend(OriginalLivewireCommand::class, function() {
+					return new MakeLivewire();
+				});
+			}
 		});
 	}
 }
