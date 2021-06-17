@@ -238,14 +238,14 @@ class ModularServiceProvider extends ServiceProvider
 		if (class_exists('Livewire\\Livewire')) {
 			$this->autoDiscoveryHelper()
 				->livewireComponentFileFinder()
-				->each(function (SplFileInfo $component) {
+				->each(function(SplFileInfo $component) {
 					$module = $this->registry()->moduleForPathOrFail($component->getPath());
-					$componentPath = collect(explode('/', $component->getRelativePath()))->map(function ($item) {
-						return (string)Str::of($item)->kebab();
-					})->reject(function ($item) {
+					$componentPath = collect(explode('/', $component->getRelativePath()))->map(function($item) {
+						return (string) Str::of($item)->kebab();
+					})->reject(function($item) {
 						return $item == null;
 					})->push(Str::of($component->getBasename('.php'))->kebab())->implode('.');
-					\Livewire\Livewire::component($module->name.'::'. $componentPath, $this->pathToFullyQualifiedClassName($component->getPathname(), $module));
+					\Livewire\Livewire::component($module->name.'::'.$componentPath, $this->pathToFullyQualifiedClassName($component->getPathname(), $module));
 				});
 		}
 	}
