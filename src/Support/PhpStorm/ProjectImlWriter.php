@@ -2,13 +2,12 @@
 
 namespace InterNACHI\Modular\Support\PhpStorm;
 
-use Illuminate\Support\Str;
 use InterNACHI\Modular\Support\ModuleConfig;
 use SimpleXMLElement;
 
 class ProjectImlWriter extends ConfigWriter
 {
-	public function write() : bool
+	public function write(): bool
 	{
 		$modules_directory = config('app-modules.modules_directory', 'app-modules');
 		
@@ -44,7 +43,7 @@ class ProjectImlWriter extends ConfigWriter
 		return false !== file_put_contents($this->config_path, $this->formatXml($iml));
 	}
 	
-	protected function getNormalizedPluginConfig() : SimpleXMLElement
+	protected function getNormalizedPluginConfig(): SimpleXMLElement
 	{
 		$config = simplexml_load_string(file_get_contents($this->config_path));
 		

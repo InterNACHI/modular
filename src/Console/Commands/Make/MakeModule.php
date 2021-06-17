@@ -116,7 +116,7 @@ class MakeModule extends Command
 		return 0;
 	}
 	
-	protected function shouldAbortToPublishConfig() : bool
+	protected function shouldAbortToPublishConfig(): bool
 	{
 		if (
 			'Modules' !== $this->module_namespace
@@ -129,12 +129,12 @@ class MakeModule extends Command
 		$this->title('Welcome');
 		
 		$message = "You're about to create your first module in the <info>{$this->module_namespace}</info> "
-			."namespace. This is the default namespace, and will work for many use-cases. However, "
-			."if you ever choose to extract a module into its own package, you will "
+			.'namespace. This is the default namespace, and will work for many use-cases. However, '
+			.'if you ever choose to extract a module into its own package, you will '
 			."likely want to use a custom namespace (like your organization name).\n\n"
-			."If you would like to use a custom namespace, please publish the config "
+			.'If you would like to use a custom namespace, please publish the config '
 			."and customize it first. You can do this by calling:\n\n"
-			."<kbd>php artisan vendor:publish --tag=modular-config</kbd>";
+			.'<kbd>php artisan vendor:publish --tag=modular-config</kbd>';
 		
 		$width = min((new Terminal())->getWidth(), 100) - 1;
 		$messages = explode(PHP_EOL, wordwrap($message, $width, PHP_EOL));
@@ -316,7 +316,7 @@ class MakeModule extends Command
 		$this->newLine();
 	}
 	
-	protected function sortComposerPackages(array $packages) : array
+	protected function sortComposerPackages(array $packages): array
 	{
 		$prefix = function($requirement) {
 			return preg_replace(

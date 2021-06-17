@@ -55,7 +55,7 @@ class ModuleRegistry
 		return $this->module($this->extractModuleNameFromPath($path));
 	}
 	
-	public function moduleForPathOrFail(string $path) : ModuleConfig
+	public function moduleForPathOrFail(string $path): ModuleConfig
 	{
 		if ($module = $this->moduleForPath($path)) {
 			return $module;

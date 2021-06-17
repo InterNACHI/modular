@@ -2,13 +2,12 @@
 
 namespace InterNACHI\Modular\Support\PhpStorm;
 
-use DOMDocument;
 use InterNACHI\Modular\Support\ModuleConfig;
 use SimpleXMLElement;
 
 class LaravelConfigWriter extends ConfigWriter
 {
-	public function write() : bool
+	public function write(): bool
 	{
 		$plugin_config = $this->getNormalizedPluginConfig();
 		$template_paths = $plugin_config->xpath('//templatePath');

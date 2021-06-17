@@ -36,7 +36,7 @@ class FinderCollection
 		return (new static())->directories();
 	}
 	
-	public static function empty(): self 
+	public static function empty(): self
 	{
 		$collection = new static();
 		

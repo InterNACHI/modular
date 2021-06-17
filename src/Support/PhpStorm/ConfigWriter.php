@@ -23,7 +23,7 @@ abstract class ConfigWriter
 	 */
 	protected $module_registry;
 	
-	abstract public function write() : bool;
+	abstract public function write(): bool;
 	
 	public function __construct($config_path, ModuleRegistry $module_registry)
 	{
@@ -31,7 +31,7 @@ abstract class ConfigWriter
 		$this->module_registry = $module_registry;
 	}
 	
-	public function handle() : bool
+	public function handle(): bool
 	{
 		if (!$this->checkConfigFilePermissions()) {
 			return false;
@@ -40,7 +40,7 @@ abstract class ConfigWriter
 		return $this->write();
 	}
 	
-	protected function checkConfigFilePermissions() : bool
+	protected function checkConfigFilePermissions(): bool
 	{
 		if (!is_readable($this->config_path) || !is_writable($this->config_path)) {
 			return $this->error("Unable to find or read: '{$this->config_path}'");
@@ -53,13 +53,13 @@ abstract class ConfigWriter
 		return true;
 	}
 	
-	protected function error(string $message) : bool
+	protected function error(string $message): bool
 	{
 		$this->last_error = $message;
 		return false;
 	}
 	
-	protected function formatXml(SimpleXMLElement $xml) : string
+	protected function formatXml(SimpleXMLElement $xml): string
 	{
 		$dom = new DOMDocument('1.0', 'UTF-8');
 		$dom->formatOutput = true;

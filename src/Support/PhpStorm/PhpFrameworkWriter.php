@@ -7,7 +7,7 @@ use InterNACHI\Modular\Support\ModuleConfig;
 
 class PhpFrameworkWriter extends ConfigWriter
 {
-	public function write() : bool
+	public function write(): bool
 	{
 		$config = simplexml_load_string(file_get_contents($this->config_path));
 		if (empty($config->xpath('//component[@name="PhpIncludePathManager"]//include_path//path'))) {
