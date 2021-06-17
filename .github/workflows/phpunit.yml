@@ -2,6 +2,7 @@ name: PHPUnit
 
 on:
   push:
+  pull_request:
   schedule:
     - cron: '0 0 * * *'
 
@@ -21,7 +22,6 @@ jobs:
           - laravel: ^8.0
             testbench: ^6.0
             minimum-stability: stable
-            coverage: pcov
 
     name: "${{ matrix.php }} / ${{ matrix.laravel }} (${{ matrix.dependency-version }})"
 
@@ -34,13 +34,20 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, bcmath, intl, iconv
-          coverage: ${{ matrix.coverage }}
-      
+
+      - name: Register composer cache directory
+        id: composer-cache-files-dir
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
-          path: vendor
-          key: composer-${{ matrix.php }}-${{ matrix.dependency-version }}-${{ hashFiles('composer.json') }}
+          path: |
+            vendor
+            ${{ steps.composer-cache-files-dir.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
             
       - name: Set minimum stability
         run: composer config minimum-stability ${{ matrix.minimum-stability }}
@@ -55,16 +62,5 @@ jobs:
           COMPOSER_DISCARD_CHANGES: true
         run: composer update --no-suggest --no-progress --no-interaction --no-suggest --prefer-dist --with-all-dependencies --prefer-${{ matrix.dependency-version }}
 
-      - if: matrix.coverage != 'pcov'
-        name: Execute tests (without coverage)
+      - name: Execute tests
         run: vendor/bin/phpunit
-        
-      - if: matrix.coverage == 'pcov'
-        name: Execute tests with coverage
-        uses: paambaati/codeclimate-action@v2.4.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-        with:
-          coverageCommand: vendor/bin/phpunit --coverage-clover ${{ github.workspace }}/clover.xml
-          coverageLocations:
-            "${{github.workspace}}/clover.xml:clover"
