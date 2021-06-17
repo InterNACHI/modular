@@ -12,7 +12,7 @@ class MakeTestTest extends TestCase
 	use WritesToAppFilesystem;
 	use TestsMakeCommands;
 	
-	public function test_it_scaffolds_a_test_in_the_module_when_module_option_is_set() : void
+	public function test_it_scaffolds_a_test_in_the_module_when_module_option_is_set(): void
 	{
 		$command = MakeTest::class;
 		$arguments = ['name' => 'TestTest'];
@@ -26,7 +26,7 @@ class MakeTestTest extends TestCase
 		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);
 	}
 	
-	public function test_it_scaffolds_a_test_in_the_app_when_module_option_is_missing() : void
+	public function test_it_scaffolds_a_test_in_the_app_when_module_option_is_missing(): void
 	{
 		$command = MakeTest::class;
 		$arguments = ['name' => 'TestTest'];

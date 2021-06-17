@@ -12,7 +12,7 @@ class MakeFactoryTest extends TestCase
 	use WritesToAppFilesystem;
 	use TestsMakeCommands;
 	
-	public function test_it_scaffolds_a_factory_in_the_module_when_module_option_is_set() : void
+	public function test_it_scaffolds_a_factory_in_the_module_when_module_option_is_set(): void
 	{
 		$command = MakeFactory::class;
 		$arguments = ['name' => 'TestFactory'];
@@ -31,7 +31,7 @@ class MakeFactoryTest extends TestCase
 		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);
 	}
 	
-	public function test_it_scaffolds_a_factory_in_the_app_when_module_option_is_missing() : void
+	public function test_it_scaffolds_a_factory_in_the_app_when_module_option_is_missing(): void
 	{
 		$command = MakeFactory::class;
 		$arguments = ['name' => 'TestFactory'];

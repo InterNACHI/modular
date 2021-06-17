@@ -11,7 +11,7 @@ class ModulesClearTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
-	public function test_it_writes_to_cache_file() : void
+	public function test_it_writes_to_cache_file(): void
 	{
 		$this->artisan(ModulesCache::class);
 		

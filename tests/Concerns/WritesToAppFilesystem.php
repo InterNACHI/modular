@@ -54,7 +54,7 @@ trait WritesToAppFilesystem
 		return $this->base_path;
 	}
 	
-	protected function getModulePath(string $module_name, string $path = '/', string $modules_root = 'app-modules'): string 
+	protected function getModulePath(string $module_name, string $path = '/', string $modules_root = 'app-modules'): string
 	{
 		return $this->getBasePath()
 			.DIRECTORY_SEPARATOR
@@ -64,7 +64,7 @@ trait WritesToAppFilesystem
 			.$this->normalizeDirectorySeparators($path);
 	}
 	
-	protected function normalizeDirectorySeparators(string $path): string 
+	protected function normalizeDirectorySeparators(string $path): string
 	{
 		$path = trim(str_replace('/', DIRECTORY_SEPARATOR, $path), DIRECTORY_SEPARATOR);
 		

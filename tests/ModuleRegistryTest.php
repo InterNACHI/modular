@@ -2,7 +2,6 @@
 
 namespace InterNACHI\Modular\Tests;
 
-use InterNACHI\Modular\Console\Commands\Make\MakeModule;
 use InterNACHI\Modular\Support\ModuleConfig;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
@@ -11,7 +10,7 @@ class ModuleRegistryTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
-	public function test_it_resolves_modules() : void
+	public function test_it_resolves_modules(): void
 	{
 		$this->makeModule('test-module');
 		$this->makeModule('test-module-two');

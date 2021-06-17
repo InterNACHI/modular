@@ -12,7 +12,7 @@ class MakePolicyTest extends TestCase
 	use WritesToAppFilesystem;
 	use TestsMakeCommands;
 	
-	public function test_it_scaffolds_a_policy_in_the_module_when_module_option_is_set() : void
+	public function test_it_scaffolds_a_policy_in_the_module_when_module_option_is_set(): void
 	{
 		$command = MakePolicy::class;
 		$arguments = ['name' => 'TestPolicy'];
@@ -25,7 +25,7 @@ class MakePolicyTest extends TestCase
 		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);
 	}
 	
-	public function test_it_scaffolds_a_policy_in_the_app_when_module_option_is_missing() : void
+	public function test_it_scaffolds_a_policy_in_the_app_when_module_option_is_missing(): void
 	{
 		$command = MakePolicy::class;
 		$arguments = ['name' => 'TestPolicy'];

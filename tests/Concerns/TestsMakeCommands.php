@@ -2,7 +2,6 @@
 
 namespace InterNACHI\Modular\Tests\Concerns;
 
-use Closure;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
 
 trait TestsMakeCommands

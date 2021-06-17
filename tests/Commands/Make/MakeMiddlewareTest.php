@@ -12,7 +12,7 @@ class MakeMiddlewareTest extends TestCase
 	use WritesToAppFilesystem;
 	use TestsMakeCommands;
 	
-	public function test_it_scaffolds_a_middleware_in_the_module_when_module_option_is_set() : void
+	public function test_it_scaffolds_a_middleware_in_the_module_when_module_option_is_set(): void
 	{
 		$command = MakeMiddleware::class;
 		$arguments = ['name' => 'TestMiddleware'];
@@ -25,7 +25,7 @@ class MakeMiddlewareTest extends TestCase
 		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);
 	}
 	
-	public function test_it_scaffolds_a_middleware_in_the_app_when_module_option_is_missing() : void
+	public function test_it_scaffolds_a_middleware_in_the_app_when_module_option_is_missing(): void
 	{
 		$command = MakeMiddleware::class;
 		$arguments = ['name' => 'TestMiddleware'];

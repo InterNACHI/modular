@@ -10,7 +10,7 @@ class ModularServiceProviderTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
-	public function test_registry_is_bound_as_a_singleton() : void
+	public function test_registry_is_bound_as_a_singleton(): void
 	{
 		$registry = $this->app->make(ModuleRegistry::class);
 		$registry2 = $this->app->make(ModuleRegistry::class);
@@ -19,7 +19,7 @@ class ModularServiceProviderTest extends TestCase
 		$this->assertSame($registry, $registry2);
 	}
 	
-	public function test_model_factory_classes_are_resolved_correctly() : void
+	public function test_model_factory_classes_are_resolved_correctly(): void
 	{
 		$this->requiresLaravelVersion('8.0.0');
 		
@@ -66,7 +66,7 @@ class ModularServiceProviderTest extends TestCase
 		);
 	}
 	
-	public function test_model_factory_classes_are_resolved_correctly_with_custom_namespace() : void
+	public function test_model_factory_classes_are_resolved_correctly_with_custom_namespace(): void
 	{
 		$this->requiresLaravelVersion('8.0.0');
 		
@@ -115,7 +115,7 @@ class ModularServiceProviderTest extends TestCase
 		);
 	}
 	
-	public function test_it_loads_translations_from_module() : void
+	public function test_it_loads_translations_from_module(): void
 	{
 		$module = $this->makeModule();
 		
@@ -127,7 +127,7 @@ class ModularServiceProviderTest extends TestCase
 		], JSON_THROW_ON_ERROR));
 		
 		$this->filesystem()->put(
-			$module->path('resources/lang/en/foo.php'), 
+			$module->path('resources/lang/en/foo.php'),
 			'<?php return ["bar" => "Test PHP translation"];'
 		);
 		
