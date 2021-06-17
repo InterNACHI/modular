@@ -54,14 +54,14 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 		'command.test.make' => MakeTest::class,
 		'command.component.make' => MakeComponent::class,
 	];
-
+	
 	public function register(): void
 	{
 		Artisan::starting(function() {
 			foreach ($this->overrides as $alias => $class_name) {
 				$this->app->singleton($alias, $class_name);
 			}
-
+			
 			$this->app->singleton('command.migrate.make', function($app) {
 				return new MakeMigration($app['migration.creator'], $app['composer']);
 			});

@@ -23,6 +23,7 @@ use InterNACHI\Modular\Console\Commands\ModulesCache;
 use InterNACHI\Modular\Console\Commands\ModulesClear;
 use InterNACHI\Modular\Console\Commands\ModulesList;
 use InterNACHI\Modular\Console\Commands\ModulesSync;
+use Livewire\Livewire;
 use ReflectionClass;
 use ReflectionProperty;
 use RuntimeException;
@@ -235,19 +236,26 @@ class ModularServiceProvider extends ServiceProvider
 
 	protected function bootLivewireComponents(): void
 	{
-		if (class_exists('Livewire\\Livewire')) {
-			$this->autoDiscoveryHelper()
-				->livewireComponentFileFinder()
-				->each(function(SplFileInfo $component) {
-					$module = $this->registry()->moduleForPathOrFail($component->getPath());
-					$componentPath = collect(explode('/', $component->getRelativePath()))->map(function($item) {
-						return (string) Str::of($item)->kebab();
-					})->reject(function($item) {
-						return $item == null;
-					})->push(Str::of($component->getBasename('.php'))->kebab())->implode('.');
-					\Livewire\Livewire::component($module->name.'::'.$componentPath, $this->pathToFullyQualifiedClassName($component->getPathname(), $module));
-				});
+		if (!class_exists(Livewire::class)) {
+			return;
 		}
+		
+		$this->autoDiscoveryHelper()
+			->livewireComponentFileFinder()
+			->each(function(SplFileInfo $component) {
+				$module = $this->registry()->moduleForPathOrFail($component->getPath());
+				
+				$component_name = Str::of($component->getRelativePath())
+					->explode('/')
+					->filter()
+					->push($component->getBasename('.php'))
+					->map([Str::class, 'kebab'])
+					->implode('.');
+				
+				$fully_qualified_component = $this->pathToFullyQualifiedClassName($component->getPathname(), $module);
+				
+				Livewire::component("{$module->name}::{$component_name}", $fully_qualified_component);
+			});
 	}
 	
 	protected function registerMigrations(Migrator $migrator): void

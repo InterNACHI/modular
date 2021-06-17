@@ -129,7 +129,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::forFiles()
 				->name('*.php')
 				->in($this->base_path.'/*/src/Http/Livewire');
-		} catch (\Exception $e) {
+		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
 		}
 	}
