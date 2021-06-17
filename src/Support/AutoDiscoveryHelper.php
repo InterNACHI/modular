@@ -34,7 +34,7 @@ class AutoDiscoveryHelper
 		try {
 			return FinderCollection::forFiles()
 				->name('*.php')
-				->in($this->base_path . '/*/src/Console/Commands');
+				->in($this->base_path.'/*/src/Console/Commands');
 		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
 		}
@@ -46,7 +46,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::forDirectories()
 				->depth(0)
 				->name('factories')
-				->in($this->base_path . '/*/database/');
+				->in($this->base_path.'/*/database/');
 		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
 		}
@@ -58,7 +58,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::forDirectories()
 				->depth(0)
 				->name('migrations')
-				->in($this->base_path . '/*/database/');
+				->in($this->base_path.'/*/database/');
 		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
 		}
@@ -69,18 +69,18 @@ class AutoDiscoveryHelper
 		try {
 			return FinderCollection::forFiles()
 				->name('*.php')
-				->in($this->base_path . '/*/src/Models');
+				->in($this->base_path.'/*/src/Models');
 		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
 		}
 	}
 
-	public function bladeComponentFileFinder(): FinderCollection
+	public function bladeComponentFileFinder() : FinderCollection
 	{
 		try {
 			return FinderCollection::forFiles()
 				->name('*.php')
-				->in($this->base_path . '/*/src/View/Components');
+				->in($this->base_path.'/*/src/View/Components');
 		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
 		}
@@ -92,7 +92,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::forFiles()
 				->depth(0)
 				->name('*.php')
-				->in($this->base_path . '/*/routes')
+				->in($this->base_path.'/*/routes')
 				->sortByName();
 		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
@@ -105,19 +105,19 @@ class AutoDiscoveryHelper
 			return FinderCollection::forDirectories()
 				->depth(0)
 				->name('views')
-				->in($this->base_path . '/*/resources/');
+				->in($this->base_path.'/*/resources/');
 		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
 		}
 	}
-
-	public function langDirectoryFinder(): FinderCollection
+	
+	public function langDirectoryFinder() : FinderCollection
 	{
 		try {
 			return FinderCollection::forDirectories()
 				->depth(0)
 				->name('lang')
-				->in($this->base_path . '/*/resources/');
+				->in($this->base_path.'/*/resources/');
 		} catch (DirectoryNotFoundException $exception) {
 			return FinderCollection::empty();
 		}
@@ -128,7 +128,7 @@ class AutoDiscoveryHelper
 		try {
 			return FinderCollection::forFiles()
 				->name('*.php')
-				->in($this->base_path . '/*/src/Http/Livewire');
+				->in($this->base_path.'/*/src/Http/Livewire');
 		} catch (\Exception $e) {
 			return FinderCollection::empty();
 		}
