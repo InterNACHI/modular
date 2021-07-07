@@ -9,7 +9,7 @@ class SeedCommandTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
-	public function test_it_looks_for_seeders_in_module_namespace_when_module_option_is_set() : void
+	public function test_it_looks_for_seeders_in_module_namespace_when_module_option_is_set(): void
 	{
 		$app_seeder = $this->createMockSeeder();
 		$module_seeder = $this->createMockSeeder();
@@ -25,7 +25,7 @@ class SeedCommandTest extends TestCase
 		$this->assertFalse($app_seeder->invoked);
 	}
 	
-	public function test_it_looks_for_named_seeders_in_module_namespace_when_module_option_is_set() : void
+	public function test_it_looks_for_named_seeders_in_module_namespace_when_module_option_is_set(): void
 	{
 		$app_seeder = $this->createMockSeeder();
 		$module_seeder = $this->createMockSeeder();
@@ -41,7 +41,7 @@ class SeedCommandTest extends TestCase
 		$this->assertFalse($app_seeder->invoked);
 	}
 	
-	public function test_it_looks_for_seeders_in_app_namespace_when_module_option_is_missing() : void
+	public function test_it_looks_for_seeders_in_app_namespace_when_module_option_is_missing(): void
 	{
 		$mock = $this->createMockSeeder();
 		
@@ -53,7 +53,7 @@ class SeedCommandTest extends TestCase
 		$this->assertTrue($mock->invoked);
 	}
 	
-	public function test_it_looks_for_named_seeders_in_app_namespace_when_module_option_is_missing() : void
+	public function test_it_looks_for_named_seeders_in_app_namespace_when_module_option_is_missing(): void
 	{
 		$mock = $this->createMockSeeder();
 		

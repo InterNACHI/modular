@@ -3,9 +3,6 @@
 namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Support\Str;
-use InterNACHI\Modular\Support\ModuleConfig;
-use InterNACHI\Modular\Support\ModuleRegistry;
-use Symfony\Component\Console\Input\InputOption;
 
 trait Modularize
 {

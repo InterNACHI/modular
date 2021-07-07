@@ -42,7 +42,7 @@ class MakeFactoryTest extends TestCase
 		if (version_compare($this->app->version(), '8.0.0', '>=')) {
 			$expected_substrings = [
 				'Illuminate\Database\Eloquent\Factories\Factory',
-				'namespace Database\Factories;'
+				'namespace Database\Factories;',
 			];
 		} else {
 			$expected_substrings = [
