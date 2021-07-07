@@ -17,6 +17,7 @@ class SeedCommandTest extends TestCase
 		$this->app->instance('Modules\\TestModule\\Database\\Seeders\\DatabaseSeeder', $module_seeder);
 		$this->app->instance('Modules\\TestModule\\DatabaseSeeder', $module_seeder);
 		$this->app->instance('Database\\Seeders\\DatabaseSeeder', $app_seeder);
+		$this->app->instance('DatabaseSeeder', $app_seeder);
 		
 		$this->makeModule('test-module');
 		
@@ -33,6 +34,7 @@ class SeedCommandTest extends TestCase
 		
 		$this->app->instance('Modules\\TestModule\\Database\\Seeders\\Custom\\Seeder', $module_seeder);
 		$this->app->instance('Database\\Seeders\\Custom\\Seeder', $app_seeder);
+		$this->app->instance('Custom\\Seeder', $app_seeder);
 		
 		$this->makeModule('test-module');
 		
@@ -59,6 +61,7 @@ class SeedCommandTest extends TestCase
 		$mock = $this->createMockSeeder();
 		
 		$this->app->instance('Database\\Seeders\\CustomSeeder', $mock);
+		$this->app->instance('CustomSeeder', $mock);
 		
 		$this->artisan('db:seed', ['--class' => 'CustomSeeder']);
 		
