@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Create seeders in the correct namespace when `--module` flag is used in Laravel 8+
+
 ## [1.3.1]
 
 ### Fixed

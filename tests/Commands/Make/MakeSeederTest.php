@@ -24,6 +24,10 @@ class MakeSeederTest extends TestCase
 			'class TestSeeder extends Seeder',
 		];
 		
+		if (version_compare($this->app->version(), '8.0.0', '>=')) {
+			$expected_substrings[] = 'namespace Modules\TestModule\Database\Seeders;';
+		}
+		
 		$this->filesystem()->deleteDirectory($this->getBasePath().$this->normalizeDirectorySeparators('database/seeds'));
 		$this->filesystem()->deleteDirectory($this->getModulePath('test-module', 'database/seeds'));
 		
@@ -41,6 +45,10 @@ class MakeSeederTest extends TestCase
 			'use Illuminate\Database\Seeder',
 			'class TestSeeder extends Seeder',
 		];
+		
+		if (version_compare($this->app->version(), '8.0.0', '>=')) {
+			$expected_substrings[] = 'namespace Database\Seeders;';
+		}
 		
 		$this->filesystem()->deleteDirectory($this->getBasePath().$this->normalizeDirectorySeparators('database/seeds'));
 		
