@@ -46,6 +46,7 @@ class SeedCommandTest extends TestCase
 		$mock = $this->createMockSeeder();
 		
 		$this->app->instance('Database\\Seeders\\DatabaseSeeder', $mock);
+		$this->app->instance('DatabaseSeeder', $mock);
 		
 		$this->artisan('db:seed');
 		
