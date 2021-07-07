@@ -25,7 +25,13 @@ class MakeFactory extends FactoryMakeCommand
 				$namespace = $module->qualify('Database\\Factories');
 			}
 			
-			$stub = str_replace('{{ factoryNamespace }}', $namespace, $stub);
+			$replacements = [
+				'{{ factoryNamespace }}' => $namespace,
+				'{{factoryNamespace}}' => $namespace,
+				'namespace Database\Factories;' => "namespace {$namespace};", // Early Laravel 8 didn't use a placeholder
+			];
+			
+			$stub = str_replace(array_keys($replacements), array_values($replacements), $stub);
 		}
 		
 		return parent::replaceNamespace($stub, $name);
