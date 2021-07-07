@@ -15,14 +15,15 @@ class SeedCommandTest extends TestCase
 		$module_seeder = $this->createMockSeeder();
 		
 		$this->app->instance('Modules\\TestModule\\Database\\Seeders\\DatabaseSeeder', $module_seeder);
+		$this->app->instance('Modules\\TestModule\\DatabaseSeeder', $module_seeder);
 		$this->app->instance('Database\\Seeders\\DatabaseSeeder', $app_seeder);
 		
 		$this->makeModule('test-module');
 		
 		$this->artisan('db:seed', ['--module' => 'test-module']);
 		
-		$this->assertTrue($module_seeder->invoked);
-		$this->assertFalse($app_seeder->invoked);
+		$this->assertEquals(1, $module_seeder->invoked);
+		$this->assertEquals(0, $app_seeder->invoked);
 	}
 	
 	public function test_it_looks_for_named_seeders_in_module_namespace_when_module_option_is_set(): void
@@ -37,8 +38,8 @@ class SeedCommandTest extends TestCase
 		
 		$this->artisan('db:seed', ['--module' => 'test-module', '--class' => 'Custom\\Seeder']);
 		
-		$this->assertTrue($module_seeder->invoked);
-		$this->assertFalse($app_seeder->invoked);
+		$this->assertEquals(1, $module_seeder->invoked);
+		$this->assertEquals(0, $app_seeder->invoked);
 	}
 	
 	public function test_it_looks_for_seeders_in_app_namespace_when_module_option_is_missing(): void
@@ -50,7 +51,7 @@ class SeedCommandTest extends TestCase
 		
 		$this->artisan('db:seed');
 		
-		$this->assertTrue($mock->invoked);
+		$this->assertEquals(1, $mock->invoked);
 	}
 	
 	public function test_it_looks_for_named_seeders_in_app_namespace_when_module_option_is_missing(): void
@@ -61,17 +62,17 @@ class SeedCommandTest extends TestCase
 		
 		$this->artisan('db:seed', ['--class' => 'CustomSeeder']);
 		
-		$this->assertTrue($mock->invoked);
+		$this->assertEquals(1, $mock->invoked);
 	}
 	
 	protected function createMockSeeder()
 	{
 		return new class() {
-			public $invoked = false;
+			public $invoked = 0;
 			
 			public function __invoke()
 			{
-				$this->invoked = true;
+				$this->invoked++;
 			}
 			
 			public function __call($method, $args)
