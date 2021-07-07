@@ -57,6 +57,21 @@ trait Modularize
 		return parent::qualifyClass($name);
 	}
 	
+	protected function qualifyModel(string $model)
+	{
+		if ($module = $this->module()) {
+			$model = str_replace('/', '\\', ltrim($model, '\\/'));
+			
+			if (Str::startsWith($model, $module->namespace())) {
+				return $model;
+			}
+			
+			return $module->qualify('Models\\'.$model);
+		}
+		
+		return parent::qualifyModel($model);
+	}
+	
 	protected function getPath($name)
 	{
 		if ($module = $this->module()) {
