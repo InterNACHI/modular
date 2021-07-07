@@ -110,6 +110,8 @@ There is **currently one exception**:
 
 ### Commands
 
+#### Package Commands
+
 We provide a few helper commands:
 
 - `php artisan make:module`  — scaffold a new module
@@ -117,6 +119,8 @@ We provide a few helper commands:
 - `php artisan modules:clear` — clear the module cache
 - `php artisan modules:sync`  — update project configs (like `phpunit.xml`) with module settings
 - `php artisan modules:list`  — list all modules
+
+#### Laravel “`make:`” Commands
 
 We also add a `--module=` option to most Laravel `make:` commands so that you can
 use all the existing tooling that you know. The commands themselves are exactly the
@@ -144,6 +148,15 @@ and everything else Laravel provides:
 - `php artisan make:rule MyModuleRule --module=my-module`
 - `php artisan make:seeder MyModuleSeeder --module=my-module`
 - `php artisan make:test MyModuleTest --module=my-module`
+
+#### Other Laravel Commands
+
+In addition to adding a `--module` option to most `make:` commands, we’ve also added the same
+option to the `db:seed` command. If you pass the `--module` option to `db:seed`, it will look
+for your seeder within your module namespace:
+
+- `php artisan db:seed --module=my-module` will try to call `Modules\MyModule\Database\Seeders\DatabaseSeeder`
+- `php artisan db:seed --class=MySeeder --module=my-module` will try to call `Modules\MyModule\Database\Seeders\MySeeder`
 
 ## Comparison to `nwidart/laravel-modules`
 

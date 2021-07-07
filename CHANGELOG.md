@@ -5,9 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added support for `--module` in `php artisan db:seed`
+
 ### Fixed
 
 - Create seeders in the correct namespace when `--module` flag is used in Laravel 8+
+- Create factories in the correct namespace when `--module` flag is used in Laravel 8+
+- Apply module namespace to models when creating a factory in a module
 
 ## [1.3.1]
 

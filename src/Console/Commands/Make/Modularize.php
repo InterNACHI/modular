@@ -9,26 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 trait Modularize
 {
-	protected function module(): ?ModuleConfig
-	{
-		return $this->getLaravel()
-			->make(ModuleRegistry::class)
-			->module($this->option('module'));
-	}
-	
-	protected function configure()
-	{
-		parent::configure();
-		
-		$this->getDefinition()->addOption(
-			new InputOption(
-				'--module',
-				null,
-				InputOption::VALUE_REQUIRED,
-				'Create this resource inside an application module'
-			)
-		);
-	}
+	use \InterNACHI\Modular\Console\Commands\Modularize;
 	
 	protected function getDefaultNamespace($rootNamespace)
 	{

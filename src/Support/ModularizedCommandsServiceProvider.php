@@ -2,8 +2,10 @@
 
 namespace InterNACHI\Modular\Support;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Support\ServiceProvider;
+use InterNACHI\Modular\Console\Commands\Database\SeedCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeChannel;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
@@ -51,11 +53,12 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 		'command.seeder.make' => MakeSeeder::class,
 		'command.test.make' => MakeTest::class,
 		'command.component.make' => MakeComponent::class,
+		'command.seed' => SeedCommand::class,
 	];
 	
 	public function register(): void
 	{
-		Artisan::starting(function() {
+		Artisan::starting(function(Application $artisan) {
 			foreach ($this->overrides as $alias => $class_name) {
 				$this->app->singleton($alias, $class_name);
 			}
