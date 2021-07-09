@@ -3,86 +3,81 @@
 namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Filesystem\Filesystem;
-use Livewire\Livewire;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Livewire\Commands\MakeCommand;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Config;
+use Livewire\Livewire;
 use Livewire\LivewireComponentsFinder;
-use Symfony\Component\Console\Input\InputOption;
 
 class MakeLivewire extends MakeCommand
 {
-    use Modularize;
+	use Modularize;
 
-    public function handle()
-    {
-        if ($module = $this->module()) {
-            Config::set('livewire.class_namespace', $module->qualify('Http\\Livewire'));
-            Config::set('livewire.view_path', $module->path('resources/views/livewire'));
+	public function handle()
+	{
+		if ($module = $this->module()) {
+			Config::set('livewire.class_namespace', $module->qualify('Http\\Livewire'));
+			Config::set('livewire.view_path', $module->path('resources/views/livewire'));
 
-            $app = $this->getLaravel();
+			$app = $this->getLaravel();
 
-            $defaultManifestPath = $app['livewire']->isRunningServerless()
-                ? '/tmp/storage/bootstrap/cache/livewire-components.php'
-                : app()->bootstrapPath('cache/livewire-components.php');
+			$defaultManifestPath = $app['livewire']->isRunningServerless()
+				? '/tmp/storage/bootstrap/cache/livewire-components.php'
+				: app()->bootstrapPath('cache/livewire-components.php');
 
-            $componentsFinder = new LivewireComponentsFinder(
-                new Filesystem,
-                config('livewire.manifest_path') ?: $defaultManifestPath,
-                $module->path('src/Http/Livewire')
-            );
+			$componentsFinder = new LivewireComponentsFinder(
+				new Filesystem(),
+				config('livewire.manifest_path') ?: $defaultManifestPath,
+				$module->path('src/Http/Livewire')
+			);
 
-            $app->instance(LivewireComponentsFinder::class, $componentsFinder);
-        }
+			$app->instance(LivewireComponentsFinder::class, $componentsFinder);
+		}
 
-        parent::handle();
-    }
+		parent::handle();
+	}
 
-    protected function createClass($force = false, $inline = false)
-    {
-        if ($module = $this->module()) {
+	protected function createClass($force = false, $inline = false)
+	{
+		if ($module = $this->module()) {
+			$directories = preg_split('/[.\/(\\\\)]+/', $this->argument('name'));
+			$directories = array_map([Str::class, 'studly'], $directories);
 
-            $directories = preg_split('/[.\/(\\\\)]+/', $this->argument('name'));
-            $directories = array_map([Str::class, 'studly'], $directories);
+			$name = Str::of($this->argument('name'))
+				->split('/[.\/(\\\\)]+/')
+				->map([Str::class, 'studly'])
+				->join(DIRECTORY_SEPARATOR);
 
+			$classPath = $module->path('src/Http/Livewire/'.$name.'.php');
 
-            $name = Str::of($this->argument('name'))
-                ->split('/[.\/(\\\\)]+/')
-                ->map([Str::class, 'studly'])
-                ->join(DIRECTORY_SEPARATOR);
+			if (File::exists($classPath) && !$force) {
+				$this->line("<options=bold,reverse;fg=red> WHOOPS-IE-TOOTLES </> 😳 \n");
+				$this->line("<fg=red;options=bold>Class already exists:</> {$this->parser->relativeClassPath()}");
 
+				return false;
+			}
 
-            $classPath = $module->path('src/Http/Livewire/' . $name . ".php");
+			$this->ensureDirectoryExists($classPath);
 
-            if (File::exists($classPath) && !$force) {
-                $this->line("<options=bold,reverse;fg=red> WHOOPS-IE-TOOTLES </> 😳 \n");
-                $this->line("<fg=red;options=bold>Class already exists:</> {$this->parser->relativeClassPath()}");
+			File::put($classPath, $this->parser->classContents($inline));
 
-                return false;
-            }
+			$component_name = Str::of($name)
+				->explode('/')
+				->filter()
+				->map([Str::class, 'kebab'])
+				->implode('.');
 
-            $this->ensureDirectoryExists($classPath);
+			$fully_qualified_component = Str::of($this->argument('name'))
+				->prepend('Http/Livewire/')
+				->split('/[.\/(\\\\)]+/')
+				->map([Str::class, 'studly'])
+				->join('\\');
 
-            File::put($classPath, $this->parser->classContents($inline));
+			Livewire::component("{$module->name}::{$component_name}", $module->qualify($fully_qualified_component));
+			return $classPath;
+		}
 
-            $component_name = Str::of($name)
-                ->explode('/')
-                ->filter()
-                ->map([Str::class, 'kebab'])
-                ->implode('.');
-
-
-            $fully_qualified_component = Str::of($this->argument('name'))
-                ->prepend("Http/Livewire/")
-                ->split('/[.\/(\\\\)]+/')
-                ->map([Str::class, 'studly'])
-                ->join("\\");
-
-            Livewire::component("{$module->name}::{$component_name}", $module->qualify($fully_qualified_component));
-            return $classPath;
-        }
-
-        return parent::createClass($force, $inline);
-    }
+		return parent::createClass($force, $inline);
+	}
 }
