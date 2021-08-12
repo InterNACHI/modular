@@ -5,10 +5,12 @@ namespace InterNACHI\Modular\Tests;
 use Illuminate\Filesystem\Filesystem;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
+use InterNACHI\Modular\Console\Commands\Make\MakeLivewire;
 use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Support\AutoDiscoveryHelper;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
+use Livewire\LivewireServiceProvider;
 use Symfony\Component\Finder\SplFileInfo;
 
 class AutoDiscoveryHelperTest extends TestCase
@@ -162,5 +164,38 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$this->assertContains($this->module1->path('resources/lang'), $resolved);
 		$this->assertContains($this->module2->path('resources/lang'), $resolved);
+	}
+	
+	public function test_it_finds_livewire_component(): void
+	{
+		$this->artisan(MakeLivewire::class, [
+			'name' => 'TestComponent',
+			'--module' => $this->module1->name,
+		]);
+		
+		$this->artisan(MakeLivewire::class, [
+			'name' => 'TestComponent',
+			'--module' => $this->module2->name,
+		]);
+		
+		$resolved = [];
+		
+		$this->helper->livewireComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
+			$resolved[] = $file->getPathname();
+		});
+		
+		$this->assertContains($this->module1->path('src/Http/Livewire/TestComponent.php'), $resolved);
+		$this->assertContains($this->module2->path('src/Http/Livewire/TestComponent.php'), $resolved);
+	}
+	
+	protected function getPackageProviders($app)
+	{
+		$providers = parent::getPackageProviders($app);
+		
+		if (class_exists(LivewireServiceProvider::class)) {
+			$providers[] = LivewireServiceProvider::class;
+		}
+		
+		return $providers;
 	}
 }

@@ -15,6 +15,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeException;
 use InterNACHI\Modular\Console\Commands\Make\MakeFactory;
 use InterNACHI\Modular\Console\Commands\Make\MakeJob;
 use InterNACHI\Modular\Console\Commands\Make\MakeListener;
+use InterNACHI\Modular\Console\Commands\Make\MakeLivewire;
 use InterNACHI\Modular\Console\Commands\Make\MakeMail;
 use InterNACHI\Modular\Console\Commands\Make\MakeMiddleware;
 use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
@@ -28,6 +29,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeResource;
 use InterNACHI\Modular\Console\Commands\Make\MakeRule;
 use InterNACHI\Modular\Console\Commands\Make\MakeSeeder;
 use InterNACHI\Modular\Console\Commands\Make\MakeTest;
+use Livewire\Commands\MakeCommand as OriginalLivewireCommand;
 
 class ModularizedCommandsServiceProvider extends ServiceProvider
 {
@@ -66,6 +68,14 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 			$this->app->singleton('command.migrate.make', function($app) {
 				return new MakeMigration($app['migration.creator'], $app['composer']);
 			});
+			
+			// Register Livewire command only if Livewire is installed
+			if (class_exists(OriginalLivewireCommand::class)) {
+				$artisan->resolveCommands([MakeLivewire::class]);
+				$this->app->extend(OriginalLivewireCommand::class, function() {
+					return new MakeLivewire();
+				});
+			}
 		});
 	}
 }
