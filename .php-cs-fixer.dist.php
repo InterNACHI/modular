@@ -38,10 +38,12 @@ return (new PhpCsFixer\Config())
 		'no_empty_comment' => true,
 		'no_empty_phpdoc' => true,
 		'no_extra_blank_lines' => [
-			'extra',
-			'use',
-			'use_trait',
-			'return',
+			'tokens' => [
+				'extra',
+				'use',
+				'use_trait',
+				'return',
+			],
 		],
 		'no_leading_import_slash' => true,
 		'no_leading_namespace_whitespace' => true,
@@ -52,7 +54,7 @@ return (new PhpCsFixer\Config())
 		'no_useless_else' => true,
 		'no_useless_return' => true,
 		'single_trait_insert_per_statement' => true,
-		'psr4' => true,
+		'psr_autoloading' => true,
 		'dir_constant' => true,
 		'single_line_comment_style' => [
 			'comment_types' => ['hash'],
@@ -64,7 +66,10 @@ return (new PhpCsFixer\Config())
 		'lowercase_static_reference' => true,
 		'magic_constant_casing' => true,
 		'magic_method_casing' => true,
-		'class_attributes_separation' => true,
+		'class_attributes_separation' => [
+			// TODO: This can be reverted when https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/5869 is merged
+			'elements' => ['const' => 'one', 'method' => 'one', 'property' => 'one'],
+		],
 		'modernize_types_casting' => true,
 		'native_function_casing' => true,
 		'native_function_type_declaration_casing' => true,
@@ -101,7 +106,7 @@ return (new PhpCsFixer\Config())
 		'standardize_not_equals' => true,
 		'ternary_operator_spaces' => true,
 		'whitespace_after_comma_in_array' => true,
-		'trailing_comma_in_multiline_array' => true,
+		'trailing_comma_in_multiline' => true,
 		'trim_array_spaces' => true,
 		'binary_operator_spaces' => true,
 		'unary_operator_spaces' => true,
