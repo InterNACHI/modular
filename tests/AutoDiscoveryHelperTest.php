@@ -23,7 +23,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	
 	protected $helper;
 	
-	protected function setUp() : void
+	protected function setUp(): void
 	{
 		parent::setUp();
 		
@@ -35,7 +35,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		);
 	}
 	
-	public function test_it_finds_commands() : void
+	public function test_it_finds_commands(): void
 	{
 		$this->artisan(MakeCommand::class, [
 			'name' => 'TestCommand',
@@ -57,7 +57,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->assertContains($this->module2->path('src/Console/Commands/TestCommand.php'), $resolved);
 	}
 	
-	public function test_it_finds_factory_directories() : void
+	public function test_it_finds_factory_directories(): void
 	{
 		$resolved = [];
 		
@@ -69,7 +69,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->assertContains($this->module2->path('database/factories'), $resolved);
 	}
 	
-	public function test_it_finds_migration_directories() : void
+	public function test_it_finds_migration_directories(): void
 	{
 		$resolved = [];
 		
@@ -81,7 +81,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->assertContains($this->module2->path('database/migrations'), $resolved);
 	}
 	
-	public function test_it_finds_models() : void
+	public function test_it_finds_models(): void
 	{
 		$this->artisan(MakeModel::class, [
 			'name' => 'TestModel',
@@ -103,7 +103,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->assertContains($this->module2->path('src/Models/TestModel.php'), $resolved);
 	}
 	
-	public function test_it_finds_blade_components() : void
+	public function test_it_finds_blade_components(): void
 	{
 		$this->artisan(MakeComponent::class, [
 			'name' => 'TestComponent',
@@ -125,7 +125,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->assertContains($this->module2->path('src/View/Components/TestComponent.php'), $resolved);
 	}
 	
-	public function test_it_finds_routes() : void
+	public function test_it_finds_routes(): void
 	{
 		$resolved = [];
 		
@@ -137,7 +137,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->assertContains($this->module2->path("routes/{$this->module2->name}-routes.php"), $resolved);
 	}
 	
-	public function test_it_finds_view_directories() : void
+	public function test_it_finds_view_directories(): void
 	{
 		$resolved = [];
 		
@@ -149,7 +149,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->assertContains($this->module2->path('resources/views'), $resolved);
 	}
 	
-	public function test_it_finds_lang_directories() : void
+	public function test_it_finds_lang_directories(): void
 	{
 		// These paths don't exist by default
 		$fs = new Filesystem();
@@ -166,7 +166,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->assertContains($this->module2->path('resources/lang'), $resolved);
 	}
 	
-	public function test_it_finds_livewire_component() : void
+	public function test_it_finds_livewire_component(): void
 	{
 		$this->artisan(MakeLivewire::class, [
 			'name' => 'TestComponent',
