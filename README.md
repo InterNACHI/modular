@@ -158,6 +158,13 @@ for your seeder within your module namespace:
 - `php artisan db:seed --module=my-module` will try to call `Modules\MyModule\Database\Seeders\DatabaseSeeder`
 - `php artisan db:seed --class=MySeeder --module=my-module` will try to call `Modules\MyModule\Database\Seeders\MySeeder`
 
+#### Vendor Commands
+
+We can also add the `--module` option to commands in 3rd-party packages. The first package
+that we support is Livewire. If you have Livewire installed, you can run:
+
+- `php artisan make:livewire counter --module=my-module`
+
 ## Comparison to `nwidart/laravel-modules`
 
 [Laravel Modules](https://nwidart.com/laravel-modules) is a great package that’s been
