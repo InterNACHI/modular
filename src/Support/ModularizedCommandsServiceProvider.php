@@ -6,6 +6,7 @@ use Illuminate\Console\Application;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Support\ServiceProvider;
 use InterNACHI\Modular\Console\Commands\Database\SeedCommand;
+use InterNACHI\Modular\Console\Commands\Make\MakeCast;
 use InterNACHI\Modular\Console\Commands\Make\MakeChannel;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
@@ -34,6 +35,7 @@ use Livewire\Commands\MakeCommand as OriginalLivewireCommand;
 class ModularizedCommandsServiceProvider extends ServiceProvider
 {
 	protected $overrides = [
+		'command.cast.make' => MakeCast::class,
 		'command.controller.make' => MakeController::class,
 		'command.console.make' => MakeCommand::class,
 		'command.channel.make' => MakeChannel::class,
