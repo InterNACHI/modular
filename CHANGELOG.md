@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.1]
+
+### Added
+
+- Added support for `make:cast`
+
 ## [1.5.0]
 
 ### Added
@@ -88,7 +94,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-[Unreleased]: https://github.com/InterNACHI/modular/compare/1.5.0...HEAD
+[Unreleased]: https://github.com/InterNACHI/modular/compare/1.5.1...HEAD
+[1.5.1]: https://github.com/InterNACHI/modular/compare/1.5.0...1.5.1
 [1.5.0]: https://github.com/InterNACHI/modular/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/InterNACHI/modular/compare/1.3.1...1.4.0
 [1.3.1]: https://github.com/InterNACHI/modular/compare/1.3.0...1.3.1
