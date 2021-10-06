@@ -3,7 +3,6 @@
 namespace InterNACHI\Modular\Tests\Commands\Make;
 
 use InterNACHI\Modular\Console\Commands\Make\MakeCast;
-use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Tests\Concerns\TestsMakeCommands;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use InterNACHI\Modular\Tests\TestCase;
