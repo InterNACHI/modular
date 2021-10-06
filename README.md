@@ -127,6 +127,7 @@ use all the existing tooling that you know. The commands themselves are exactly 
 same, which means you can use your [custom stubs](https://laravel.com/docs/7.x/artisan#stub-customization)
 and everything else Laravel provides:
 
+- `php artisan make:cast MyModuleCast --module=my-module`
 - `php artisan make:controller MyModuleController --module=my-module`
 - `php artisan make:command MyModuleCommand --module=my-module`
 - `php artisan make:component MyModuleComponent --module=my-module`
