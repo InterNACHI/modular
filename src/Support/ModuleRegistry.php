@@ -120,7 +120,7 @@ class ModuleRegistry
 	
 	protected function extractModuleNameFromPath(string $path): string
 	{
-		$relative_path = trim(Str::after($path, $this->modules_path), DIRECTORY_SEPARATOR);
+		$relative_path = trim(Str::after(str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], $path), str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR],$this->modules_path)), DIRECTORY_SEPARATOR);
 		
 		$segments = explode(DIRECTORY_SEPARATOR, $relative_path);
 		return $segments[0];
