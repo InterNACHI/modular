@@ -9,6 +9,7 @@ use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Support\PhpStorm\LaravelConfigWriter;
 use InterNACHI\Modular\Support\PhpStorm\PhpFrameworkWriter;
 use InterNACHI\Modular\Support\PhpStorm\ProjectImlWriter;
+use InterNACHI\Modular\Support\PhpStorm\WorkspaceWriter;
 use Symfony\Component\Finder\SplFileInfo;
 
 class ModulesSync extends Command
@@ -82,6 +83,7 @@ class ModulesSync extends Command
 	{
 		$this->updatePhpStormLaravelPlugin();
 		$this->updatePhpStormPhpConfig();
+		$this->updatePhpStormWorkspaceConfig();
 		$this->updatePhpStormProjectIml();
 	}
 	
@@ -106,9 +108,24 @@ class ModulesSync extends Command
 		$writer = new PhpFrameworkWriter($config_path, $this->registry);
 		
 		if ($writer->handle()) {
-			$this->info('Updated PhpStorm library roots config file...');
+			$this->info('Updated PhpStorm PHP config file...');
 		} else {
-			$this->info('Did not find/update PhpStorm library roots config.');
+			$this->info('Did not find/update PhpStorm PHP config.');
+			if ($this->getOutput()->isVerbose()) {
+				$this->warn($writer->last_error);
+			}
+		}
+	}
+	
+	protected function updatePhpStormWorkspaceConfig(): void
+	{
+		$config_path = $this->getLaravel()->basePath('.idea/workspace.xml');
+		$writer = new WorkspaceWriter($config_path, $this->registry);
+		
+		if ($writer->handle()) {
+			$this->info('Updated PhpStorm workspace library roots...');
+		} else {
+			$this->info('Did not find/update PhpStorm workspace config.');
 			if ($this->getOutput()->isVerbose()) {
 				$this->warn($writer->last_error);
 			}

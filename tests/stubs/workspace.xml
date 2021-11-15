@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+	<component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP">
+		<include_path>
+			<path value="$PROJECT_DIR$/vendor/another-vendor/package"/>
+			<path value="$PROJECT_DIR$/vendor/modules/non-module-in-same-namespace"/>
+			<path value="$PROJECT_DIR$/vendor/modules/test-module"/>
+		</include_path>
+	</component>
+</project>
