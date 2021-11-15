@@ -22,7 +22,6 @@ class MakeFactoryTest extends TestCase
 			$expected_substrings = [
 				'use Illuminate\Database\Eloquent\Factories\Factory;',
 				'namespace Modules\TestModule\Database\Factories;',
-				'use Modules\TestModule\Models\Model;',
 			];
 		} else {
 			$expected_substrings = [
