@@ -32,9 +32,9 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ModularServiceProvider extends ServiceProvider
 {
-	protected ModuleRegistry $registry;
+	protected ?ModuleRegistry $registry = null;
 	
-	protected AutoDiscoveryHelper $auto_discovery_helper;
+	protected ?AutoDiscoveryHelper $auto_discovery_helper = null;
 	
 	/**
 	 * This is the base directory of the modular package
