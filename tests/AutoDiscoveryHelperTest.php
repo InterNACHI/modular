@@ -12,7 +12,6 @@ use InterNACHI\Modular\Support\CacheHelper;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use Livewire\LivewireServiceProvider;
-use Symfony\Component\Finder\SplFileInfo;
 
 class AutoDiscoveryHelperTest extends TestCase
 {

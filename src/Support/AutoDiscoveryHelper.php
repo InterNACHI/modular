@@ -23,9 +23,7 @@ class AutoDiscoveryHelper
 		$this->cache = $cache;
 	}
 	
-	// ------------------------------------
-	
-	public function getModules(): ?Collection
+	public function getModules(): Collection
 	{
 		return $this->load('modules', function() {
 			return $this->fileFinder()
@@ -51,7 +49,7 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function getBladeComponents(): ?Collection
+	public function getBladeComponents(): Collection
 	{
 		return $this->load('blade_components', function() {
 			return $this->fileFinder('*/src/View/Components/')
@@ -73,7 +71,7 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function getLegacyFactories(): ?Collection
+	public function getLegacyFactories(): Collection
 	{
 		return $this->load('legacy_factories', function() {
 			return $this->directoryFinder('*/database')
@@ -85,7 +83,7 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function getMigrations(): ?Collection
+	public function getMigrations(): Collection
 	{
 		return $this->load('migrations', function() {
 			return $this->directoryFinder('*/database/')
@@ -97,7 +95,7 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function getModels(): ?Collection
+	public function getModels(): Collection
 	{
 		return $this->load('models', function() {
 			return $this->fileFinder('*/src/Models/')
@@ -108,7 +106,7 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function getRoutes(): ?Collection
+	public function getRoutes(): Collection
 	{
 		return $this->load('routes', function() {
 			return $this->fileFinder('*/routes/')
@@ -120,7 +118,7 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function getViewDirectories(): ?Collection
+	public function getViewDirectories(): Collection
 	{
 		return $this->load('view_directories', function() {
 			return $this->directoryFinder('*/resources/')
@@ -132,7 +130,7 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function getLangDirectories(): ?Collection
+	public function getLangDirectories(): Collection
 	{
 		return $this->load('lang_directories', function() {
 			return $this->directoryFinder('*/resources/')
@@ -144,7 +142,7 @@ class AutoDiscoveryHelper
 		});
 	}
 	
-	public function getLivewireComponentFiles(): ?Collection
+	public function getLivewireComponentFiles(): Collection
 	{
 		return $this->load('livewire_components', function() {
 			return $this->fileFinder('*/src/Http/Livewire')
