@@ -4,13 +4,14 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
+use IteratorAggregate;
 use Symfony\Component\Finder\Finder;
 
 /**
  * @mixin \Illuminate\Support\LazyCollection
  * @mixin \Symfony\Component\Finder\Finder
  */
-class FinderCollection
+class FinderCollection implements IteratorAggregate
 {
 	use ForwardsCalls;
 	
@@ -73,5 +74,10 @@ class FinderCollection
 		
 		// Otherwise, just return the new result (in the case of toBase() or sum()-type calls)
 		return $result;
+	}
+	
+	public function getIterator()
+	{
+		return $this->collection->getIterator();
 	}
 }

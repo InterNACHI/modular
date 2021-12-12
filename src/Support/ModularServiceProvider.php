@@ -12,10 +12,8 @@ use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
 use Illuminate\Database\Eloquent\Factory as LegacyEloquentFactory;
 use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Illuminate\Translation\Translator;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Factory as ViewFactory;
 use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
@@ -64,10 +62,14 @@ class ModularServiceProvider extends ServiceProvider
 			);
 		});
 		
+		$this->app->singleton(CacheHelper::class, function(Application $app) {
+			return new CacheHelper($app->bootstrapPath('cache/modules.php'));
+		});
+		
 		$this->app->singleton(AutoDiscoveryHelper::class, function(Application $app) {
 			return new AutoDiscoveryHelper(
 				$app->make(ModuleRegistry::class),
-				$app->make(Filesystem::class)
+				$app->make(CacheHelper::class)
 			);
 		});
 		
@@ -156,20 +158,18 @@ class ModularServiceProvider extends ServiceProvider
 		}
 		
 		$this->autoDiscoveryHelper()
-			->routeFileFinder()
-			->each(function(SplFileInfo $file) {
-				require $file->getRealPath();
-			});
+			->getRoutes()
+			->each(fn($pathname) => require $pathname);
 	}
 	
 	protected function bootViews(): void
 	{
 		$this->callAfterResolving('view', function(ViewFactory $view_factory) {
 			$this->autoDiscoveryHelper()
-				->viewDirectoryFinder()
-				->each(function(SplFileInfo $directory) use ($view_factory) {
-					$module = $this->registry()->moduleForPathOrFail($directory->getPath());
-					$view_factory->addNamespace($module->name, $directory->getRealPath());
+				->getViewDirectories()
+				->each(function($pathname) use ($view_factory) {
+					$module = $this->registry()->moduleForPathOrFail($pathname);
+					$view_factory->addNamespace($module->name, $pathname);
 				});
 		});
 	}
@@ -178,10 +178,10 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->callAfterResolving(BladeCompiler::class, function(BladeCompiler $blade) {
 			$this->autoDiscoveryHelper()
-				->bladeComponentFileFinder()
-				->each(function(SplFileInfo $component) use ($blade) {
-					$module = $this->registry()->moduleForPathOrFail($component->getPath());
-					$fully_qualified_component = $this->pathToFullyQualifiedClassName($component->getPathname(), $module);
+				->getBladeComponents()
+				->each(function($pathname) use ($blade) {
+					$module = $this->registry()->moduleForPathOrFail($pathname);
+					$fully_qualified_component = $this->pathToFullyQualifiedClassName($pathname, $module);
 					$blade->component($fully_qualified_component, null, $module->name);
 				});
 		});
@@ -190,18 +190,18 @@ class ModularServiceProvider extends ServiceProvider
 	protected function bootTranslations(): void
 	{
 		$this->callAfterResolving('translator', function(TranslatorContract $translator) {
-			if (!$translator instanceof Translator) {
+			// These methods aren't on the contract so we'll confirm that they exist on the
+			// implementation before proceeding (if the app has a custom translator)
+			if (!method_exists($translator, 'addNamespace') || !method_exists($translator, 'addJsonPath')) {
 				return;
 			}
 			
 			$this->autoDiscoveryHelper()
-				->langDirectoryFinder()
-				->each(function(SplFileInfo $directory) use ($translator) {
-					$module = $this->registry()->moduleForPathOrFail($directory->getPath());
-					$path = $directory->getRealPath();
-					
-					$translator->addNamespace($module->name, $path);
-					$translator->addJsonPath($path);
+				->getLangDirectories()
+				->each(function(string $pathname) use ($translator) {
+					$module = $this->registry()->moduleForPathOrFail($pathname);
+					$translator->addNamespace($module->name, $pathname);
+					$translator->addJsonPath($pathname);
 				});
 		});
 	}
@@ -236,18 +236,12 @@ class ModularServiceProvider extends ServiceProvider
 		}
 		
 		$this->autoDiscoveryHelper()
-			->livewireComponentFileFinder()
-			->each(function(SplFileInfo $component) {
-				$module = $this->registry()->moduleForPathOrFail($component->getPath());
+			->getLivewireComponentFiles()
+			->each(function(array $component) {
+				[$pathname, $component_name] = $component;
 				
-				$component_name = Str::of($component->getRelativePath())
-					->explode('/')
-					->filter()
-					->push($component->getBasename('.php'))
-					->map([Str::class, 'kebab'])
-					->implode('.');
-				
-				$fully_qualified_component = $this->pathToFullyQualifiedClassName($component->getPathname(), $module);
+				$module = $this->registry()->moduleForPathOrFail($pathname);
+				$fully_qualified_component = $this->pathToFullyQualifiedClassName($pathname, $module);
 				
 				Livewire::component("{$module->name}::{$component_name}", $fully_qualified_component);
 			});
@@ -256,9 +250,9 @@ class ModularServiceProvider extends ServiceProvider
 	protected function registerMigrations(Migrator $migrator): void
 	{
 		$this->autoDiscoveryHelper()
-			->migrationDirectoryFinder()
-			->each(function(SplFileInfo $path) use ($migrator) {
-				$migrator->path($path->getRealPath());
+			->getMigrations()
+			->each(function($pathname) use ($migrator) {
+				$migrator->path($pathname);
 			});
 	}
 	
@@ -295,16 +289,16 @@ class ModularServiceProvider extends ServiceProvider
 	protected function registerLegacyFactories(LegacyEloquentFactory $factory): void
 	{
 		$this->autoDiscoveryHelper()
-			->factoryDirectoryFinder()
-			->each(function(SplFileInfo $path) use ($factory) {
-				$factory->load($path->getRealPath());
+			->getLegacyFactories()
+			->each(function($pathname) use ($factory) {
+				$factory->load($pathname);
 			});
 	}
 	
 	protected function registerPolicies(Gate $gate): void
 	{
 		$this->autoDiscoveryHelper()
-			->modelFileFinder()
+			->getModels()
 			->each(function(SplFileInfo $file) use ($gate) {
 				$module = $this->registry()->moduleForPathOrFail($file->getPath());
 				$fully_qualified_model = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
@@ -333,10 +327,10 @@ class ModularServiceProvider extends ServiceProvider
 	protected function registerCommands(Artisan $artisan): void
 	{
 		$this->autoDiscoveryHelper()
-			->commandFileFinder()
-			->each(function(SplFileInfo $file) use ($artisan) {
-				$module = $this->registry()->moduleForPathOrFail($file->getPath());
-				$class_name = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
+			->getCommands()
+			->each(function(string $pathname) use ($artisan) {
+				$module = $this->registry()->moduleForPathOrFail($pathname);
+				$class_name = $this->pathToFullyQualifiedClassName($pathname, $module);
 				if ($this->isInstantiableCommand($class_name)) {
 					$artisan->resolve($class_name);
 				}
