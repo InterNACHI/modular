@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
@@ -31,29 +32,19 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ModularServiceProvider extends ServiceProvider
 {
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry
-	 */
-	protected $registry;
+	protected ModuleRegistry $registry;
 	
-	/**
-	 * @var \InterNACHI\Modular\Support\AutoDiscoveryHelper
-	 */
-	protected $auto_discovery_helper;
+	protected AutoDiscoveryHelper $auto_discovery_helper;
 	
 	/**
 	 * This is the base directory of the modular package
-	 *
-	 * @var string
 	 */
-	protected $base_dir;
+	protected string $base_dir;
 	
 	/**
 	 * This is the configured modules directory (app-modules/ by default)
-	 *
-	 * @var string
 	 */
-	protected $modules_path;
+	protected ?string $modules_path = null;
 	
 	public function __construct($app)
 	{
@@ -66,21 +57,21 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->mergeConfigFrom("{$this->base_dir}/config.php", 'app-modules');
 		
-		$this->app->singleton(ModuleRegistry::class, function() {
+		$this->app->singleton(ModuleRegistry::class, function(Application $app) {
 			return new ModuleRegistry(
 				$this->getModulesBasePath(),
-				$this->app->bootstrapPath('cache/modules.php')
+				$app->bootstrapPath('cache/modules.php')
 			);
 		});
 		
-		$this->app->singleton(AutoDiscoveryHelper::class, function($app) {
+		$this->app->singleton(AutoDiscoveryHelper::class, function(Application $app) {
 			return new AutoDiscoveryHelper(
 				$app->make(ModuleRegistry::class),
 				$app->make(Filesystem::class)
 			);
 		});
 		
-		$this->app->singleton(MakeMigration::class, function($app) {
+		$this->app->singleton(MakeMigration::class, function(Application $app) {
 			return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
 		});
 		
@@ -89,7 +80,11 @@ class ModularServiceProvider extends ServiceProvider
 		// if we're running the migrator)
 		$this->registerLazily(Migrator::class, [$this, 'registerMigrations']);
 		$this->registerLazily(Gate::class, [$this, 'registerPolicies']);
-		$this->registerLazily(LegacyEloquentFactory::class, [$this, 'registerLegacyFactories']);
+		
+		// If we're running Laravel 7 or lower, set up legacy factory support 
+		if (class_exists(LegacyEloquentFactory::class)) {
+			$this->registerLazily(LegacyEloquentFactory::class, [$this, 'registerLegacyFactories']);
+		}
 		
 		// If we're running Laravel 8 or higher, set up the Eloquent Factory to resolve
 		// module factories as well as App factories.

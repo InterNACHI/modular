@@ -9,22 +9,11 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ModuleRegistry
 {
-	/**
-	 * @var Collection
-	 */
-	protected $modules;
+	protected ?Collection $modules = null;
 	
-	/**
-	 * @var string
-	 */
-	protected $cache_path;
+	protected string $cache_path;
 	
-	/**
-	 * This is the base path that all modules are installed in
-	 *
-	 * @var string
-	 */
-	protected $modules_path;
+	protected string $modules_path;
 	
 	public function __construct(string $modules_path, string $cache_path)
 	{
@@ -98,7 +87,7 @@ class ModuleRegistry
 		if (file_exists($this->cache_path)) {
 			return Collection::make(require $this->cache_path)
 				->mapWithKeys(function(array $cached) {
-					$config = new ModuleConfig($cached['name'], $cached['base_path'], new Collection($cached['namespaces']));
+					$config = ModuleConfig::fromCache($cached);
 					return [$config->name => $config];
 				});
 		}

@@ -8,20 +8,11 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ModuleConfig implements Arrayable
 {
-	/**
-	 * @var string
-	 */
-	public $name;
+	public string $name;
 	
-	/**
-	 * @var string
-	 */
-	public $base_path;
+	public string $base_path;
 	
-	/**
-	 * @var Collection
-	 */
-	public $namespaces;
+	public Collection $namespaces;
 	
 	public static function fromComposerFile(SplFileInfo $composer_file): self
 	{
@@ -39,6 +30,15 @@ class ModuleConfig implements Arrayable
 			});
 		
 		return new static($name, $base_path, $namespaces);
+	}
+	
+	public static function fromCache(array $cache): self
+	{
+		return new static(
+			$cache['name'],
+			$cache['base_path'],
+			new Collection($cache['namespaces'])
+		);
 	}
 	
 	public function __construct($name, $base_path, Collection $namespaces = null)

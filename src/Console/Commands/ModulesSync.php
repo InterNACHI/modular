@@ -18,15 +18,9 @@ class ModulesSync extends Command
 	
 	protected $description = 'Sync your project\'s configuration with your current modules';
 	
-	/**
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $filesystem;
+	protected Filesystem $filesystem;
 	
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry
-	 */
-	protected $registry;
+	protected ModuleRegistry $registry;
 	
 	public function handle(ModuleRegistry $registry, Filesystem $filesystem)
 	{

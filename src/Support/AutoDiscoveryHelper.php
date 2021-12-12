@@ -7,20 +7,11 @@ use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 
 class AutoDiscoveryHelper
 {
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry
-	 */
-	protected $module_registry;
-
-	/**
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $filesystem;
-
-	/**
-	 * @var string
-	 */
-	protected $base_path;
+	protected ModuleRegistry $module_registry;
+	
+	protected Filesystem $filesystem;
+	
+	protected string $base_path;
 
 	public function __construct(ModuleRegistry $module_registry, Filesystem $filesystem)
 	{

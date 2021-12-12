@@ -15,6 +15,7 @@ class ModulesClear extends Command
 	public function handle(Filesystem $filesystem, ModuleRegistry $registry)
 	{
 		$filesystem->delete($registry->getCachePath());
+		
 		$this->info('Module cache cleared!');
 	}
 }

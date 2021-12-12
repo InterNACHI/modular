@@ -14,17 +14,14 @@ class FinderCollection
 {
 	use ForwardsCalls;
 	
-	protected static $prefer_collection_methods = ['filter', 'each'];
+	protected static array $prefer_collection_methods = ['filter', 'each'];
 	
 	/**
-	 * @var \Symfony\Component\Finder\Finder
+	 * @var Finder|array
 	 */
 	protected $finder;
 	
-	/**
-	 * @var \Illuminate\Support\LazyCollection
-	 */
-	protected $collection;
+	protected LazyCollection $collection;
 	
 	public static function forFiles(): self
 	{

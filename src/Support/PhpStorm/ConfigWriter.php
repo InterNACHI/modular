@@ -8,20 +8,11 @@ use SimpleXMLElement;
 
 abstract class ConfigWriter
 {
-	/**
-	 * @var string
-	 */
-	public $last_error;
+	public ?string $last_error = null;
 	
-	/**
-	 * @var string
-	 */
-	protected $config_path;
+	protected string $config_path;
 	
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry
-	 */
-	protected $module_registry;
+	protected ModuleRegistry $module_registry;
 	
 	abstract public function write(): bool;
 	
@@ -56,6 +47,7 @@ abstract class ConfigWriter
 	protected function error(string $message): bool
 	{
 		$this->last_error = $message;
+		
 		return false;
 	}
 	
