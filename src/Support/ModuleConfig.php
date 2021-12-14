@@ -4,7 +4,7 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
-use Symfony\Component\Finder\SplFileInfo;
+use InvalidArgumentException;
 
 class ModuleConfig implements Arrayable
 {
@@ -14,30 +14,16 @@ class ModuleConfig implements Arrayable
 	
 	public Collection $namespaces;
 	
-	public static function fromComposerFile(SplFileInfo $composer_file): self
+	public static function fromArray(array $data): self
 	{
-		$composer_config = json_decode($composer_file->getContents(), true, 16, JSON_THROW_ON_ERROR);
+		if (! isset($data['name'], $data['base_path'], $data['namespaces'])) {
+			throw new InvalidArgumentException('Module data array must contain name, base_path, and namespaces.');
+		}
 		
-		$base_path = rtrim($composer_file->getPath(), DIRECTORY_SEPARATOR);
-		
-		$name = basename($base_path);
-		
-		$namespaces = Collection::make($composer_config['autoload']['psr-4'] ?? [])
-			->mapWithKeys(function($src, $namespace) use ($base_path) {
-				$src = str_replace('/', DIRECTORY_SEPARATOR, $src);
-				$path = $base_path.DIRECTORY_SEPARATOR.$src;
-				return [$path => $namespace];
-			});
-		
-		return new static($name, $base_path, $namespaces);
-	}
-	
-	public static function fromCache(array $cache): self
-	{
 		return new static(
-			$cache['name'],
-			$cache['base_path'],
-			new Collection($cache['namespaces'])
+			$data['name'],
+			$data['base_path'],
+			new Collection($data['namespaces'])
 		);
 	}
 	

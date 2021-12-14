@@ -21,7 +21,7 @@ class CacheHelper
 		$this->cache[static::VERSION_KEY] = static::CACHE_VERSION;
 		
 		if (is_readable($this->filename)) {
-			$this->cache = $this->load();
+			$this->load();
 		}
 	}
 	
@@ -34,9 +34,13 @@ class CacheHelper
 		return file_put_contents($this->filename, $contents);
 	}
 	
-	public function getFilename(): string
+	public function delete(): bool
 	{
-		return $this->filename;
+		if (!file_exists($this->filename)) {
+			return true;
+		}
+		
+		return unlink($this->filename);
 	}
 	
 	public function has(string $name): bool
@@ -63,25 +67,50 @@ class CacheHelper
 		return $this;
 	}
 	
-	protected function load(): array
+	public function clear(): self
 	{
+		$this->cache = [];
+		
+		return $this;
+	}
+	
+	public function reload(): self
+	{
+		if (!is_readable($this->filename)) {
+			return $this;
+		}
+		
 		try {
 			$cache = include $this->filename;
+			
+			if (!is_array($cache)) {
+				throw new RuntimeException('Module cache is not a valid array of data.');
+			}
+			
+			$cache = $this->migrate($cache);
+			
+			if ($cache[static::VERSION_KEY] !== static::CACHE_VERSION) {
+				throw new RuntimeException("Unrecognized modular cache version: {$cache[static::VERSION_KEY]}");
+			}
+			
+			$this->cache = $cache;
 		} catch (Throwable $exception) {
-			return $this->cache;
+			@unlink($this->filename);
+			$this->cache = [];
+			
+			throw $exception;
 		}
 		
-		if (!is_array($cache)) {
-			return $this->cache;
+		return $this;
+	}
+	
+	protected function load()
+	{
+		try {
+			$this->reload();
+		} catch (Throwable $exception) {
+			//
 		}
-		
-		$cache = $this->migrate($cache);
-		
-		if ($cache[static::VERSION_KEY] !== static::CACHE_VERSION) {
-			throw new RuntimeException("Unrecognized modular cache version: {$cache[static::VERSION_KEY]}");
-		}
-		
-		return $cache;
 	}
 	
 	protected function migrate(array $cache): array

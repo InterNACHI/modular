@@ -5,22 +5,51 @@ namespace InterNACHI\Modular\Support;
 use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use ReflectionClass;
+use ReflectionMethod;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\SplFileInfo;
+use Throwable;
 
 class AutoDiscoveryHelper
 {
-	protected ModuleRegistry $module_registry;
-	
 	protected CacheHelper $cache;
 	
 	protected string $modules_path;
 	
-	public function __construct(ModuleRegistry $module_registry, CacheHelper $cache)
+	public function __construct($modules_path, CacheHelper $cache)
 	{
-		$this->module_registry = $module_registry;
-		$this->modules_path = $module_registry->getModulesPath();
+		$this->modules_path = $modules_path;
 		$this->cache = $cache;
+	}
+	
+	public function writeCache(): bool
+	{
+		// Execute all our loaders to ensure everything is in the cache
+		collect((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC))
+			->map(fn(ReflectionMethod $method) => $method->getName())
+			->filter(fn($name) => Str::startsWith($name, 'get'))
+			->each(fn($method) => $this->{$method}());
+		
+		return $this->cache->write();
+	}
+	
+	public function clearCache(): self
+	{
+		$this->cache->clear();
+		$this->cache->delete();
+		
+		return $this;
+	}
+	
+	public function reloadCache(): bool
+	{
+		try {
+			$this->cache->reload();
+			return true;
+		} catch (Throwable $exception) {
+			return false;
+		}
 	}
 	
 	public function getModules(): Collection

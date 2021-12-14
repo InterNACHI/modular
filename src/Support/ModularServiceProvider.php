@@ -12,6 +12,7 @@ use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
 use Illuminate\Database\Eloquent\Factory as LegacyEloquentFactory;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -30,10 +31,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ModularServiceProvider extends ServiceProvider
 {
-	protected ?ModuleRegistry $registry = null;
-	
-	protected ?AutoDiscoveryHelper $auto_discovery_helper = null;
-	
 	/**
 	 * This is the base directory of the modular package
 	 */
@@ -55,26 +52,34 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->mergeConfigFrom("{$this->base_dir}/config.php", 'app-modules');
 		
-		$this->app->singleton(ModuleRegistry::class, function(Application $app) {
-			return new ModuleRegistry(
-				$this->getModulesBasePath(),
-				$app->bootstrapPath('cache/modules.php')
-			);
-		});
-		
 		$this->app->singleton(CacheHelper::class, function(Application $app) {
 			return new CacheHelper($app->bootstrapPath('cache/modules.php'));
 		});
 		
 		$this->app->singleton(AutoDiscoveryHelper::class, function(Application $app) {
 			return new AutoDiscoveryHelper(
-				$app->make(ModuleRegistry::class),
+				$this->getModulesBasePath(),
 				$app->make(CacheHelper::class)
+			);
+		});
+		
+		$this->app->singleton(ModuleRegistry::class, function(Application $app) {
+			return new ModuleRegistry(
+				$this->getModulesBasePath(),
+				$app->make(AutoDiscoveryHelper::class)
 			);
 		});
 		
 		$this->app->singleton(MakeMigration::class, function(Application $app) {
 			return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
+		});
+		
+		$this->app->bind(MakeModule::class, function(Application $app) {
+			return new MakeModule(
+				$app->make(Filesystem::class),
+				$app->make(ModuleRegistry::class),
+				$this->getModulesBasePath()
+			);
 		});
 		
 		// Set up lazy registrations for things that only need to run if we're using
@@ -100,33 +105,17 @@ class ModularServiceProvider extends ServiceProvider
 	
 	public function boot(): void
 	{
+		// Boot package
 		$this->publishVendorFiles();
 		$this->bootPackageCommands();
 		
+		// Boot modules
 		$this->bootRoutes();
 		$this->bootBreadcrumbs();
 		$this->bootViews();
 		$this->bootBladeComponents();
 		$this->bootTranslations();
 		$this->bootLivewireComponents();
-	}
-	
-	protected function registry(): ModuleRegistry
-	{
-		if (null === $this->registry) {
-			$this->registry = $this->app->make(ModuleRegistry::class);
-		}
-		
-		return $this->registry;
-	}
-	
-	protected function autoDiscoveryHelper(): AutoDiscoveryHelper
-	{
-		if (null === $this->auto_discovery_helper) {
-			$this->auto_discovery_helper = $this->app->make(AutoDiscoveryHelper::class);
-		}
-		
-		return $this->auto_discovery_helper;
 	}
 	
 	protected function publishVendorFiles(): void
@@ -337,6 +326,16 @@ class ModularServiceProvider extends ServiceProvider
 			});
 	}
 	
+	protected function registry(): ModuleRegistry
+	{
+		return $this->app->make(ModuleRegistry::class);
+	}
+	
+	protected function autoDiscoveryHelper(): AutoDiscoveryHelper
+	{
+		return $this->app->make(AutoDiscoveryHelper::class);
+	}
+	
 	protected function registerLazily(string $class_name, callable $callback): self
 	{
 		$this->app->resolving($class_name, Closure::fromCallable($callback));
@@ -375,11 +374,7 @@ class ModularServiceProvider extends ServiceProvider
 			'.php' => '',
 		];
 		
-		return str_replace(
-			array_keys($replacements),
-			array_values($replacements),
-			$path
-		);
+		return str_replace(array_keys($replacements), array_values($replacements), $path);
 	}
 	
 	protected function isInstantiableCommand($command): bool

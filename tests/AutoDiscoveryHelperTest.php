@@ -30,9 +30,19 @@ class AutoDiscoveryHelperTest extends TestCase
 		$this->module1 = $this->makeModule('test-module');
 		$this->module2 = $this->makeModule('test-module-two');
 		$this->helper = new AutoDiscoveryHelper(
-			new ModuleRegistry($this->getBasePath().'/app-modules', ''),
-			new CacheHelper($this->getBasePath().'/bootstrap/cache/modules.php') // FIXME: Clean up at end?
+			$this->getBasePath().'/app-modules',
+			new CacheHelper($this->getBasePath().'/bootstrap/cache/modules.php')
 		);
+	}
+	
+	protected function tearDown(): void
+	{
+		$cache_path = $this->getBasePath().'/bootstrap/cache/modules.php';
+		if ($this->filesystem()->exists($cache_path)) {
+			$this->filesystem()->delete($cache_path);
+		}
+		
+		parent::tearDown();
 	}
 	
 	public function test_it_finds_commands(): void

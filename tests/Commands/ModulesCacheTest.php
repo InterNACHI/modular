@@ -5,6 +5,7 @@ namespace InterNACHI\Modular\Tests\Commands;
 use InterNACHI\Modular\Console\Commands\ModulesCache;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use InterNACHI\Modular\Tests\TestCase;
+use Livewire\Livewire;
 
 class ModulesCacheTest extends TestCase
 {
@@ -23,7 +24,24 @@ class ModulesCacheTest extends TestCase
 		
 		$cache = include $expected_path;
 		
-		$this->assertArrayHasKey('test-module', $cache);
-		$this->assertArrayHasKey('test-module-two', $cache);
+		$this->assertArrayHasKey('modules', $cache);
+		$this->assertArrayHasKey('blade_components', $cache);
+		$this->assertArrayHasKey('commands', $cache);
+		$this->assertArrayHasKey('migrations', $cache);
+		$this->assertArrayHasKey('models', $cache);
+		$this->assertArrayHasKey('routes', $cache);
+		$this->assertArrayHasKey('view_directories', $cache);
+		$this->assertArrayHasKey('lang_directories', $cache);
+		
+		if (class_exists(Livewire::class)) {
+			$this->assertArrayHasKey('livewire_components', $cache);
+		}
+		
+		if (version_compare($this->app->version(), '8.0.0', '<')) {
+			$this->assertArrayHasKey('legacy_factories', $cache);
+		}
+		
+		$this->assertArrayHasKey('test-module', $cache['modules']);
+		$this->assertArrayHasKey('test-module-two', $cache['modules']);
 	}
 }
