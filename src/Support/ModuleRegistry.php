@@ -53,7 +53,7 @@ class ModuleRegistry
 	public function clear(): self
 	{
 		$this->modules = null;
-		$this->auto_discovery_helper->clearCache();
+		$this->auto_discovery_helper->clear();
 		
 		return $this;
 	}

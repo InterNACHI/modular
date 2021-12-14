@@ -8,7 +8,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeLivewire;
 use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Support\AutoDiscoveryHelper;
-use InterNACHI\Modular\Support\CacheHelper;
+use InterNACHI\Modular\Support\Cache;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use Livewire\LivewireServiceProvider;
@@ -29,10 +29,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$this->module1 = $this->makeModule('test-module');
 		$this->module2 = $this->makeModule('test-module-two');
-		$this->helper = new AutoDiscoveryHelper(
-			$this->getBasePath().'/app-modules',
-			new CacheHelper($this->getBasePath().'/bootstrap/cache/modules.php')
-		);
+		$this->helper = new AutoDiscoveryHelper($this->getBasePath().'/app-modules', []);
 	}
 	
 	protected function tearDown(): void

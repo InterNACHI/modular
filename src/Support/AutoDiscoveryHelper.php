@@ -9,47 +9,35 @@ use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\SplFileInfo;
-use Throwable;
 
 class AutoDiscoveryHelper
 {
-	protected CacheHelper $cache;
+	protected array $discovered = [];
 	
 	protected string $modules_path;
 	
-	public function __construct($modules_path, CacheHelper $cache)
+	public function __construct($modules_path, array $discovered = [])
 	{
 		$this->modules_path = $modules_path;
-		$this->cache = $cache;
+		$this->discovered = $discovered;
 	}
 	
-	public function writeCache(): bool
+	public function toArray(): array
 	{
-		// Execute all our loaders to ensure everything is in the cache
+		// Execute all our loaders to ensure everything has been discovered
 		collect((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC))
 			->map(fn(ReflectionMethod $method) => $method->getName())
 			->filter(fn($name) => Str::startsWith($name, 'get'))
 			->each(fn($method) => $this->{$method}());
 		
-		return $this->cache->write();
+		return $this->discovered;
 	}
 	
-	public function clearCache(): self
+	public function clear(): self
 	{
-		$this->cache->clear();
-		$this->cache->delete();
+		$this->discovered = [];
 		
 		return $this;
-	}
-	
-	public function reloadCache(): bool
-	{
-		try {
-			$this->cache->reload();
-			return true;
-		} catch (Throwable $exception) {
-			return false;
-		}
 	}
 	
 	public function getModules(): Collection
@@ -191,15 +179,15 @@ class AutoDiscoveryHelper
 	
 	protected function load(string $name, Closure $loader): Collection
 	{
-		if (!$this->cache->has($name)) {
+		if (!isset($this->discovered[$name])) {
 			try {
-				$this->cache->set($name, collect($loader())->toArray());
+				$this->discovered[$name] = collect($loader())->toArray();
 			} catch (DirectoryNotFoundException $exception) {
-				$this->cache->set($name, []);
+				$this->discovered[$name] = [];
 			}
 		}
 		
-		return collect($this->cache->get($name));
+		return collect($this->discovered[$name]);
 	}
 	
 	protected function fileFinder(string $in = ''): FinderCollection
