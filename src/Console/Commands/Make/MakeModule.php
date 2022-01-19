@@ -101,7 +101,6 @@ class MakeModule extends Command
 			return 0;
 		}
 		
-		$this->buildDirectoryStructure();
 		$this->writeStubs();
 		$this->updateCoreComposerConfig();
 		
@@ -153,54 +152,9 @@ class MakeModule extends Command
 		}
 	}
 	
-	protected function buildDirectoryStructure()
-	{
-		$this->title('Setting up directory structure');
-		
-		$directories = [
-			'src',
-			'src/Providers',
-			'src/Console/Commands',
-			'tests',
-			'routes',
-			'resources/views',
-			'database/migrations',
-			'database/factories',
-			'database/'.$this->seedersDirectory(),
-		];
-		
-		foreach ($directories as $directory) {
-			$path = "{$this->base_path}/{$directory}";
-			
-			if ($this->filesystem->isDirectory($path)) {
-				$this->line(" - Skipping <info>{$this->module_name}/{$directory}</info> (already exists)");
-			} else {
-				$this->filesystem->makeDirectory($path, 0777, true, true);
-				$this->line(" - Created <info>{$this->module_name}/{$directory}</info>");
-			}
-		}
-		
-		$this->newLine();
-	}
-	
 	protected function writeStubs()
 	{
 		$this->title('Creating initial module files');
-		
-		$stubs = [
-			'composer.json' => 'composer-stub-v'.substr($this->getLaravel()->version(), 0, 1).'.json',
-			'src/Providers/StubClassNamePrefixServiceProvider.php' => 'ServiceProvider.php',
-			'tests/StubClassNamePrefixServiceProviderTest.php' => 'ServiceProviderTest.php',
-			'database/migrations/StubMigrationPrefix_set_up_StubModuleName_module.php' => 'migration.php',
-			'routes/StubModuleName-routes.php' => 'web-routes.php',
-			'resources/views/index.blade.php' => 'view.blade.php',
-			'resources/views/create.blade.php' => 'view.blade.php',
-			'resources/views/show.blade.php' => 'view.blade.php',
-			'resources/views/edit.blade.php' => 'view.blade.php',
-			'database/factories/.gitkeep' => '.gitkeep',
-			'database/migrations/.gitkeep' => '.gitkeep',
-			'database/'.$this->seedersDirectory().'/.gitkeep' => '.gitkeep',
-		];
 		
 		$tests_base = config('app-modules.tests_base', 'Tests\TestCase');
 		
@@ -221,12 +175,12 @@ class MakeModule extends Command
 		$search = array_keys($placeholders);
 		$replace = array_values($placeholders);
 		
-		foreach ($stubs as $destination => $stub) {
-			$stub_file = dirname(__DIR__, 4)."/stubs/{$stub}";
-			$contents = file_get_contents($stub_file);
-			
+		foreach ($this->getStubs() as $destination => $stub) {
 			$destination = str_replace($search, $replace, $destination);
+			
 			$filename = "{$this->base_path}/{$destination}";
+			
+			$contents = file_get_contents($stub);
 			
 			$output = str_replace($search, $replace, $contents);
 			
@@ -235,7 +189,12 @@ class MakeModule extends Command
 				continue;
 			}
 			
+			$this->filesystem->ensureDirectoryExists(
+				$this->filesystem->dirname($filename)
+			);
+			
 			$this->filesystem->put($filename, $output);
+			
 			$this->line(" - Wrote to <info>{$destination}</info>");
 		}
 		
@@ -364,5 +323,27 @@ class MakeModule extends Command
 	public function newLine($count = 1)
 	{
 		$this->getOutput()->newLine($count);
+	}
+	
+	protected function getStubs(): array
+	{
+		$stubPath = function(string $filename) {
+			return dirname(__DIR__, 4)."/stubs/{$filename}";
+		};
+		
+		return config('app-modules.stubs', [
+			'composer.json' => $stubPath('composer-stub-v'.substr($this->getLaravel()->version(), 0, 1).'.json'),
+			'src/Providers/StubClassNamePrefixServiceProvider.php' => $stubPath('ServiceProvider.php'),
+			'tests/StubClassNamePrefixServiceProviderTest.php' => $stubPath('ServiceProviderTest.php'),
+			'database/migrations/StubMigrationPrefix_set_up_StubModuleName_module.php' => $stubPath('migration.php'),
+			'routes/StubModuleName-routes.php' => $stubPath('web-routes.php'),
+			'resources/views/index.blade.php' => $stubPath('view.blade.php'),
+			'resources/views/create.blade.php' => $stubPath('view.blade.php'),
+			'resources/views/show.blade.php' => $stubPath('view.blade.php'),
+			'resources/views/edit.blade.php' => $stubPath('view.blade.php'),
+			'database/factories/.gitkeep' => $stubPath('.gitkeep'),
+			'database/migrations/.gitkeep' => $stubPath('.gitkeep'),
+			'database/'.$this->seedersDirectory().'/.gitkeep' => $stubPath('.gitkeep'),
+		]);
 	}
 }
