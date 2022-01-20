@@ -63,12 +63,12 @@ class MakeModuleTest extends TestCase
 	
 	public function test_it_scaffolds_a_new_module_based_on_custom_config(): void
 	{
+		$fs = $this->filesystem();
+		
 		$module_name = 'test-module';
 		
-		config([
-			'app-modules.stubs' => [
-				'src/Info.php' => __DIR__.'/../../stubs/StubClassNamePrefixInfo.php',
-			],
+		config()->set('app-modules.stubs', [
+			'src/StubClassNamePrefixInfo.php' => __DIR__.'/../../stubs/test-stub.php',
 		]);
 		
 		$this->artisan(MakeModule::class, [
@@ -76,15 +76,10 @@ class MakeModuleTest extends TestCase
 			'--accept-default-namespace' => true,
 		]);
 		
-		$fs = $this->filesystem();
-		$module_path = $this->getBasePath().DIRECTORY_SEPARATOR.'app-modules'.DIRECTORY_SEPARATOR.$module_name;
+		$path = $this->getModulePath($module_name, 'src/TestModuleInfo.php');
 		
-		$this->assertTrue($fs->isDirectory($module_path));
-		$this->assertTrue($fs->isDirectory($module_path.DIRECTORY_SEPARATOR.'src'));
-		
-		$file = $module_path.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Info.php';
-		
-		$this->assertTrue($fs->isFile($file));
+		$this->assertTrue($fs->isFile($path));
+		$this->assertStringContainsString($module_name, $fs->get($path));
 	}
 	
 	public function test_it_prompts_on_first_module_if_no_custom_namespace_is_set(): void
