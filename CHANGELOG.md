@@ -10,11 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added support for custom module stubs
-- Added support for syncing modules to PhpStorm library roots
 
 ### Fixed
 
 - Only  register the `make:livewire` integration if Livewire is installed
+
+## [1.5.2]
+
+### Added
+
+- Added support for syncing modules to PhpStorm library roots
 
 ## [1.5.1]
 
@@ -106,7 +111,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Security` in case of vulnerabilities.
 
 [Unreleased]: https://github.com/InterNACHI/modular/compare/1.6.0...HEAD
-[1.6.0]: https://github.com/InterNACHI/modular/compare/1.5.1...1.6.0
+[1.6.0]: https://github.com/InterNACHI/modular/compare/1.5.2...1.6.0
+[1.5.2]: https://github.com/InterNACHI/modular/compare/1.5.1...1.5.2
 [1.5.1]: https://github.com/InterNACHI/modular/compare/1.5.0...1.5.1
 [1.5.0]: https://github.com/InterNACHI/modular/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/InterNACHI/modular/compare/1.3.1...1.4.0
