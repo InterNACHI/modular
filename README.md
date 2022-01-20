@@ -166,37 +166,25 @@ that we support is Livewire. If you have Livewire installed, you can run:
 
 - `php artisan make:livewire counter --module=my-module`
 
-#### Custom Module Stubs
+#### Customizing the Default Module Structure
 
-You may decide to have custom module stubs, rather than using the default package provided stubs.
+When you call `make:module`, Modular will scaffold some basic boilerplate for you. If you 
+would like to customize this behavior, you can do so by publishing the `app-modules.php`
+config file and adding your own stubs.
 
-```php
-// config/app-modules.php
+Both filenames and file contents support a number of placeholders. These include:
 
-return [
-    // ...
-    
-    'stubs'=> [
-        // Module Structure  => Source Stub File
-        'src/Events/StubModuleNameEvent.php' => base_path('stubs/modular/Event.php'),
-        'src/View/Components/.gitkeep' => base_path('stubs/modular/.gitkeep-stub'),
-        'composer.json' => base_path('stubs/modular/my-custom-composer.json'),
-    ]
-]
-```
-
-Available placeholders: 
-`StubBasePath`,
-`StubModuleNamespace`,
-`StubComposerNamespace`,
-`StubModuleNameSingular`,
-`StubModuleNamePlural`,
-`StubModuleName`,
-`StubClassNamePrefix`,
-`StubComposerName`,
-`StubMigrationPrefix`,
-`StubFullyQualifiedTestCaseBase`,
-`StubTestCaseBase`
+ - `StubBasePath`
+ - `StubModuleNamespace`
+ - `StubComposerNamespace`
+ - `StubModuleNameSingular`
+ - `StubModuleNamePlural`
+ - `StubModuleName`
+ - `StubClassNamePrefix`
+ - `StubComposerName`
+ - `StubMigrationPrefix`
+ - `StubFullyQualifiedTestCaseBase`
+ - `StubTestCaseBase`
 
 ## Comparison to `nwidart/laravel-modules`
 

@@ -58,4 +58,24 @@ return [
 	*/
 	
 	'tests_base' => 'Tests\TestCase',
+	
+	/*
+	|--------------------------------------------------------------------------
+	| Custom Stubs
+	|--------------------------------------------------------------------------
+	|
+	| If you would like to use your own custom stubs for new modules, you can
+	| configure those here. This should be an array where the key is the path
+	| relative to the module and the value is the absolute path to the stub
+	| stub file. Destination paths and contents support placeholders. See the
+	| README.md file for more information.
+	|
+	| For example:
+	|
+	| 'stubs' => [
+	| 	'src/Providers/StubClassNamePrefixServiceProvider.php' => base_path('stubs/app-modules/ServiceProvider.php'),
+	| ],
+	*/
+	
+	'stubs' => null,
 ];
