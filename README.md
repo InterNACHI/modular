@@ -166,6 +166,38 @@ that we support is Livewire. If you have Livewire installed, you can run:
 
 - `php artisan make:livewire counter --module=my-module`
 
+#### Custom Module Stubs
+
+You may decide to have custom module stubs, rather than using the default package provided stubs.
+
+```php
+// config/app-modules.php
+
+return [
+    // ...
+    
+    'stubs'=> [
+        // Module Structure  => Source Stub File
+        'src/Events/StubModuleNameEvent.php' => base_path('stubs/modular/Event.php'),
+        'src/View/Components/.gitkeep' => base_path('stubs/modular/.gitkeep-stub'),
+        'composer.json' => base_path('stubs/modular/my-custom-composer.json'),
+    ]
+]
+```
+
+Available placeholders: 
+`StubBasePath`,
+`StubModuleNamespace`,
+`StubComposerNamespace`,
+`StubModuleNameSingular`,
+`StubModuleNamePlural`,
+`StubModuleName`,
+`StubClassNamePrefix`,
+`StubComposerName`,
+`StubMigrationPrefix`,
+`StubFullyQualifiedTestCaseBase`,
+`StubTestCaseBase`
+
 ## Comparison to `nwidart/laravel-modules`
 
 [Laravel Modules](https://nwidart.com/laravel-modules) is a great package that’s been

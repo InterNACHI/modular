@@ -61,6 +61,27 @@ class MakeModuleTest extends TestCase
 		$this->assertContains($repository, $app_composer_contents['repositories']);
 	}
 	
+	public function test_it_scaffolds_a_new_module_based_on_custom_config(): void
+	{
+		$fs = $this->filesystem();
+		
+		$module_name = 'test-module';
+		
+		config()->set('app-modules.stubs', [
+			'src/StubClassNamePrefixInfo.php' => __DIR__.'/../../stubs/test-stub.php',
+		]);
+		
+		$this->artisan(MakeModule::class, [
+			'name' => $module_name,
+			'--accept-default-namespace' => true,
+		]);
+		
+		$path = $this->getModulePath($module_name, 'src/TestModuleInfo.php');
+		
+		$this->assertTrue($fs->isFile($path));
+		$this->assertStringContainsString($module_name, $fs->get($path));
+	}
+	
 	public function test_it_prompts_on_first_module_if_no_custom_namespace_is_set(): void
 	{
 		$fs = $this->filesystem();
