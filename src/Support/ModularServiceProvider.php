@@ -141,7 +141,7 @@ class ModularServiceProvider extends ServiceProvider
 	
 	protected function bootPackageCommands(): void
 	{
-		if (!$this->app->runningInConsole()) {
+		if (! $this->app->runningInConsole()) {
 			return;
 		}
 		
@@ -195,7 +195,7 @@ class ModularServiceProvider extends ServiceProvider
 	protected function bootTranslations(): void
 	{
 		$this->callAfterResolving('translator', function(TranslatorContract $translator) {
-			if (!$translator instanceof Translator) {
+			if (! $translator instanceof Translator) {
 				return;
 			}
 			
@@ -219,7 +219,7 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$class_name = 'Diglactic\\Breadcrumbs\\Manager';
 		
-		if (!class_exists($class_name)) {
+		if (! class_exists($class_name)) {
 			return;
 		}
 		
@@ -236,7 +236,7 @@ class ModularServiceProvider extends ServiceProvider
 
 	protected function bootLivewireComponents(): void
 	{
-		if (!class_exists(Livewire::class)) {
+		if (! class_exists(Livewire::class)) {
 			return;
 		}
 		
@@ -396,6 +396,6 @@ class ModularServiceProvider extends ServiceProvider
 	protected function isInstantiableCommand($command): bool
 	{
 		return is_subclass_of($command, Command::class)
-			&& !(new ReflectionClass($command))->isAbstract();
+			&& ! (new ReflectionClass($command))->isAbstract();
 	}
 }

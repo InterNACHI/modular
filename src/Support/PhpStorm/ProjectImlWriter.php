@@ -24,7 +24,7 @@ class ProjectImlWriter extends ConfigWriter
 			->each(function(ModuleConfig $module_config) use (&$content, $modules_directory, $existing_urls) {
 				$src_url = "file://\$MODULE_DIR\$/{$modules_directory}/{$module_config->name}/src";
 				
-				if (!$existing_urls->contains($src_url)) {
+				if (! $existing_urls->contains($src_url)) {
 					$src_node = $content->addChild('sourceFolder');
 					$src_node->addAttribute('url', $src_url);
 					$src_node->addAttribute('isTestSource', 'false');
@@ -32,7 +32,7 @@ class ProjectImlWriter extends ConfigWriter
 				}
 				
 				$tests_url = "file://\$MODULE_DIR\$/{$modules_directory}/{$module_config->name}/tests";
-				if (!$existing_urls->contains($tests_url)) {
+				if (! $existing_urls->contains($tests_url)) {
 					$tests_node = $content->addChild('sourceFolder');
 					$tests_node->addAttribute('url', $tests_url);
 					$tests_node->addAttribute('isTestSource', 'true');

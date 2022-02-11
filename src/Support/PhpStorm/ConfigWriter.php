@@ -33,7 +33,7 @@ abstract class ConfigWriter
 	
 	public function handle(): bool
 	{
-		if (!$this->checkConfigFilePermissions()) {
+		if (! $this->checkConfigFilePermissions()) {
 			return false;
 		}
 		
@@ -42,11 +42,11 @@ abstract class ConfigWriter
 	
 	protected function checkConfigFilePermissions(): bool
 	{
-		if (!is_readable($this->config_path) || !is_writable($this->config_path)) {
+		if (! is_readable($this->config_path) || ! is_writable($this->config_path)) {
 			return $this->error("Unable to find or read: '{$this->config_path}'");
 		}
 		
-		if (!is_writable($this->config_path)) {
+		if (! is_writable($this->config_path)) {
 			return $this->error("Config file is not writable: '{$this->config_path}'");
 		}
 		

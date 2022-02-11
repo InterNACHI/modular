@@ -19,7 +19,7 @@ class MakeLivewireTest extends TestCase
 	{
 		parent::setUp();
 
-		if (!class_exists(Livewire::class)) {
+		if (! class_exists(Livewire::class)) {
 			$this->markTestSkipped('Livewire is not installed.');
 		}
 	}

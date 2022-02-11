@@ -44,7 +44,7 @@ class ModulesSync extends Command
 	{
 		$config_path = $this->getLaravel()->basePath('phpunit.xml');
 		
-		if (!$this->filesystem->exists($config_path)) {
+		if (! $this->filesystem->exists($config_path)) {
 			$this->warn('No phpunit.xml file found. Skipping PHPUnit configuration.');
 			return;
 		}
@@ -61,7 +61,7 @@ class ModulesSync extends Command
 		}
 		
 		$testsuites = $config->xpath('//phpunit//testsuites');
-		if (!count($testsuites)) {
+		if (! count($testsuites)) {
 			$this->error('Cannot find <testsuites> node in phpunit.xml file. Skipping PHPUnit configuration.');
 			return;
 		}
@@ -135,7 +135,7 @@ class ModulesSync extends Command
 	protected function updatePhpStormProjectIml(): void
 	{
 		$idea_directory = $this->getLaravel()->basePath('.idea/');
-		if (!$this->filesystem->isDirectory($idea_directory)) {
+		if (! $this->filesystem->isDirectory($idea_directory)) {
 			return;
 		}
 		

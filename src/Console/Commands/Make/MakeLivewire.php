@@ -49,7 +49,7 @@ if (class_exists(MakeCommand::class)) {
 				
 				$classPath = $module->path('src/Http/Livewire/'.$name.'.php');
 				
-				if (File::exists($classPath) && !$force) {
+				if (File::exists($classPath) && ! $force) {
 					$this->line("<options=bold,reverse;fg=red> WHOOPS-IE-TOOTLES </> 😳 \n");
 					$this->line("<fg=red;options=bold>Class already exists:</> {$this->parser->relativeClassPath()}");
 					

@@ -12,7 +12,7 @@ class MakeController extends ControllerMakeCommand
 	
 	protected function parseModel($model)
 	{
-		if (!$module = $this->module()) {
+		if (! $module = $this->module()) {
 			return parent::parseModel($model);
 		}
 		
@@ -22,7 +22,7 @@ class MakeController extends ControllerMakeCommand
 		
 		$model = trim(str_replace('/', '\\', $model), '\\');
 		
-		if (!Str::startsWith($model, $namespace = $module->namespaces->first())) {
+		if (! Str::startsWith($model, $namespace = $module->namespaces->first())) {
 			$model = $namespace.$model;
 		}
 		

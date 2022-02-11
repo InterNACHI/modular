@@ -103,7 +103,7 @@ class ModuleRegistry
 				});
 		}
 		
-		if (!is_dir($this->modules_path)) {
+		if (! is_dir($this->modules_path)) {
 			return new Collection();
 		}
 		

@@ -146,7 +146,7 @@ class MakeModule extends Command
 	
 	protected function ensureModulesDirectoryExists()
 	{
-		if (!$this->filesystem->isDirectory($this->base_path)) {
+		if (! $this->filesystem->isDirectory($this->base_path)) {
 			$this->filesystem->makeDirectory($this->base_path, 0777, true);
 			$this->line(" - Created <info>{$this->base_path}</info>");
 		}
@@ -216,11 +216,11 @@ class MakeModule extends Command
 		$json_file = new JsonFile(Factory::getComposerFile());
 		$definition = $json_file->read();
 		
-		if (!isset($definition['repositories'])) {
+		if (! isset($definition['repositories'])) {
 			$definition['repositories'] = [];
 		}
 		
-		if (!isset($definition['require'])) {
+		if (! isset($definition['require'])) {
 			$definition['require'] = [];
 		}
 		
@@ -250,7 +250,7 @@ class MakeModule extends Command
 			}
 		}
 		
-		if (!isset($definition['require'][$this->composer_name])) {
+		if (! isset($definition['require'][$this->composer_name])) {
 			$this->line(" - Adding require statement for <info>{$this->composer_name}:*</info>");
 			$has_changes = true;
 			
@@ -305,7 +305,7 @@ class MakeModule extends Command
 	{
 		$formatter = $this->getOutput()->getFormatter();
 		
-		if (!$formatter->hasStyle('kbd')) {
+		if (! $formatter->hasStyle('kbd')) {
 			$formatter->setStyle('kbd', new OutputFormatterStyle('cyan'));
 		}
 	}

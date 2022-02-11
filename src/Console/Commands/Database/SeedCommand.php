@@ -17,7 +17,7 @@ class SeedCommand extends \Illuminate\Database\Console\Seeds\SeedCommand
 			
 			if ($class === $default) {
 				$class = $module->qualify($default);
-			} elseif (!Str::contains($class, 'Database\\Seeders')) {
+			} elseif (! Str::contains($class, 'Database\\Seeders')) {
 				$class = $module->qualify("Database\\Seeders\\{$class}");
 			}
 			
