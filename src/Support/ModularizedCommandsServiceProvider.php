@@ -65,6 +65,7 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 		Artisan::starting(function(Application $artisan) {
 			foreach ($this->overrides as $alias => $class_name) {
 				$this->app->singleton($alias, $class_name);
+				$this->app->singleton(get_parent_class($class_name), $class_name);
 			}
 			
 			$this->app->singleton('command.migrate.make', function($app) {
