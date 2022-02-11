@@ -21,6 +21,6 @@ class ModulesClearTest extends TestCase
 		
 		$this->artisan(ModulesClear::class);
 		
-		$this->assertFileNotExists($expected_path);
+		$this->assertFileDoesNotExist($expected_path);
 	}
 }
