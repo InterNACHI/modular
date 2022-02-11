@@ -326,8 +326,12 @@ class MakeModule extends Command
 			return $custom_stubs;
 		}
 		
+		$composer_stub = version_compare($this->getLaravel()->version(), '8.0.0', '<')
+			? 'composer-stub-v7.json'
+			: 'composer-stub-latest.json';
+		
 		return [
-			'composer.json' => $this->pathToStub('composer-stub-v'.substr($this->getLaravel()->version(), 0, 1).'.json'),
+			'composer.json' => $this->pathToStub($composer_stub),
 			'src/Providers/StubClassNamePrefixServiceProvider.php' => $this->pathToStub('ServiceProvider.php'),
 			'tests/StubClassNamePrefixServiceProviderTest.php' => $this->pathToStub('ServiceProviderTest.php'),
 			'database/migrations/StubMigrationPrefix_set_up_StubModuleName_module.php' => $this->pathToStub('migration.php'),
