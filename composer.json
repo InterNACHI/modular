@@ -7,8 +7,29 @@
         "modular",
         "module"
     ],
+    "authors": [
+        {
+            "name": "Chris Morrell",
+            "homepage": "http://www.cmorrell.com"
+        }
+    ],
     "type": "library",
     "license": "MIT",
+    "require": {
+        "php": ">=7.3",
+        "ext-simplexml": "*",
+        "ext-dom": "*",
+        "composer/composer": "^2.1",
+        "illuminate/support": "^7.27.0|^8.0|^9.0|dev-master"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.0|^6.0|^7.0|dev-master",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "mockery/mockery": "^1.3",
+        "phpunit/phpunit": "^9.5",
+        "ext-json": "*",
+        "livewire/livewire": "^2.5"
+    },
     "autoload": {
         "psr-4": {
             "InterNACHI\\Modular\\": "src/"
@@ -19,7 +40,10 @@
             "InterNACHI\\Modular\\Tests\\": "tests/"
         }
     },
-    "minimum-stability": "stable",
+    "scripts": {
+        "fix-style": "vendor/bin/php-cs-fixer fix",
+        "check-style": "vendor/bin/php-cs-fixer fix --diff --dry-run"
+    },
     "extra": {
         "laravel": {
             "providers": [
@@ -31,19 +55,6 @@
             }
         }
     },
-    "require": {
-        "php": ">=7.3",
-        "ext-simplexml": "*",
-        "ext-dom": "*",
-        "composer/composer": "^2.1",
-        "illuminate/support": "^7.27.0|^8.0"
-    },
-    "require-dev": {
-        "orchestra/testbench": "^5.0|^6.0",
-        "phpunit/phpunit": "^8.0",
-        "mockery/mockery": "^1.3",
-        "ext-json": "*",
-        "livewire/livewire": "^2.5",
-        "friendsofphp/php-cs-fixer": "^3.0"
-    }
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

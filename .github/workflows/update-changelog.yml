@@ -1,0 +1,27 @@
+name: Update Changelog
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  update-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.repository.full_name }}
+          ref: 'main'
+
+      - name: Update changelog
+        uses: thomaseizinger/keep-a-changelog-new-release@v1
+        with:
+          version: ${{ github.event.release.tag_name }}
+
+      - name: Commit changelog back to repo
+        uses: EndBug/add-and-commit@v8
+        with:
+          add: 'CHANGELOG.md'
+          message: ${{ github.event.release.tag_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
