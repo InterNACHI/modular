@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added support for Blade component namespaces (i.e. `<x-module::component.name />`)
 
+### Fixed
+
+- Fixed issue with `make:seeder` command introduced in Laravel 9.6.0
+
 ## [1.7.0] - 2022-02-11
 
 ### Added

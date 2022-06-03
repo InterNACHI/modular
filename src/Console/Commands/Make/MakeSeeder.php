@@ -17,4 +17,15 @@ class MakeSeeder extends SeederMakeCommand
 		
 		return parent::replaceNamespace($stub, $name);
 	}
+	
+	protected function rootNamespace()
+	{
+		if ($module = $this->module()) {
+			if (version_compare($this->getLaravel()->version(), '9.6.0', '>=')) {
+				return $module->qualify('Database\Seeders');
+			}
+		}
+		
+		return parent::rootNamespace();
+	}
 }
