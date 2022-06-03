@@ -102,6 +102,7 @@ should work as expected in most cases:
 - Migrations will be run by the Migrator
 - Factories are auto-loaded for `factory()`
 - Policies are auto-discovered for your Models
+- Blade components will be auto-discovered
 
 There is **currently one exception**:
 
@@ -165,6 +166,21 @@ We can also add the `--module` option to commands in 3rd-party packages. The fir
 that we support is Livewire. If you have Livewire installed, you can run:
 
 - `php artisan make:livewire counter --module=my-module`
+
+#### Blade Components
+
+Your [Laravel Blade components](https://laravel.com/docs/blade#components) will be
+automatically registered for you under a [component namespace](https://laravel.com/docs/9.x/blade#manually-registering-package-components).
+A few examples:
+
+| File                                                               | Component                      |
+|--------------------------------------------------------------------|--------------------------------|
+| `app-modules/demo/src/View/Components/Basic.php`                   | `<x-demo::basic />`            |
+| `app-modules/demo/src/View/Components/Nested/One.php`              | `<x-demo::nested.one />`       |
+| `app-modules/demo/src/View/Components/Nested/Two.php`              | `<x-demo::nested.two />`       |
+| `app-modules/demo/resources/components/anonymous.blade.php`        | `<x-demo::anonymous />`        |
+| `app-modules/demo/resources/components/anonymous/index.blade.php`  | `<x-demo::anonymous />`        |
+| `app-modules/demo/resources/components/anonymous/nested.blade.php` | `<x-demo::anonymous.nested />` |
 
 #### Customizing the Default Module Structure
 

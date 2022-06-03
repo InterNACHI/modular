@@ -182,12 +182,21 @@ class ModularServiceProvider extends ServiceProvider
 	protected function bootBladeComponents(): void
 	{
 		$this->callAfterResolving(BladeCompiler::class, function(BladeCompiler $blade) {
+			// Boot individual Blade components (old syntax: `<x-module-* />`)
 			$this->autoDiscoveryHelper()
 				->bladeComponentFileFinder()
 				->each(function(SplFileInfo $component) use ($blade) {
 					$module = $this->registry()->moduleForPathOrFail($component->getPath());
 					$fully_qualified_component = $this->pathToFullyQualifiedClassName($component->getPathname(), $module);
 					$blade->component($fully_qualified_component, null, $module->name);
+				});
+			
+			// Boot Blade component namespaces (new syntax: `<x-module::* />`)
+			$this->autoDiscoveryHelper()
+				->bladeComponentDirectoryFinder()
+				->each(function(SplFileInfo $component) use ($blade) {
+					$module = $this->registry()->moduleForPathOrFail($component->getPath());
+					$blade->componentNamespace($module->qualify('View\\Components'), $module->name);
 				});
 		});
 	}

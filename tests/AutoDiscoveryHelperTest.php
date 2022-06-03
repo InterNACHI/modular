@@ -115,14 +115,22 @@ class AutoDiscoveryHelperTest extends TestCase
 			'--module' => $this->module2->name,
 		]);
 		
-		$resolved = [];
+		$resolved_directories = [];
+		$resolved_files = [];
 		
-		$this->helper->bladeComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = $file->getPathname();
+		$this->helper->bladeComponentDirectoryFinder()->each(function(SplFileInfo $file) use (&$resolved_directories) {
+			$resolved_directories[] = $file->getPathname();
 		});
 		
-		$this->assertContains($this->module1->path('src/View/Components/TestComponent.php'), $resolved);
-		$this->assertContains($this->module2->path('src/View/Components/TestComponent.php'), $resolved);
+		$this->helper->bladeComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved_files) {
+			$resolved_files[] = $file->getPathname();
+		});
+		
+		$this->assertContains($this->module1->path('src/View/Components'), $resolved_directories);
+		$this->assertContains($this->module2->path('src/View/Components'), $resolved_directories);
+		
+		$this->assertContains($this->module1->path('src/View/Components/TestComponent.php'), $resolved_files);
+		$this->assertContains($this->module2->path('src/View/Components/TestComponent.php'), $resolved_files);
 	}
 	
 	public function test_it_finds_routes(): void

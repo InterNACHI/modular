@@ -86,6 +86,17 @@ class AutoDiscoveryHelper
 		}
 	}
 
+	public function bladeComponentDirectoryFinder(): FinderCollection
+	{
+		try {
+			return FinderCollection::forDirectories()
+				->name('Components')
+				->in($this->base_path.'/*/src/View');
+		} catch (DirectoryNotFoundException $exception) {
+			return FinderCollection::empty();
+		}
+	}
+
 	public function routeFileFinder(): FinderCollection
 	{
 		try {
