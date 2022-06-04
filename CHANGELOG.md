@@ -5,13 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2022-06-04
+
 ### Added
 
-- Added support for Blade component namespaces (i.e. `<x-module::component.name />`)
+-   Added support for Blade component namespaces (i.e. `<x-module::component.name />`)
 
 ### Fixed
 
-- Fixed issue with `make:seeder` command introduced in Laravel 9.6.0
+-   Fixed issue with `make:seeder` command introduced in Laravel 9.6.0
 
 ## [1.7.0] - 2022-02-11
 
@@ -130,7 +132,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   `Fixed` for any bug fixes.
 -   `Security` in case of vulnerabilities.
 
-[Unreleased]: https://github.com/InterNACHI/modular/compare/1.7.0...HEAD
+[Unreleased]: https://github.com/InterNACHI/modular/compare/1.8.0...HEAD
+
+[1.8.0]: https://github.com/InterNACHI/modular/compare/1.7.0...1.8.0
 
 [1.7.0]: https://github.com/InterNACHI/modular/compare/1.6.0...1.7.0
 
