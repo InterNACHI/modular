@@ -23,6 +23,17 @@ class MakeLivewireTest extends TestCase
 			$this->markTestSkipped('Livewire is not installed.');
 		}
 	}
+	
+	public function test_it_overrides_the_default_commands(): void
+	{
+		$this->artisan('make:livewire', ['--help' => true])
+			->expectsOutputToContain('--module')
+			->assertExitCode(0);
+		
+		$this->artisan('livewire:make', ['--help' => true])
+			->expectsOutputToContain('--module')
+			->assertExitCode(0);
+	}
 
 	public function test_it_scaffolds_a_component_in_the_module_when_module_option_is_set(): void
 	{

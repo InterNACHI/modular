@@ -27,6 +27,13 @@ class MakeMigrationTest extends TestCase
 		});
 	}
 	
+	public function test_it_overrides_the_default_command(): void
+	{
+		$this->artisan('make:migration', ['--help' => true])
+			->expectsOutputToContain('--module')
+			->assertExitCode(0);
+	}
+	
 	public function test_it_scaffolds_a_migration_in_the_module_when_module_option_is_set(): void
 	{
 		$command = MakeMigration::class;
