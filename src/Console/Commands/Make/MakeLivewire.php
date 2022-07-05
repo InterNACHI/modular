@@ -15,6 +15,11 @@ if (class_exists(MakeCommand::class)) {
 	{
 		use Modularize;
 		
+		public function getAliases(): array
+		{
+			return ['make:livewire', 'livewire:make'];
+		}
+		
 		public function handle()
 		{
 			if ($module = $this->module()) {

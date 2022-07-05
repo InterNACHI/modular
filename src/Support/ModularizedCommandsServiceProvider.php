@@ -4,6 +4,7 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Console\Application;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand as OriginalMakeMigrationCommand;
 use Illuminate\Support\ServiceProvider;
 use InterNACHI\Modular\Console\Commands\Database\SeedCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeCast;
@@ -30,7 +31,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeResource;
 use InterNACHI\Modular\Console\Commands\Make\MakeRule;
 use InterNACHI\Modular\Console\Commands\Make\MakeSeeder;
 use InterNACHI\Modular\Console\Commands\Make\MakeTest;
-use Livewire\Commands\MakeCommand as OriginalLivewireCommand;
+use Livewire\Commands as Livewire;
 
 class ModularizedCommandsServiceProvider extends ServiceProvider
 {
@@ -62,23 +63,56 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 	
 	public function register(): void
 	{
-		Artisan::starting(function(Application $artisan) {
-			foreach ($this->overrides as $alias => $class_name) {
-				$this->app->singleton($alias, $class_name);
-				$this->app->singleton(get_parent_class($class_name), $class_name);
-			}
-			
-			$this->app->singleton('command.migrate.make', function($app) {
-				return new MakeMigration($app['migration.creator'], $app['composer']);
+		// Register our overrides via the "booted" event to ensure that we override
+		// the default behavior regardless of which service provider happens to be
+		// bootstrapped first (this mostly matters for Livewire).
+		$this->app->booted(function() {
+			Artisan::starting(function(Application $artisan) {
+				$this->registerMakeCommandOverrides();
+				$this->registerMigrationCommandOverrides();
+				$this->registerLivewireOverrides($artisan);
 			});
-			
-			// Register Livewire command only if Livewire is installed
-			if (class_exists(OriginalLivewireCommand::class)) {
-				$artisan->resolveCommands([MakeLivewire::class]);
-				$this->app->extend(OriginalLivewireCommand::class, function() {
-					return new MakeLivewire();
-				});
-			}
+		});
+	}
+	
+	protected function registerMakeCommandOverrides()
+	{
+		foreach ($this->overrides as $alias => $class_name) {
+			$this->app->singleton($alias, $class_name);
+			$this->app->singleton(get_parent_class($class_name), $class_name);
+		}
+	}
+	
+	protected function registerMigrationCommandOverrides()
+	{
+		// Laravel 8
+		$this->app->singleton('command.migrate.make', function($app) {
+			return new MakeMigration($app['migration.creator'], $app['composer']);
+		});
+		
+		// Laravel 9
+		$this->app->singleton(OriginalMakeMigrationCommand::class, function($app) {
+			return new MakeMigration($app['migration.creator'], $app['composer']);
+		});
+	}
+	
+	protected function registerLivewireOverrides(Artisan $artisan)
+	{
+		// Don't register commands if Livewire isn't installed
+		if (!class_exists(Livewire\MakeCommand::class)) {
+			return;
+		}
+		
+		// Replace the resolved command with our subclass
+		$artisan->resolveCommands([MakeLivewire::class]);
+		
+		// Ensure that if 'make:livewire' or 'livewire:make' is resolved from the container
+		// in the future, our subclass is used instead
+		$this->app->extend(Livewire\MakeCommand::class, function() {
+			return new MakeLivewire();
+		});
+		$this->app->extend(Livewire\MakeLivewireCommand::class, function() {
+			return new MakeLivewire();
 		});
 	}
 }

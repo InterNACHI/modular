@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Addressed issue where `make:migration` and `make:livewire` were not loading the custom `--module` option
+
 ## [1.8.0] - 2022-06-04
 
 ### Added
