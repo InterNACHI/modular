@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Addressed issue where `make:migration` and `make:livewire` were not loading the custom `--module` option
+- Added additional tests for `make:` commands to catch necessary changes quicker in the future
 
 ## [1.8.0] - 2022-06-04
 
