@@ -14,6 +14,8 @@ class MakeComponentTest extends TestCase
 	
 	public function test_it_overrides_the_default_command(): void
 	{
+		$this->requiresLaravelVersion('9.2.0');
+		
 		$this->artisan('make:component', ['--help' => true])
 			->expectsOutputToContain('--module')
 			->assertExitCode(0);
