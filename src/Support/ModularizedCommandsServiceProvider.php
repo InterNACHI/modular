@@ -99,7 +99,7 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 	protected function registerLivewireOverrides(Artisan $artisan)
 	{
 		// Don't register commands if Livewire isn't installed
-		if (!class_exists(Livewire\MakeCommand::class)) {
+		if (! class_exists(Livewire\MakeCommand::class)) {
 			return;
 		}
 		
