@@ -5,11 +5,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2022-07-06
+
 ### Fixed
 
-- Addressed issue where `make:migration` and `make:livewire` were not loading the custom `--module` option
-- Added additional tests for `make:` commands to catch necessary changes quicker in the future
-- Passing a `--module` flag for an unknown module now triggers a console error
+-   Addressed issue where `make:migration` and `make:livewire` were not loading the custom `--module` option
+-   Added additional tests for `make:` commands to catch necessary changes quicker in the future
+-   Passing a `--module` flag for an unknown module now triggers a console error
 
 ## [1.8.0] - 2022-06-04
 
@@ -138,7 +140,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   `Fixed` for any bug fixes.
 -   `Security` in case of vulnerabilities.
 
-[Unreleased]: https://github.com/InterNACHI/modular/compare/1.8.0...HEAD
+[Unreleased]: https://github.com/InterNACHI/modular/compare/1.9.0...HEAD
+
+[1.9.0]: https://github.com/InterNACHI/modular/compare/1.8.0...1.9.0
 
 [1.8.0]: https://github.com/InterNACHI/modular/compare/1.7.0...1.8.0
 
