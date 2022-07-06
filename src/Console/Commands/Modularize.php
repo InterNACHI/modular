@@ -4,16 +4,21 @@ namespace InterNACHI\Modular\Console\Commands;
 
 use InterNACHI\Modular\Support\ModuleConfig;
 use InterNACHI\Modular\Support\ModuleRegistry;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputOption;
 
 trait Modularize
 {
 	protected function module(): ?ModuleConfig
 	{
-		if ($module = $this->option('module')) {
-			return $this->getLaravel()
-				->make(ModuleRegistry::class)
-				->module($module);
+		if ($name = $this->option('module')) {
+			$registry = $this->getLaravel()->make(ModuleRegistry::class);
+			
+			if ($module = $registry->module($name)) {
+				return $module;
+			}
+			
+			throw new InvalidOptionException(sprintf('The "%s" module does not exist.', $name));
 		}
 		
 		return null;

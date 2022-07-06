@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Addressed issue where `make:migration` and `make:livewire` were not loading the custom `--module` option
 - Added additional tests for `make:` commands to catch necessary changes quicker in the future
+- Passing a `--module` flag for an unknown module now triggers a console error
 
 ## [1.8.0] - 2022-06-04
 
