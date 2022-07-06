@@ -128,28 +128,28 @@ use all the existing tooling that you know. The commands themselves are exactly 
 same, which means you can use your [custom stubs](https://laravel.com/docs/7.x/artisan#stub-customization)
 and everything else Laravel provides:
 
-- `php artisan make:cast MyModuleCast --module=my-module`
-- `php artisan make:controller MyModuleController --module=my-module`
-- `php artisan make:command MyModuleCommand --module=my-module`
-- `php artisan make:component MyModuleComponent --module=my-module`
-- `php artisan make:channel MyModuleChannel --module=my-module`
-- `php artisan make:event MyModuleEvent --module=my-module`
-- `php artisan make:exception MyModuleException --module=my-module`
-- `php artisan make:factory MyModuleFactory --module=my-module`
-- `php artisan make:job MyModuleJob --module=my-module`
-- `php artisan make:listener MyModuleListener --module=my-module`
-- `php artisan make:mail MyModuleMail --module=my-module`
-- `php artisan make:middleware MyModuleMiddleware --module=my-module`
-- `php artisan make:model MyModule --module=my-module`
-- `php artisan make:notification MyModuleNotification --module=my-module`
-- `php artisan make:observer MyModuleObserver --module=my-module`
-- `php artisan make:policy MyModulePolicy --module=my-module`
-- `php artisan make:provider MyModuleProvider --module=my-module`
-- `php artisan make:request MyModuleRequest --module=my-module`
-- `php artisan make:resource MyModule --module=my-module`
-- `php artisan make:rule MyModuleRule --module=my-module`
-- `php artisan make:seeder MyModuleSeeder --module=my-module`
-- `php artisan make:test MyModuleTest --module=my-module`
+- `php artisan make:cast MyModuleCast --module=[module name]`
+- `php artisan make:controller MyModuleController --module=[module name]`
+- `php artisan make:command MyModuleCommand --module=[module name]`
+- `php artisan make:component MyModuleComponent --module=[module name]`
+- `php artisan make:channel MyModuleChannel --module=[module name]`
+- `php artisan make:event MyModuleEvent --module=[module name]`
+- `php artisan make:exception MyModuleException --module=[module name]`
+- `php artisan make:factory MyModuleFactory --module=[module name]`
+- `php artisan make:job MyModuleJob --module=[module name]`
+- `php artisan make:listener MyModuleListener --module=[module name]`
+- `php artisan make:mail MyModuleMail --module=[module name]`
+- `php artisan make:middleware MyModuleMiddleware --module=[module name]`
+- `php artisan make:model MyModule --module=[module name]`
+- `php artisan make:notification MyModuleNotification --module=[module name]`
+- `php artisan make:observer MyModuleObserver --module=[module name]`
+- `php artisan make:policy MyModulePolicy --module=[module name]`
+- `php artisan make:provider MyModuleProvider --module=[module name]`
+- `php artisan make:request MyModuleRequest --module=[module name]`
+- `php artisan make:resource MyModule --module=[module name]`
+- `php artisan make:rule MyModuleRule --module=[module name]`
+- `php artisan make:seeder MyModuleSeeder --module=[module name]`
+- `php artisan make:test MyModuleTest --module=[module name]`
 
 #### Other Laravel Commands
 
@@ -157,15 +157,15 @@ In addition to adding a `--module` option to most `make:` commands, we’ve also
 option to the `db:seed` command. If you pass the `--module` option to `db:seed`, it will look
 for your seeder within your module namespace:
 
-- `php artisan db:seed --module=my-module` will try to call `Modules\MyModule\Database\Seeders\DatabaseSeeder`
-- `php artisan db:seed --class=MySeeder --module=my-module` will try to call `Modules\MyModule\Database\Seeders\MySeeder`
+- `php artisan db:seed --module=[module name]` will try to call `Modules\MyModule\Database\Seeders\DatabaseSeeder`
+- `php artisan db:seed --class=MySeeder --module=[module name]` will try to call `Modules\MyModule\Database\Seeders\MySeeder`
 
 #### Vendor Commands
 
 We can also add the `--module` option to commands in 3rd-party packages. The first package
 that we support is Livewire. If you have Livewire installed, you can run:
 
-- `php artisan make:livewire counter --module=my-module`
+- `php artisan make:livewire counter --module=[module name]`
 
 #### Blade Components
 
