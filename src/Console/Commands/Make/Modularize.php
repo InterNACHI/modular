@@ -69,7 +69,7 @@ trait Modularize
 			// Normalize all our paths for compatibility's sake
 			$normalize = function($path) {
 				return windows_os()
-					? trim($path, DIRECTORY_SEPARATOR) 
+					? trim($path, DIRECTORY_SEPARATOR)
 					: DIRECTORY_SEPARATOR.trim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 			};
 			
