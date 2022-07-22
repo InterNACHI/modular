@@ -20,7 +20,7 @@ class MakeSymlink extends
      *
      * @var string
      */
-    protected $description = "Create symbolic link to root asset/js/Pages directory for given module";
+    protected $description = "Create symbolic link between source files 'module/resource/js' and root asset/js/Pages directory for given module";
 
     /**
      * Execute the console command.
