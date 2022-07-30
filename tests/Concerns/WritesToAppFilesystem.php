@@ -47,7 +47,7 @@ trait WritesToAppFilesystem
 		if (null === $this->base_path) {
 			$this->filesystem()->copyDirectory(
 				parent::getBasePath(),
-				$this->base_path = str_replace('\\','/',sys_get_temp_dir()).'/'.md5(microtime())
+				$this->base_path = str_replace('\\', '/', sys_get_temp_dir()).'/'.md5(microtime())
 			);
 		}
 
