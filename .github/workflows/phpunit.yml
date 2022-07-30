@@ -64,4 +64,4 @@ jobs:
         run: composer update --no-suggest --no-progress --no-interaction --no-suggest --prefer-dist --with-all-dependencies --prefer-${{ matrix.dependency-version }}
 
       - name: Execute tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit -v
