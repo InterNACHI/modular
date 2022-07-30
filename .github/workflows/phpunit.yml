@@ -10,15 +10,17 @@ jobs:
   php-tests:
     strategy:
       matrix:
+        dependency-version: [ stable, lowest ]
+        os: [ ubuntu-latest, windows-latest ]
         php: [ 7.4, 8.0, 8.1 ]
         laravel: [ ^8.79, ^9.0, ^9.2 ]
-        dependency-version: [ stable, lowest ]
         exclude:
           - php: 7.4
-            laravel: ^9.0
-          - laravel: ^9.0
+            laravel: ^9.0, ^9.2
+          - php: 8.0
+            laravel: ^9.2
+          - laravel: ^9.0, ^9.2
             dependency-version: lowest
-        os: [ ubuntu-latest, windows-latest ]
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
