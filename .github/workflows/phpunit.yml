@@ -16,10 +16,10 @@ jobs:
         laravel: [ ^8.79, ^9.0, ^9.2 ]
         exclude:
           - php: 7.4
-            laravel: ^9.0, ^9.2
+            laravel: [^9.0, ^9.2]
           - php: 8.0
             laravel: ^9.2
-          - laravel: ^9.0, ^9.2
+          - laravel: [^9.0, ^9.2]
             dependency-version: lowest
 
     runs-on: ${{ matrix.os }}
