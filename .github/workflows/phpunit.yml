@@ -32,7 +32,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, bcmath, intl, iconv
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, bcmath, intl, iconv, fileinfo
           tools: composer:v2
 
       - name: Register composer cache directory
