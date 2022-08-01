@@ -11,24 +11,24 @@ class AutoDiscoveryHelper
 	 * @var \InterNACHI\Modular\Support\ModuleRegistry
 	 */
 	protected $module_registry;
-	
+
 	/**
 	 * @var \Illuminate\Filesystem\Filesystem
 	 */
 	protected $filesystem;
-	
+
 	/**
 	 * @var string
 	 */
 	protected $base_path;
-	
+
 	public function __construct(ModuleRegistry $module_registry, Filesystem $filesystem)
 	{
 		$this->module_registry = $module_registry;
 		$this->filesystem = $filesystem;
 		$this->base_path = $module_registry->getModulesPath();
 	}
-	
+
 	public function commandFileFinder(): FinderCollection
 	{
 		try {
@@ -39,7 +39,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::empty();
 		}
 	}
-	
+
 	public function factoryDirectoryFinder(): FinderCollection
 	{
 		try {
@@ -51,7 +51,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::empty();
 		}
 	}
-	
+
 	public function migrationDirectoryFinder(): FinderCollection
 	{
 		try {
@@ -63,7 +63,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::empty();
 		}
 	}
-	
+
 	public function modelFileFinder(): FinderCollection
 	{
 		try {
@@ -74,7 +74,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::empty();
 		}
 	}
-	
+
 	public function bladeComponentFileFinder(): FinderCollection
 	{
 		try {
@@ -85,7 +85,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::empty();
 		}
 	}
-	
+
 	public function bladeComponentDirectoryFinder(): FinderCollection
 	{
 		try {
@@ -96,7 +96,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::empty();
 		}
 	}
-	
+
 	public function routeFileFinder(): FinderCollection
 	{
 		try {
@@ -109,7 +109,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::empty();
 		}
 	}
-	
+
 	public function viewDirectoryFinder(): FinderCollection
 	{
 		try {
@@ -133,7 +133,7 @@ class AutoDiscoveryHelper
 			return FinderCollection::empty();
 		}
 	}
-	
+
 	public function livewireComponentFileFinder(): FinderCollection
 	{
 		try {
