@@ -12,18 +12,12 @@ jobs:
       matrix:
         dependency-version: [ stable, lowest ]
         os: [ ubuntu-latest, windows-latest ]
-        laravel: [ ^8.79, ^9.0, ^9.2 ]
+        laravel: [ ^8.79, ^9.0 ]
         php: [ 7.4, 8.0, 8.1 ]
         exclude:
           - php: 7.4
             laravel: ^9.0
-          - php: 7.4
-            laravel: ^9.2
-          - php: 8.0
-            laravel: ^9.2
           - laravel: ^9.0
-            dependency-version: lowest
-          - laravel: ^9.2
             dependency-version: lowest
 
     runs-on: ${{ matrix.os }}
