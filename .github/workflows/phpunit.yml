@@ -8,20 +8,22 @@ on:
 
 jobs:
   php-tests:
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        php: [ 7.4, 8.0, 8.1 ]
-        laravel: [ ^8.79, ^9.0 ]
         dependency-version: [ stable, lowest ]
+        os: [ ubuntu-latest, windows-latest ]
+        laravel: [ ^8.79, ^9.0 ]
+        php: [ 7.4, 8.0, 8.1 ]
         exclude:
           - php: 7.4
             laravel: ^9.0
           - laravel: ^9.0
             dependency-version: lowest
-            
-    name: "${{ matrix.php }} / ${{ matrix.laravel }} (${{ matrix.dependency-version }})"
+
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+
+    name: "${{ matrix.os }} Laravel:${{ matrix.laravel }} PHP:${{ matrix.php }} (${{ matrix.dependency-version }})"
 
     steps:
       - name: Checkout code
@@ -31,7 +33,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, bcmath, intl, iconv
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, bcmath, intl, iconv, fileinfo
           tools: composer:v2
 
       - name: Register composer cache directory
@@ -62,4 +64,4 @@ jobs:
         run: composer update --no-suggest --no-progress --no-interaction --no-suggest --prefer-dist --with-all-dependencies --prefer-${{ matrix.dependency-version }}
 
       - name: Execute tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit -v

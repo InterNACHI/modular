@@ -27,14 +27,13 @@ class ModuleConfig implements Arrayable
 	{
 		$composer_config = json_decode($composer_file->getContents(), true, 16, JSON_THROW_ON_ERROR);
 		
-		$base_path = rtrim($composer_file->getPath(), DIRECTORY_SEPARATOR);
+		$base_path = rtrim(str_replace('\\', '/', $composer_file->getPath()), '/');
 		
 		$name = basename($base_path);
 		
 		$namespaces = Collection::make($composer_config['autoload']['psr-4'] ?? [])
 			->mapWithKeys(function($src, $namespace) use ($base_path) {
-				$src = str_replace('/', DIRECTORY_SEPARATOR, $src);
-				$path = $base_path.DIRECTORY_SEPARATOR.$src;
+				$path = $base_path.'/'.$src;
 				return [$path => $namespace];
 			});
 		
@@ -50,7 +49,7 @@ class ModuleConfig implements Arrayable
 	
 	public function path(string $to = ''): string
 	{
-		return rtrim($this->base_path.DIRECTORY_SEPARATOR.$to, DIRECTORY_SEPARATOR);
+		return rtrim($this->base_path.'/'.$to, '/');
 	}
 	
 	public function namespace(): string

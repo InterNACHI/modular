@@ -59,7 +59,7 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		parent::__construct($app);
 		
-		$this->base_dir = dirname(__DIR__, 2);
+		$this->base_dir = str_replace('\\', '/', dirname(__DIR__, 2));
 	}
 	
 	public function register(): void
@@ -242,7 +242,7 @@ class ModularServiceProvider extends ServiceProvider
 			require_once $file;
 		}
 	}
-
+	
 	protected function bootLivewireComponents(): void
 	{
 		if (! class_exists(Livewire::class)) {
@@ -368,7 +368,7 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		if (null === $this->modules_path) {
 			$directory_name = $this->app->make('config')->get('app-modules.modules_directory', 'app-modules');
-			$this->modules_path = $this->app->basePath($directory_name);
+			$this->modules_path = str_replace('\\', '/', $this->app->basePath($directory_name));
 		}
 		
 		return $this->modules_path;
@@ -388,7 +388,7 @@ class ModularServiceProvider extends ServiceProvider
 	
 	protected function formatPathAsNamespace(string $path): string
 	{
-		$path = trim($path, DIRECTORY_SEPARATOR);
+		$path = trim($path, '/');
 		
 		$replacements = [
 			'/' => '\\',

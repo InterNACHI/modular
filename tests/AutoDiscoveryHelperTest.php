@@ -50,7 +50,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$resolved = [];
 		
 		$this->helper->commandFileFinder()->each(function(SplFileInfo $command) use (&$resolved) {
-			$resolved[] = $command->getPathname();
+			$resolved[] = str_replace('\\', '/', $command->getPathname());
 		});
 		
 		$this->assertContains($this->module1->path('src/Console/Commands/TestCommand.php'), $resolved);
@@ -62,7 +62,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$resolved = [];
 		
 		$this->helper->factoryDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = $directory->getPathname();
+			$resolved[] = str_replace('\\', '/', $directory->getPathname());
 		});
 		
 		$this->assertContains($this->module1->path('database/factories'), $resolved);
@@ -74,7 +74,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$resolved = [];
 		
 		$this->helper->migrationDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = $directory->getPathname();
+			$resolved[] = str_replace('\\', '/', $directory->getPathname());
 		});
 		
 		$this->assertContains($this->module1->path('database/migrations'), $resolved);
@@ -96,7 +96,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$resolved = [];
 		
 		$this->helper->modelFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = $file->getPathname();
+			$resolved[] = str_replace('\\', '/', $file->getPathname());
 		});
 		
 		$this->assertContains($this->module1->path('src/Models/TestModel.php'), $resolved);
@@ -119,11 +119,11 @@ class AutoDiscoveryHelperTest extends TestCase
 		$resolved_files = [];
 		
 		$this->helper->bladeComponentDirectoryFinder()->each(function(SplFileInfo $file) use (&$resolved_directories) {
-			$resolved_directories[] = $file->getPathname();
+			$resolved_directories[] = str_replace('\\', '/', $file->getPathname());
 		});
 		
 		$this->helper->bladeComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved_files) {
-			$resolved_files[] = $file->getPathname();
+			$resolved_files[] = str_replace('\\', '/', $file->getPathname());
 		});
 		
 		$this->assertContains($this->module1->path('src/View/Components'), $resolved_directories);
@@ -138,7 +138,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$resolved = [];
 		
 		$this->helper->routeFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = $file->getPathname();
+			$resolved[] = str_replace('\\', '/', $file->getPathname());
 		});
 		
 		$this->assertContains($this->module1->path("routes/{$this->module1->name}-routes.php"), $resolved);
@@ -150,7 +150,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$resolved = [];
 		
 		$this->helper->viewDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = $directory->getPathname();
+			$resolved[] = str_replace('\\', '/', $directory->getPathname());
 		});
 		
 		$this->assertContains($this->module1->path('resources/views'), $resolved);
@@ -167,7 +167,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$resolved = [];
 		
 		$this->helper->langDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = $directory->getPathname();
+			$resolved[] = str_replace('\\', '/', $directory->getPathname());
 		});
 		
 		$this->assertContains($this->module1->path('resources/lang'), $resolved);
@@ -189,7 +189,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		$resolved = [];
 		
 		$this->helper->livewireComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = $file->getPathname();
+			$resolved[] = str_replace('\\', '/', $file->getPathname());
 		});
 		
 		$this->assertContains($this->module1->path('src/Http/Livewire/TestComponent.php'), $resolved);

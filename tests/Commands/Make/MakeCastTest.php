@@ -25,7 +25,7 @@ class MakeCastTest extends TestCase
 	{
 		$command = MakeCast::class;
 		$arguments = ['name' => 'JsonCast'];
-		$expected_path = 'src/Casts/JsonCast.php';
+		$expected_path = '/src/Casts/JsonCast.php';
 		$expected_substrings = [
 			'namespace Modules\TestModule\Casts',
 			'class JsonCast',

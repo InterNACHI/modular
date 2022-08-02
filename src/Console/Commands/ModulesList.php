@@ -29,7 +29,7 @@ class ModulesList extends Command
 				
 				return [
 					$config->name,
-					Str::after($config->base_path, $this->laravel->basePath().DIRECTORY_SEPARATOR),
+					Str::after(str_replace('\\', '/', $config->base_path), str_replace('\\', '/', $this->laravel->basePath()).'/'),
 					$namespaces->implode(', '),
 				];
 			})

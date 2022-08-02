@@ -21,16 +21,16 @@ class MakeModuleTest extends TestCase
 		]);
 		
 		$fs = $this->filesystem();
-		$module_path = $this->getBasePath().DIRECTORY_SEPARATOR.'app-modules'.DIRECTORY_SEPARATOR.$module_name;
+		$module_path = $this->getBasePath().'/app-modules/'.$module_name;
 		
 		$this->assertTrue($fs->isDirectory($module_path));
-		$this->assertTrue($fs->isDirectory($module_path.DIRECTORY_SEPARATOR.'database'));
-		$this->assertTrue($fs->isDirectory($module_path.DIRECTORY_SEPARATOR.'resources'));
-		$this->assertTrue($fs->isDirectory($module_path.DIRECTORY_SEPARATOR.'routes'));
-		$this->assertTrue($fs->isDirectory($module_path.DIRECTORY_SEPARATOR.'src'));
-		$this->assertTrue($fs->isDirectory($module_path.DIRECTORY_SEPARATOR.'tests'));
+		$this->assertTrue($fs->isDirectory($module_path.'/database'));
+		$this->assertTrue($fs->isDirectory($module_path.'/resources'));
+		$this->assertTrue($fs->isDirectory($module_path.'/routes'));
+		$this->assertTrue($fs->isDirectory($module_path.'/src'));
+		$this->assertTrue($fs->isDirectory($module_path.'/tests'));
 		
-		$composer_file = $module_path.DIRECTORY_SEPARATOR.'composer.json';
+		$composer_file = $module_path.'/composer.json';
 		$this->assertTrue($fs->isFile($composer_file));
 		
 		$composer_contents = json_decode($fs->get($composer_file), true);
@@ -48,7 +48,7 @@ class MakeModuleTest extends TestCase
 			$this->assertContains('database/seeds', $composer_contents['autoload']['classmap']);
 		}
 		
-		$app_composer_file = $this->getBasePath().DIRECTORY_SEPARATOR.'composer.json';
+		$app_composer_file = $this->getBasePath().'/composer.json';
 		$app_composer_contents = json_decode($fs->get($app_composer_file), true);
 		
 		$this->assertEquals('*', $app_composer_contents['require']["modules/{$module_name}"]);
@@ -68,7 +68,7 @@ class MakeModuleTest extends TestCase
 		$module_name = 'test-module';
 		
 		config()->set('app-modules.stubs', [
-			'src/StubClassNamePrefixInfo.php' => __DIR__.'/../../stubs/test-stub.php',
+			'src/StubClassNamePrefixInfo.php' => str_replace('\\', '/', dirname(__DIR__, 2)).'/stubs/test-stub.php',
 		]);
 		
 		$this->artisan(MakeModule::class, [
@@ -76,7 +76,7 @@ class MakeModuleTest extends TestCase
 			'--accept-default-namespace' => true,
 		]);
 		
-		$path = $this->getModulePath($module_name, 'src/TestModuleInfo.php');
+		$path = $this->getModulePath($module_name, '/src/TestModuleInfo.php');
 		
 		$this->assertTrue($fs->isFile($path));
 		$this->assertStringContainsString($module_name, $fs->get($path));
@@ -92,11 +92,11 @@ class MakeModuleTest extends TestCase
 		
 		Modules::reload();
 		
-		$this->assertTrue($fs->isDirectory($this->getBasePath().DIRECTORY_SEPARATOR.'app-modules'.DIRECTORY_SEPARATOR.'test-module'));
+		$this->assertTrue($fs->isDirectory($this->getBasePath().'/app-modules/test-module'));
 		
 		$this->artisan(MakeModule::class, ['name' => 'test-module-two'])
 			->assertExitCode(0);
 		
-		$this->assertTrue($fs->isDirectory($this->getBasePath().DIRECTORY_SEPARATOR.'app-modules'.DIRECTORY_SEPARATOR.'test-module-two'));
+		$this->assertTrue($fs->isDirectory($this->getBasePath().'/app-modules/test-module-two'));
 	}
 }

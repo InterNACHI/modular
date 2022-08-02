@@ -11,8 +11,7 @@ class MakeComponent extends ComponentMakeCommand
 	protected function viewPath($path = '')
 	{
 		if ($module = $this->module()) {
-			$sep = DIRECTORY_SEPARATOR;
-			return $module->path("resources{$sep}views{$sep}{$path}");
+			return $module->path("resources/views/{$path}");
 		}
 		
 		return parent::viewPath($path);

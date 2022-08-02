@@ -15,8 +15,8 @@ use Symfony\Component\Console\Terminal;
 
 class MakeModule extends Command
 {
-	protected $signature = 'make:module 
-		{name : The name of the module} 
+	protected $signature = 'make:module
+		{name : The name of the module}
 		{--accept-default-namespace : Skip default namespace confirmation}';
 	
 	protected $description = 'Create a new Laravel module';
@@ -89,7 +89,7 @@ class MakeModule extends Command
 		$this->module_namespace = config('app-modules.modules_namespace', 'Modules');
 		$this->composer_namespace = config('app-modules.modules_vendor') ?? Str::kebab($this->module_namespace);
 		$this->composer_name = "{$this->composer_namespace}/{$this->module_name}";
-		$this->base_path = $this->module_registry->getModulesPath().DIRECTORY_SEPARATOR.$this->module_name;
+		$this->base_path = $this->module_registry->getModulesPath().'/'.$this->module_name;
 		
 		$this->setUpStyles();
 		
@@ -226,7 +226,7 @@ class MakeModule extends Command
 		
 		$module_config = [
 			'type' => 'path',
-			'url' => config('app-modules.modules_directory', 'app-modules').DIRECTORY_SEPARATOR.'*',
+			'url' => str_replace('\\', '/', config('app-modules.modules_directory', 'app-modules')).'/*',
 			'options' => [
 				'symlink' => true,
 			],
@@ -348,6 +348,6 @@ class MakeModule extends Command
 	
 	protected function pathToStub($filename): string
 	{
-		return dirname(__DIR__, 4)."/stubs/{$filename}";
+		return str_replace('\\', '/', dirname(__DIR__, 4))."/stubs/{$filename}";
 	}
 }

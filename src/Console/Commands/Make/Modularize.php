@@ -68,7 +68,7 @@ trait Modularize
 			
 			// Normalize all our paths for compatibility's sake
 			$normalize = function($path) {
-				return DIRECTORY_SEPARATOR.trim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+				return rtrim($path, '/').'/';
 			};
 			
 			$find = array_map($normalize, array_keys($replacements));

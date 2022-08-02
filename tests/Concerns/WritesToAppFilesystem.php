@@ -29,9 +29,9 @@ trait WritesToAppFilesystem
 	protected function copyStub(string $stub, string $destination): string
 	{
 		$destination = trim($destination, '/');
-		$destination = $this->getBasePath().$this->normalizeDirectorySeparators("/{$destination}");
+		$destination = $this->getBasePath().$this->normalizeDirectorySeparators("{$destination}");
 		
-		$stubs_directory = dirname(__FILE__, 2).'/stubs';
+		$stubs_directory = str_replace('\\', '/', dirname(__DIR__, 1)).'/stubs';
 		
 		$from = $this->normalizeDirectorySeparators("{$stubs_directory}/{$stub}");
 		$to = $this->normalizeDirectorySeparators("{$destination}/{$stub}");
@@ -47,7 +47,7 @@ trait WritesToAppFilesystem
 		if (null === $this->base_path) {
 			$this->filesystem()->copyDirectory(
 				parent::getBasePath(),
-				$this->base_path = sys_get_temp_dir().DIRECTORY_SEPARATOR.md5(microtime())
+				$this->base_path = str_replace('\\', '/', sys_get_temp_dir()).'/'.md5(microtime())
 			);
 		}
 		
@@ -57,19 +57,17 @@ trait WritesToAppFilesystem
 	protected function getModulePath(string $module_name, string $path = '/', string $modules_root = 'app-modules'): string
 	{
 		return $this->getBasePath()
-			.DIRECTORY_SEPARATOR
+			.'/'
 			.$modules_root
-			.DIRECTORY_SEPARATOR
+			.'/'
 			.$module_name
 			.$this->normalizeDirectorySeparators($path);
 	}
 	
 	protected function normalizeDirectorySeparators(string $path): string
 	{
-		$path = trim(str_replace('/', DIRECTORY_SEPARATOR, $path), DIRECTORY_SEPARATOR);
-		
-		if ('' !== $path) {
-			$path = DIRECTORY_SEPARATOR.$path;
+		if (($path = trim($path, '/')) && (substr($path, 1, 1) !== ':')) {
+			$path = '/'.$path;
 		}
 		
 		return $path;

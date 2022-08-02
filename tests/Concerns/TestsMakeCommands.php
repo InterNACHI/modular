@@ -34,10 +34,10 @@ trait TestsMakeCommands
 		$full_path = $this->getModulePath($module_name, $expected_path);
 		
 		$directory = dirname($full_path);
-		$files = implode(', ', glob($directory.DIRECTORY_SEPARATOR.'*') ?? []);
+		$files = implode(', ', glob($directory.'/*') ?? []);
 		
 		$directory = dirname($directory);
-		$sibling_paths = implode(', ', glob($directory.DIRECTORY_SEPARATOR.'*') ?? []);
+		$sibling_paths = implode(', ', glob($directory.'/*') ?? []);
 		
 		$this->assertFileExists($full_path, "Could not find file. Files in directory: '{$files}'. Siblings to parent directory: '{$sibling_paths}'");
 		
@@ -53,10 +53,10 @@ trait TestsMakeCommands
 		$full_path = $this->getBasePath().$this->normalizeDirectorySeparators($expected_path);
 		
 		$directory = dirname($full_path);
-		$files = implode(', ', glob($directory.DIRECTORY_SEPARATOR.'*') ?? []);
+		$files = implode(', ', glob($directory.'/*') ?? []);
 		
 		$directory = dirname($directory);
-		$sibling_paths = implode(', ', glob($directory.DIRECTORY_SEPARATOR.'*') ?? []);
+		$sibling_paths = implode(', ', glob($directory.'/*') ?? []);
 		
 		$this->assertFileExists($full_path, "Could not find file. Files in directory: '{$files}'. Siblings to parent directory: '{$sibling_paths}'");
 		
