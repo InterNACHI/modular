@@ -4,10 +4,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '**.php'
 
 jobs:
   coverage:
+    if: github.repository == 'InterNACHI/modular'
+
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     name: Publish code coverage
 
