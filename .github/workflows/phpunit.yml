@@ -29,7 +29,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
 
-    name: "${{ matrix.os }} Laravel:${{ matrix.laravel }} PHP:${{ matrix.php }} (${{ matrix.dependency-version }})"
+    name: "PHPUnit ${{ matrix.os }} Laravel:${{ matrix.laravel }} PHP:${{ matrix.php }} (${{ matrix.dependency-version }})"
 
     steps:
       - name: Checkout code
