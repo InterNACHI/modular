@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - '**.php'
+      - '/.github/workflows/coverage.yml'
 
 jobs:
   coverage:
