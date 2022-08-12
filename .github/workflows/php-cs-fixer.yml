@@ -1,6 +1,11 @@
 name: Code Style
 
-on: [ pull_request, push ]
+on:
+  push:
+    paths:
+      - '**.php'
+      - '/.github/workflows/php-cs-fixer.yml'
+  pull_request:
     paths:
       - '**.php'
       - '/.github/workflows/php-cs-fixer.yml'
