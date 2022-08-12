@@ -1,10 +1,14 @@
 name: Code Style
 
 on: [ pull_request, push ]
+    paths:
+      - '**.php'
+      - '/.github/workflows/php-cs-fixer.yml'
 
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     name: Run code style checks
 
