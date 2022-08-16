@@ -8,9 +8,13 @@
 	"autoload": {
 		"psr-4": {
 			"StubModuleNamespace\\StubClassNamePrefix\\": "src/",
-			"StubModuleNamespace\\StubClassNamePrefix\\Tests\\": "tests/",
 			"StubModuleNamespace\\StubClassNamePrefix\\Database\\Factories\\": "database/factories/",
 			"StubModuleNamespace\\StubClassNamePrefix\\Database\\Seeders\\": "database/seeders/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"StubModuleNamespace\\StubClassNamePrefix\\Tests\\": "tests/"
 		}
 	},
 	"minimum-stability": "stable",
@@ -22,3 +26,4 @@
 		}
 	}
 }
+-
