@@ -15,6 +15,8 @@ jobs:
         laravel: [ ^8.79, ^9.20, ^10.0 ]
         php: [ 8.0, 8.1, 8.2 ]
         exclude:
+          - php: 8.2
+            laravel: ^8.79
           - php: 8.0
             laravel: ^10.0
 
