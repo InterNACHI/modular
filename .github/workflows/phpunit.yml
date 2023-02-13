@@ -56,12 +56,12 @@ jobs:
       - name: Install dependencies
         env:
           COMPOSER_DISCARD_CHANGES: true
-        run: composer require --no-suggest --no-progress --no-interaction --prefer-dist --update-with-all-dependencies "laravel/framework:${{ matrix.laravel }}"
+        run: composer require --no-interaction --prefer-dist --no-update "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench"
 
       - name: Set dependency version
         env:
           COMPOSER_DISCARD_CHANGES: true
-        run: composer update --no-suggest --no-progress --no-interaction --no-suggest --prefer-dist --with-all-dependencies --prefer-${{ matrix.dependency-version }}
+        run: composer update --no-interaction --prefer-dist --with-all-dependencies --prefer-${{ matrix.dependency-version }}
 
       - name: Execute tests
         run: vendor/bin/phpunit -v
