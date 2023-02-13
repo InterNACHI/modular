@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Updated version constraints to add Laravel 10 support and drop automated testing for old versions of PHP and Laravel
+
 ### Fixed
 
 -   Improved path normalization on Windows (thanks to @Sophist-UK)
