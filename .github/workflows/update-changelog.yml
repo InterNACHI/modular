@@ -8,7 +8,7 @@ jobs:
   update-publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           repository: ${{ github.event.repository.full_name }}
           ref: 'main'
