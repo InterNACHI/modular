@@ -12,13 +12,11 @@ jobs:
       matrix:
         dependency-version: [ stable, lowest ]
         os: [ ubuntu-latest, windows-latest ]
-        laravel: [ ^8.79, ^9.0 ]
-        php: [ 7.4, 8.0, 8.1 ]
+        laravel: [ ^8.79, ^9.20, ^10.0 ]
+        php: [ 8.0, 8.1, 8.2 ]
         exclude:
-          - php: 7.4
-            laravel: ^9.0
-          - laravel: ^9.0
-            dependency-version: lowest
+          - php: 8.0
+            laravel: ^10.0
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
