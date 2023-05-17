@@ -36,6 +36,18 @@ class MakeCommandTest extends TestCase
 		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);
 	}
 	
+	public function test_it_uses_the_command_option_for_name_when_set(): void
+	{
+		$command = MakeCommand::class;
+		$arguments = ['name' => 'TestCommand', '--command' => 'foo:bar-baz'];
+		$expected_path = 'src/Console/Commands/TestCommand.php';
+		$expected_substrings = [
+			"signature = 'foo:bar-baz'",
+		];
+		
+		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);
+	}
+	
 	public function test_it_scaffolds_a_command_in_the_app_when_module_option_is_missing(): void
 	{
 		$command = MakeCommand::class;

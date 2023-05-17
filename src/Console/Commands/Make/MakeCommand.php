@@ -12,10 +12,17 @@ class MakeCommand extends ConsoleMakeCommand
 	protected function replaceClass($stub, $name)
 	{
 		$stub = parent::replaceClass($stub, $name);
+		$module = $this->module();
 		
-		if ($module = $this->module()) {
-			$cli_name = Str::kebab(preg_replace('/Command$/', '', class_basename($name)));
-			$stub = str_replace('command:name', "{$module->name}:{$cli_name}", $stub);
+		if ($module && ! $this->option('command')) {
+			$cli_name = Str::of($name)->classBasename()->kebab();
+			
+			$find = [
+				"signature = 'command:name'",
+				"signature = 'app:{$cli_name}'",
+			];
+			
+			$stub = str_replace($find, "{$module->name}:{$cli_name}", $stub);
 		}
 		
 		return $stub;
