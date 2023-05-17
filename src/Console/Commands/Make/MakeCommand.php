@@ -14,7 +14,7 @@ class MakeCommand extends ConsoleMakeCommand
 		$stub = parent::replaceClass($stub, $name);
 		$module = $this->module();
 		
-		if ($module && ! $this->option('command')) {
+		if ($module && (! $this->option('command') || 'command:name' === $this->option('command'))) {
 			$cli_name = Str::of($name)->classBasename()->kebab();
 			
 			$find = [
