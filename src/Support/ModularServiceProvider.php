@@ -25,7 +25,6 @@ use InterNACHI\Modular\Console\Commands\ModulesList;
 use InterNACHI\Modular\Console\Commands\ModulesSync;
 use Livewire\Livewire;
 use ReflectionClass;
-use ReflectionProperty;
 use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -278,32 +277,10 @@ class ModularServiceProvider extends ServiceProvider
 	
 	protected function registerEloquentFactories(): void
 	{
-		EloquentFactory::guessFactoryNamesUsing(function($model_name) {
-			// Because Factory::$namespace is protected, we need to access it via reflection.
-			// Hopefully we can PR something into Laravel to make this less hacky.
-			$reflection = new ReflectionProperty(EloquentFactory::class, 'namespace');
-			$reflection->setAccessible(true);
-			$factory_namespace = $reflection->getValue();
-			
-			$modules_namespace = config('app-modules.modules_namespace', 'Modules');
-			
-			if (
-				Str::startsWith($model_name, $modules_namespace)
-				&& $module = $this->registry()->moduleForClass($model_name)
-			) {
-				$model_name = Str::startsWith($model_name, $module->qualify('Models\\'))
-					? Str::after($model_name, $module->qualify('Models\\'))
-					: Str::after($model_name, $module->namespace());
-				
-				return $module->qualify($factory_namespace.$model_name.'Factory');
-			}
-			
-			$model_name = Str::startsWith($model_name, 'App\\Models\\')
-				? Str::after($model_name, 'App\\Models\\')
-				: Str::after($model_name, 'App\\');
-			
-			return $factory_namespace.$model_name.'Factory';
-		});
+		$helper = new DatabaseFactoryHelper($this->registry());
+		
+		EloquentFactory::guessModelNamesUsing($helper->modelNameResolver());
+		EloquentFactory::guessFactoryNamesUsing($helper->factoryNameResolver());
 	}
 	
 	protected function registerLegacyFactories(LegacyEloquentFactory $factory): void

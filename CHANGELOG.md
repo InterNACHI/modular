@@ -5,9 +5,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.0]
+
+### Added
+
+- Added support for factory model name resolution inside modules
+- 
+## [1.11.0] - 2023-02-14
+
 ### Changed
 
 - Updated version constraints to add Laravel 10 support and drop automated testing for old versions of PHP and Laravel
+
+## [1.10.0] - 2022-08-12
 
 ### Fixed
 
@@ -148,7 +158,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   `Fixed` for any bug fixes.
 -   `Security` in case of vulnerabilities.
 
-[Unreleased]: https://github.com/InterNACHI/modular/compare/1.9.0...HEAD
+[Unreleased]: https://github.com/InterNACHI/modular/compare/1.12.0...HEAD
+
+[1.12.0]: https://github.com/InterNACHI/modular/compare/1.11.0...1.12.0
+
+[1.11.0]: https://github.com/InterNACHI/modular/compare/1.10.0...1.11.0
+
+[1.10.0]: https://github.com/InterNACHI/modular/compare/1.9.0...1.10.0
 
 [1.9.0]: https://github.com/InterNACHI/modular/compare/1.8.0...1.9.0
 

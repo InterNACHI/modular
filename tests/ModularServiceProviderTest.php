@@ -115,6 +115,36 @@ class ModularServiceProviderTest extends TestCase
 		);
 	}
 	
+	public function test_model_classes_are_resolved_correctly_for_factories_with_custom_namespace(): void
+	{
+		$this->requiresLaravelVersion('8.0.0');
+		
+		$module = $this->makeModule();
+		
+		// We'll create a factory and instantiate it
+		$this->artisan('make:model', ['name' => 'Widget', '--factory' => true, '--module' => $module->name]);
+		require $module->path('database/factories/WidgetFactory.php');
+		$factory_class = $module->qualify('Database\\Factories\\WidgetFactory');
+		$factory = new $factory_class();
+		
+		/** @var Factory $factory */
+		
+		$this->assertEquals(
+			$module->qualify('Models\\Widget'),
+			$factory->modelName(),
+		);
+		
+		// We'll also confirm that non-app factories are unaffected
+		$this->artisan('make:model', ['name' => 'Widget', '--factory' => true]);
+		require database_path('factories/WidgetFactory.php');
+		$factory = new \Database\Factories\WidgetFactory();
+		
+		$this->assertEquals(
+			'App\\Widget',
+			$factory->modelName(),
+		);
+	}
+	
 	public function test_it_loads_translations_from_module(): void
 	{
 		$module = $this->makeModule();
