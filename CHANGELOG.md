@@ -5,12 +5,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.12.0]
+## [1.12.0] - 2023-05-18
 
 ### Added
 
 - Added support for factory model name resolution inside modules
-- 
+
+### Fixed
+
+- Added support for new `make:command` changes in Laravel 10
+
 ## [1.11.0] - 2023-02-14
 
 ### Changed
