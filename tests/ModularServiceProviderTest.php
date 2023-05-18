@@ -128,7 +128,6 @@ class ModularServiceProviderTest extends TestCase
 		$factory = new $factory_class();
 		
 		/** @var Factory $factory */
-		
 		$this->assertEquals(
 			$module->qualify('Models\\Widget'),
 			$factory->modelName(),
