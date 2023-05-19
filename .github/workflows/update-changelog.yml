@@ -19,7 +19,7 @@ jobs:
           version: ${{ github.event.release.tag_name }}
 
       - name: Commit changelog back to repo
-        uses: EndBug/add-and-commit@v8
+        uses: EndBug/add-and-commit@v9
         with:
           add: 'CHANGELOG.md'
           message: ${{ github.event.release.tag_name }}
