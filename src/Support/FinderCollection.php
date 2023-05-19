@@ -31,7 +31,7 @@ class FinderCollection
 		protected ?Finder $finder = null,
 		protected ?LazyCollection $collection = null,
 	) {
-		if (!$this->finder && !$this->collection) {
+		if (! $this->finder && ! $this->collection) {
 			$this->collection = new LazyCollection();
 		}
 	}

@@ -23,7 +23,6 @@ use InterNACHI\Modular\Console\Commands\ModulesList;
 use InterNACHI\Modular\Console\Commands\ModulesSync;
 use Livewire\Livewire;
 use ReflectionClass;
-use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
 
 class ModularServiceProvider extends ServiceProvider

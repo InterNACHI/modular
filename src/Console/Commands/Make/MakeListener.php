@@ -16,11 +16,15 @@ class MakeListener extends ListenerMakeCommand
 		
 		if (Modules::moduleForClass($name)) {
 			$stub = str_replace(
-				['DummyEvent', '{{ event }}'], class_basename($event), GeneratorCommand::buildClass($name)
+				['DummyEvent', '{{ event }}'],
+				class_basename($event),
+				GeneratorCommand::buildClass($name)
 			);
 			
 			return str_replace(
-				['DummyFullEvent', '{{ eventNamespace }}'], trim($event, '\\'), $stub
+				['DummyFullEvent', '{{ eventNamespace }}'],
+				trim($event, '\\'),
+				$stub
 			);
 		}
 		

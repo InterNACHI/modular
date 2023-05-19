@@ -1,7 +1,6 @@
 <?php
 
 namespace InterNACHI\Modular\Tests {
-	
 	use App\Tests\ModularEventSeviceProviderTest\ForceEventDiscoveryProvider;
 	use Illuminate\Support\Facades\Event;
 	use InterNACHI\Modular\Support\ModularEventServiceProvider;
@@ -36,7 +35,7 @@ namespace InterNACHI\Modular\Tests {
 			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[ModularEventServiceProvider::class]);
 			
 			$this->assertContains(
-				$module->qualify('Listeners\\TestEventListener@handle'), 
+				$module->qualify('Listeners\\TestEventListener@handle'),
 				$cache[ModularEventServiceProvider::class][$module->qualify('Events\\TestEvent')]
 			);
 			
@@ -46,8 +45,8 @@ namespace InterNACHI\Modular\Tests {
 }
 
 // We need to use an "App" namespace to tell modular that this provider should be deferred to
+
 namespace App\Tests\ModularEventSeviceProviderTest {
-	
 	use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 	
 	class ForceEventDiscoveryProvider extends EventServiceProvider
