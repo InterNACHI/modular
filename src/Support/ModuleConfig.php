@@ -54,6 +54,9 @@ class ModuleConfig implements Arrayable
 	
 	public function pathToFullyQualifiedClassName(string $path): string
 	{
+		// Handle Windows-style paths
+		$path = str_replace('\\', '/', $path);
+		
 		foreach ($this->namespaces as $namespace_path => $namespace) {
 			if (str_starts_with($path, $namespace_path)) {
 				$relative_path = Str::after($path, $namespace_path);
