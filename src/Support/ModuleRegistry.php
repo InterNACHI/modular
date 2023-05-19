@@ -101,6 +101,9 @@ class ModuleRegistry
 	
 	protected function extractModuleNameFromPath(string $path): string
 	{
+		// Handle Windows-style paths
+		$path = str_replace('\\', '/', $path);
+		
 		$relative_path = trim(Str::after($path, $this->modules_path), '/');
 		$segments = explode('/', $relative_path);
 		
