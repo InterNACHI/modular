@@ -51,7 +51,7 @@ class FinderCollection
 		try {
 			return $this->in($dirs);
 		} catch (DirectoryNotFoundException) {
-			return FinderCollection::empty();
+			return static::empty();
 		}
 	}
 	

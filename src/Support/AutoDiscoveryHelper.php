@@ -64,8 +64,8 @@ class AutoDiscoveryHelper
 		return FinderCollection::forFiles()
 			->depth(0)
 			->name('*.php')
-			->inOrEmpty($this->base_path.'/*/routes')
-			->sortByName();
+			->sortByName()
+			->inOrEmpty($this->base_path.'/*/routes');
 	}
 	
 	public function viewDirectoryFinder(): FinderCollection
