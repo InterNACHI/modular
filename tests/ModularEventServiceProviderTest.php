@@ -26,6 +26,21 @@ namespace InterNACHI\Modular\Tests {
 			$this->app->register(new ModularEventServiceProvider($this->app), true);
 			
 			$this->assertNotEmpty(Event::getListeners($module->qualify('Events\\TestEvent')));
+			
+			// Also check that the events are cached correctly
+			
+			$this->artisan('event:cache');
+			
+			$cache = require $this->app->getCachedEventsPath();
+			
+			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[ModularEventServiceProvider::class]);
+			
+			$this->assertContains(
+				$module->qualify('Listeners\\TestEventListener@handle'), 
+				$cache[ModularEventServiceProvider::class][$module->qualify('Events\\TestEvent')]
+			);
+			
+			$this->artisan('event:clear');
 		}
 	}
 }
