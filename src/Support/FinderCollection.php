@@ -4,6 +4,7 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -14,17 +15,11 @@ class FinderCollection
 {
 	use ForwardsCalls;
 	
-	protected static $prefer_collection_methods = ['filter', 'each'];
+	protected const PREFER_COLLECTION_METHODS = ['filter', 'each'];
 	
-	/**
-	 * @var \Symfony\Component\Finder\Finder
-	 */
-	protected $finder;
+	protected Finder|array $finder;
 	
-	/**
-	 * @var \Illuminate\Support\LazyCollection
-	 */
-	protected $collection;
+	protected LazyCollection $collection;
 	
 	public static function forFiles(): self
 	{
@@ -51,11 +46,20 @@ class FinderCollection
 		$this->collection = new LazyCollection();
 	}
 	
+	public function inOrEmpty(string|array $dirs): static
+	{
+		try {
+			return $this->in($dirs);
+		} catch (DirectoryNotFoundException) {
+			return FinderCollection::empty();
+		}
+	}
+	
 	public function __call($name, $arguments)
 	{
 		// Forward the call either to the Finder or the LazyCollection depending
 		// on the method (always giving precedence to the Finder class unless otherwise configured)
-		if (is_callable([$this->finder, $name]) && ! in_array($name, static::$prefer_collection_methods)) {
+		if (is_callable([$this->finder, $name]) && ! in_array($name, static::PREFER_COLLECTION_METHODS)) {
 			$result = $this->forwardCallTo($this->finder, $name, $arguments);
 		} else {
 			$this->collection->source = $this->finder;

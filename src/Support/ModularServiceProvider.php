@@ -9,9 +9,7 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
-use Illuminate\Database\Eloquent\Factory as LegacyEloquentFactory;
 use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Translation\Translator;
@@ -30,29 +28,13 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ModularServiceProvider extends ServiceProvider
 {
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry
-	 */
-	protected $registry;
+	protected ?ModuleRegistry $registry = null;
 	
-	/**
-	 * @var \InterNACHI\Modular\Support\AutoDiscoveryHelper
-	 */
-	protected $auto_discovery_helper;
+	protected ?AutoDiscoveryHelper $auto_discovery_helper = null;
 	
-	/**
-	 * This is the base directory of the modular package
-	 *
-	 * @var string
-	 */
-	protected $base_dir;
+	protected string $base_dir;
 	
-	/**
-	 * This is the configured modules directory (app-modules/ by default)
-	 *
-	 * @var string
-	 */
-	protected $modules_path;
+	protected ?string $modules_path = null;
 	
 	public function __construct($app)
 	{
@@ -72,29 +54,19 @@ class ModularServiceProvider extends ServiceProvider
 			);
 		});
 		
-		$this->app->singleton(AutoDiscoveryHelper::class, function($app) {
-			return new AutoDiscoveryHelper(
-				$app->make(ModuleRegistry::class),
-				$app->make(Filesystem::class)
-			);
-		});
+		$this->app->singleton(AutoDiscoveryHelper::class);
 		
 		$this->app->singleton(MakeMigration::class, function($app) {
 			return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
 		});
+		
+		$this->registerEloquentFactories();
 		
 		// Set up lazy registrations for things that only need to run if we're using
 		// that functionality (e.g. we only need to look for and register migrations
 		// if we're running the migrator)
 		$this->registerLazily(Migrator::class, [$this, 'registerMigrations']);
 		$this->registerLazily(Gate::class, [$this, 'registerPolicies']);
-		$this->registerLazily(LegacyEloquentFactory::class, [$this, 'registerLegacyFactories']);
-		
-		// If we're running Laravel 8 or higher, set up the Eloquent Factory to resolve
-		// module factories as well as App factories.
-		if (class_exists(EloquentFactory::class)) {
-			$this->registerEloquentFactories();
-		}
 		
 		// Look for and register all our commands in the CLI context
 		Artisan::starting(Closure::fromCallable([$this, 'registerCommands']));
@@ -115,20 +87,12 @@ class ModularServiceProvider extends ServiceProvider
 	
 	protected function registry(): ModuleRegistry
 	{
-		if (null === $this->registry) {
-			$this->registry = $this->app->make(ModuleRegistry::class);
-		}
-		
-		return $this->registry;
+		return $this->registry ??= $this->app->make(ModuleRegistry::class);
 	}
 	
 	protected function autoDiscoveryHelper(): AutoDiscoveryHelper
 	{
-		if (null === $this->auto_discovery_helper) {
-			$this->auto_discovery_helper = $this->app->make(AutoDiscoveryHelper::class);
-		}
-		
-		return $this->auto_discovery_helper;
+		return $this->auto_discovery_helper ??= $this->app->make(AutoDiscoveryHelper::class);
 	}
 	
 	protected function publishVendorFiles(): void
@@ -283,15 +247,6 @@ class ModularServiceProvider extends ServiceProvider
 		EloquentFactory::guessFactoryNamesUsing($helper->factoryNameResolver());
 	}
 	
-	protected function registerLegacyFactories(LegacyEloquentFactory $factory): void
-	{
-		$this->autoDiscoveryHelper()
-			->factoryDirectoryFinder()
-			->each(function(SplFileInfo $path) use ($factory) {
-				$factory->load($path->getRealPath());
-			});
-	}
-	
 	protected function registerPolicies(Gate $gate): void
 	{
 		$this->autoDiscoveryHelper()
@@ -354,7 +309,7 @@ class ModularServiceProvider extends ServiceProvider
 	protected function pathToFullyQualifiedClassName($path, ModuleConfig $module_config): string
 	{
 		foreach ($module_config->namespaces as $namespace_path => $namespace) {
-			if (0 === strpos($path, $namespace_path)) {
+			if (str_starts_with($path, $namespace_path)) {
 				$relative_path = Str::after($path, $namespace_path);
 				return $namespace.$this->formatPathAsNamespace($relative_path);
 			}

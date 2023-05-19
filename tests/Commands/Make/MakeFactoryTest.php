@@ -27,16 +27,10 @@ class MakeFactoryTest extends TestCase
 		$arguments = ['name' => 'TestFactory'];
 		$expected_path = 'database/factories/TestFactory.php';
 		
-		if (version_compare($this->app->version(), '8.0.0', '>=')) {
-			$expected_substrings = [
-				'use Illuminate\Database\Eloquent\Factories\Factory;',
-				'namespace Modules\TestModule\Database\Factories;',
-			];
-		} else {
-			$expected_substrings = [
-				'Illuminate\Database\Eloquent\Factory',
-			];
-		}
+		$expected_substrings = [
+			'use Illuminate\Database\Eloquent\Factories\Factory;',
+			'namespace Modules\TestModule\Database\Factories;',
+		];
 		
 		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);
 	}
@@ -47,16 +41,10 @@ class MakeFactoryTest extends TestCase
 		$arguments = ['name' => 'TestFactory'];
 		$expected_path = 'database/factories/TestFactory.php';
 		
-		if (version_compare($this->app->version(), '8.0.0', '>=')) {
-			$expected_substrings = [
-				'Illuminate\Database\Eloquent\Factories\Factory',
-				'namespace Database\Factories;',
-			];
-		} else {
-			$expected_substrings = [
-				'Illuminate\Database\Eloquent\Factory',
-			];
-		}
+		$expected_substrings = [
+			'Illuminate\Database\Eloquent\Factories\Factory',
+			'namespace Database\Factories;',
+		];
 		
 		$this->assertBaseCommandResults($command, $arguments, $expected_path, $expected_substrings);
 	}

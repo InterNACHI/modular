@@ -21,8 +21,6 @@ class ModularServiceProviderTest extends TestCase
 	
 	public function test_model_factory_classes_are_resolved_correctly(): void
 	{
-		$this->requiresLaravelVersion('8.0.0');
-		
 		$module = $this->makeModule();
 		
 		$this->assertEquals(
@@ -68,8 +66,6 @@ class ModularServiceProviderTest extends TestCase
 	
 	public function test_model_factory_classes_are_resolved_correctly_with_custom_namespace(): void
 	{
-		$this->requiresLaravelVersion('8.0.0');
-		
 		Factory::useNamespace('Something\\');
 		
 		$module = $this->makeModule();
@@ -119,8 +115,6 @@ class ModularServiceProviderTest extends TestCase
 	
 	public function test_model_classes_are_resolved_correctly_for_factories_with_custom_namespace(): void
 	{
-		$this->requiresLaravelVersion('8.0.0');
-		
 		$module = $this->makeModule();
 		
 		// We'll create a factory and instantiate it

@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Dropped support for older versions of PHP and Laravel. If you are using Laravel 7 or 8, or PHP 7, please use the 1.x releases
+
 ## [1.12.0] - 2023-05-19
 
 ### Added

@@ -35,7 +35,7 @@ use Livewire\Commands as Livewire;
 
 class ModularizedCommandsServiceProvider extends ServiceProvider
 {
-	protected $overrides = [
+	protected array $overrides = [
 		'command.cast.make' => MakeCast::class,
 		'command.controller.make' => MakeController::class,
 		'command.console.make' => MakeCommand::class,

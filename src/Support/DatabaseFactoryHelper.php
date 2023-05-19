@@ -9,16 +9,14 @@ use ReflectionProperty;
 
 class DatabaseFactoryHelper
 {
-	protected $namespace = null;
+	protected ?string $namespace = null;
 	
-	protected $registry;
-	
-	public function __construct(ModuleRegistry $registry)
-	{
-		$this->registry = $registry;
+	public function __construct(
+		protected ModuleRegistry $registry
+	) {
 	}
 	
-	public function resetResolvers()
+	public function resetResolvers(): void
 	{
 		$this->unsetProperty(Factory::class, 'modelNameResolver');
 		$this->unsetProperty(Factory::class, 'factoryNameResolver');
@@ -70,11 +68,7 @@ class DatabaseFactoryHelper
 	 */
 	public function namespace(): string
 	{
-		if (null === $this->namespace) {
-			$this->namespace = $this->getProperty(Factory::class, 'namespace');
-		}
-		
-		return $this->namespace;
+		return $this->namespace ??= $this->getProperty(Factory::class, 'namespace');
 	}
 	
 	protected function getProperty($target, $property)

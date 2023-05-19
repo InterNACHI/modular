@@ -9,27 +9,12 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ModuleRegistry
 {
-	/**
-	 * @var Collection
-	 */
-	protected $modules;
+	protected ?Collection $modules = null;
 	
-	/**
-	 * @var string
-	 */
-	protected $cache_path;
-	
-	/**
-	 * This is the base path that all modules are installed in
-	 *
-	 * @var string
-	 */
-	protected $modules_path;
-	
-	public function __construct(string $modules_path, string $cache_path)
-	{
-		$this->modules_path = $modules_path;
-		$this->cache_path = $cache_path;
+	public function __construct(
+		protected string $modules_path,
+		protected string $cache_path
+	) {
 	}
 	
 	public function getModulesPath(): string
@@ -79,11 +64,7 @@ class ModuleRegistry
 	
 	public function modules(): Collection
 	{
-		if (null === $this->modules) {
-			$this->modules = $this->loadModules();
-		}
-		
-		return $this->modules;
+		return $this->modules ??= $this->loadModules();
 	}
 	
 	public function reload(): Collection
@@ -121,8 +102,8 @@ class ModuleRegistry
 	protected function extractModuleNameFromPath(string $path): string
 	{
 		$relative_path = trim(Str::after($path, $this->modules_path), '/');
-		
 		$segments = explode('/', $relative_path);
+		
 		return $segments[0];
 	}
 }
