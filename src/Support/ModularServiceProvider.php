@@ -150,7 +150,7 @@ class ModularServiceProvider extends ServiceProvider
 				->bladeComponentFileFinder()
 				->each(function(SplFileInfo $component) use ($blade) {
 					$module = $this->registry()->moduleForPathOrFail($component->getPath());
-					$fully_qualified_component = $this->pathToFullyQualifiedClassName($component->getPathname(), $module);
+					$fully_qualified_component = $module->pathToFullyQualifiedClassName($component->getPathname());
 					$blade->component($fully_qualified_component, null, $module->name);
 				});
 			
@@ -224,7 +224,7 @@ class ModularServiceProvider extends ServiceProvider
 					->map([Str::class, 'kebab'])
 					->implode('.');
 				
-				$fully_qualified_component = $this->pathToFullyQualifiedClassName($component->getPathname(), $module);
+				$fully_qualified_component = $module->pathToFullyQualifiedClassName($component->getPathname());
 				
 				Livewire::component("{$module->name}::{$component_name}", $fully_qualified_component);
 			});
@@ -253,7 +253,7 @@ class ModularServiceProvider extends ServiceProvider
 			->modelFileFinder()
 			->each(function(SplFileInfo $file) use ($gate) {
 				$module = $this->registry()->moduleForPathOrFail($file->getPath());
-				$fully_qualified_model = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
+				$fully_qualified_model = $module->pathToFullyQualifiedClassName($file->getPathname());
 				
 				// First, check for a policy that maps to the full namespace of the model
 				// i.e. Models/Foo/Bar -> Policies/Foo/BarPolicy
@@ -282,7 +282,7 @@ class ModularServiceProvider extends ServiceProvider
 			->commandFileFinder()
 			->each(function(SplFileInfo $file) use ($artisan) {
 				$module = $this->registry()->moduleForPathOrFail($file->getPath());
-				$class_name = $this->pathToFullyQualifiedClassName($file->getPathname(), $module);
+				$class_name = $module->pathToFullyQualifiedClassName($file->getPathname());
 				if ($this->isInstantiableCommand($class_name)) {
 					$artisan->resolve($class_name);
 				}
@@ -304,34 +304,6 @@ class ModularServiceProvider extends ServiceProvider
 		}
 		
 		return $this->modules_path;
-	}
-	
-	protected function pathToFullyQualifiedClassName($path, ModuleConfig $module_config): string
-	{
-		foreach ($module_config->namespaces as $namespace_path => $namespace) {
-			if (str_starts_with($path, $namespace_path)) {
-				$relative_path = Str::after($path, $namespace_path);
-				return $namespace.$this->formatPathAsNamespace($relative_path);
-			}
-		}
-		
-		throw new RuntimeException("Unable to infer qualified class name for '{$path}'");
-	}
-	
-	protected function formatPathAsNamespace(string $path): string
-	{
-		$path = trim($path, '/');
-		
-		$replacements = [
-			'/' => '\\',
-			'.php' => '',
-		];
-		
-		return str_replace(
-			array_keys($replacements),
-			array_values($replacements),
-			$path
-		);
 	}
 	
 	protected function isInstantiableCommand($command): bool

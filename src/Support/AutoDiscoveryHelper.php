@@ -84,6 +84,13 @@ class AutoDiscoveryHelper
 			->inOrEmpty($this->base_path.'/*/resources/');
 	}
 	
+	public function listenerDirectoryFinder(): FinderCollection
+	{
+		return FinderCollection::forDirectories()
+			->name('Listeners')
+			->inOrEmpty($this->base_path.'/*/src');
+	}
+	
 	public function livewireComponentFileFinder(): FinderCollection
 	{
 		return FinderCollection::forFiles()

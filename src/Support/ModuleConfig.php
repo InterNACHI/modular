@@ -4,6 +4,8 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
 
 class ModuleConfig implements Arrayable
@@ -50,6 +52,18 @@ class ModuleConfig implements Arrayable
 		return $this->namespace().ltrim($class_name, '\\');
 	}
 	
+	public function pathToFullyQualifiedClassName(string $path): string
+	{
+		foreach ($this->namespaces as $namespace_path => $namespace) {
+			if (str_starts_with($path, $namespace_path)) {
+				$relative_path = Str::after($path, $namespace_path);
+				return $namespace.$this->formatPathAsNamespace($relative_path);
+			}
+		}
+		
+		throw new RuntimeException("Unable to infer qualified class name for '{$path}'");
+	}
+	
 	public function toArray(): array
 	{
 		return [
@@ -57,5 +71,21 @@ class ModuleConfig implements Arrayable
 			'base_path' => $this->base_path,
 			'namespaces' => $this->namespaces->toArray(),
 		];
+	}
+	
+	protected function formatPathAsNamespace(string $path): string
+	{
+		$path = trim($path, '/');
+		
+		$replacements = [
+			'/' => '\\',
+			'.php' => '',
+		];
+		
+		return str_replace(
+			array_keys($replacements),
+			array_values($replacements),
+			$path
+		);
 	}
 }

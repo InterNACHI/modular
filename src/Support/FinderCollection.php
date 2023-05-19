@@ -15,35 +15,25 @@ class FinderCollection
 {
 	use ForwardsCalls;
 	
-	protected const PREFER_COLLECTION_METHODS = ['filter', 'each'];
-	
-	protected Finder|array $finder;
-	
-	protected LazyCollection $collection;
+	protected const PREFER_COLLECTION_METHODS = ['filter', 'each', 'map'];
 	
 	public static function forFiles(): self
 	{
-		return (new static())->files();
+		return new static(Finder::create()->files());
 	}
 	
 	public static function forDirectories(): self
 	{
-		return (new static())->directories();
+		return new static(Finder::create()->directories());
 	}
 	
-	public static function empty(): self
-	{
-		$collection = new static();
-		
-		$collection->finder = [];
-		
-		return $collection;
-	}
-	
-	public function __construct(Finder $finder = null)
-	{
-		$this->finder = $finder ?? new Finder();
-		$this->collection = new LazyCollection();
+	public function __construct(
+		protected ?Finder $finder = null,
+		protected ?LazyCollection $collection = null,
+	) {
+		if (!$this->finder && !$this->collection) {
+			$this->collection = new LazyCollection();
+		}
 	}
 	
 	public function inOrEmpty(string|array $dirs): static
@@ -51,34 +41,40 @@ class FinderCollection
 		try {
 			return $this->in($dirs);
 		} catch (DirectoryNotFoundException) {
-			return static::empty();
+			return new static();
 		}
 	}
 	
 	public function __call($name, $arguments)
 	{
-		// Forward the call either to the Finder or the LazyCollection depending
-		// on the method (always giving precedence to the Finder class unless otherwise configured)
-		if (is_callable([$this->finder, $name]) && ! in_array($name, static::PREFER_COLLECTION_METHODS)) {
-			$result = $this->forwardCallTo($this->finder, $name, $arguments);
-		} else {
-			$this->collection->source = $this->finder;
-			$result = $this->forwardCallTo($this->collection, $name, $arguments);
-		}
+		$result = $this->forwardCallTo($this->forwardCallTargetForMethod($name), $name, $arguments);
 		
-		// If we get a Finder object back, update our internal reference and chain
 		if ($result instanceof Finder) {
-			$this->finder = $result;
-			return $this;
+			return new static($result);
 		}
 		
-		// If we get a Collection object back, update our internal reference and chain
 		if ($result instanceof LazyCollection) {
-			$this->collection = $result;
-			return $this;
+			return new static($this->finder, $result);
 		}
 		
-		// Otherwise, just return the new result (in the case of toBase() or sum()-type calls)
 		return $result;
+	}
+	
+	protected function forwardCallTargetForMethod(string $name): Finder|LazyCollection
+	{
+		if (is_callable([$this->finder, $name]) && ! in_array($name, static::PREFER_COLLECTION_METHODS)) {
+			return $this->finder;
+		}
+		
+		return $this->forwardCollection();
+	}
+	
+	protected function forwardCollection(): LazyCollection
+	{
+		return $this->collection ??= new LazyCollection(function() {
+			foreach ($this->finder as $key => $value) {
+				yield $key => $value;
+			}
+		});
 	}
 }

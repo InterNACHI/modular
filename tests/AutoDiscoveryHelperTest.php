@@ -5,6 +5,7 @@ namespace InterNACHI\Modular\Tests;
 use Illuminate\Filesystem\Filesystem;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
+use InterNACHI\Modular\Console\Commands\Make\MakeListener;
 use InterNACHI\Modular\Console\Commands\Make\MakeLivewire;
 use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Support\AutoDiscoveryHelper;
@@ -172,6 +173,26 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$this->assertContains($this->module1->path('resources/lang'), $resolved);
 		$this->assertContains($this->module2->path('resources/lang'), $resolved);
+	}
+	
+	public function test_it_finds_event_listeners(): void
+	{
+		$this->artisan(MakeListener::class, [
+			'name' => 'TestListener',
+			'--module' => $this->module1->name,
+		]);
+		
+		$this->artisan(MakeListener::class, [
+			'name' => 'TestListener',
+			'--module' => $this->module2->name,
+		]);
+		
+		$resolved = $this->helper->listenerDirectoryFinder()
+			->map(fn(SplFileInfo $directory) => str_replace('\\', '/', $directory->getPathname()))
+			->all();
+		
+		$this->assertContains($this->module1->path('src/Listeners'), $resolved);
+		$this->assertContains($this->module2->path('src/Listeners'), $resolved);
 	}
 	
 	public function test_it_finds_livewire_component(): void

@@ -103,11 +103,7 @@ should work as expected in most cases:
 - Factories are auto-loaded for `factory()`
 - Policies are auto-discovered for your Models
 - Blade components will be auto-discovered
-
-There is **currently one exception**:
-
-- [Event discovery](https://laravel.com/docs/7.x/events#event-discovery) (which is optional 
-  and disabled by default in Laravel) is currently not supported.
+- Event listeners will be auto-discovered
 
 ### Commands
 
