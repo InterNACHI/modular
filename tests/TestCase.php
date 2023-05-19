@@ -4,6 +4,7 @@ namespace InterNACHI\Modular\Tests;
 
 use Illuminate\Encryption\Encrypter;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
+use InterNACHI\Modular\Support\DatabaseFactoryHelper;
 use InterNACHI\Modular\Support\Facades\Modules;
 use InterNACHI\Modular\Support\ModularizedCommandsServiceProvider;
 use InterNACHI\Modular\Support\ModularServiceProvider;
@@ -25,6 +26,13 @@ abstract class TestCase extends Orchestra
 		
 		// Add stubs to view
 		// $this->app['view']->addLocation(__DIR__.'/Feature/stubs');
+	}
+	
+	protected function tearDown(): void
+	{
+		$this->app->make(DatabaseFactoryHelper::class)->resetResolvers();
+		
+		parent::tearDown();
 	}
 	
 	protected function makeModule(string $name = 'test-module'): ModuleConfig

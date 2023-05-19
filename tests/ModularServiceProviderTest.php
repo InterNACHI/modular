@@ -113,6 +113,8 @@ class ModularServiceProviderTest extends TestCase
 			'Something\\Foo\\BarFactory',
 			Factory::resolveFactoryName('App\\Foo\\Bar')
 		);
+		
+		Factory::useNamespace('Database\\Factories\\');
 	}
 	
 	public function test_model_classes_are_resolved_correctly_for_factories_with_custom_namespace(): void

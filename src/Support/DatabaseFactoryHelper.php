@@ -18,6 +18,12 @@ class DatabaseFactoryHelper
 		$this->registry = $registry;
 	}
 	
+	public function resetResolvers()
+	{
+		$this->unsetProperty(Factory::class, 'modelNameResolver');
+		$this->unsetProperty(Factory::class, 'factoryNameResolver');
+	}
+	
 	public function modelNameResolver(): Closure
 	{
 		return function(Factory $factory) {
