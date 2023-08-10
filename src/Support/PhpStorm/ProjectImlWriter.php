@@ -28,7 +28,6 @@ class ProjectImlWriter extends ConfigWriter
 					$src_node = $content->addChild('sourceFolder');
 					$src_node->addAttribute('url', $src_url);
 					$src_node->addAttribute('isTestSource', 'false');
-					$src_node->addAttribute('packagePrefix', rtrim($module_config->namespaces->first(), '\\'));
 				}
 				
 				$tests_url = "file://\$MODULE_DIR\$/{$modules_directory}/{$module_config->name}/tests";
@@ -36,7 +35,6 @@ class ProjectImlWriter extends ConfigWriter
 					$tests_node = $content->addChild('sourceFolder');
 					$tests_node->addAttribute('url', $tests_url);
 					$tests_node->addAttribute('isTestSource', 'true');
-					$tests_node->addAttribute('packagePrefix', rtrim($module_config->namespaces->first(), '\\').'\\Tests');
 				}
 			});
 		
