@@ -11,10 +11,13 @@ class ModuleRegistry
 {
 	protected ?Collection $modules = null;
 	
+	protected string $modules_real_path;
+	
 	public function __construct(
 		protected string $modules_path,
 		protected string $cache_path
 	) {
+		$this->modules_real_path = realpath($this->modules_path);
 	}
 	
 	public function getModulesPath(): string
@@ -104,8 +107,24 @@ class ModuleRegistry
 		// Handle Windows-style paths
 		$path = str_replace('\\', '/', $path);
 		
-		$relative_path = trim(Str::after($path, $this->modules_path), '/');
+		$modules_path = str_replace('\\', '/', $this->modules_path);
+		$modules_real_path = str_replace('\\', '/', $this->modules_real_path);
+		
+		$prefix = str_starts_with($path, $modules_real_path)
+			? $modules_real_path
+			: $modules_path;
+		
+		$relative_path = trim(Str::after($path, $prefix), '/');
 		$segments = explode('/', $relative_path);
+		
+		dump([
+			sprintf('path = %s', $path),
+			sprintf('modules_path = %s', $modules_path),
+			sprintf('modules_real_path = %s', $modules_real_path),
+			sprintf('prefix = %s', $prefix),
+			sprintf('relative_path = %s', $relative_path),
+			sprintf('name = %s', $segments[0]),
+		]);
 		
 		return $segments[0];
 	}
