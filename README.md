@@ -3,9 +3,9 @@
 # `internachi/modular`
 
 <div>
-	<a href="https://github.com/InterNACHI/modular/actions?query=workflow%3APHPUnit" target="_blank">
+	<a href="https://github.com/InterNACHI/modular/actions/workflows/phpunit.yml" target="_blank">
 		<img 
-			src="https://github.com/InterNACHI/modular/workflows/PHPUnit/badge.svg" 
+			src="https://github.com/InterNACHI/modular/actions/workflows/phpunit.yml/badge.svg" 
 			alt="Build Status" 
 		/>
 	</a>
