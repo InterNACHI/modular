@@ -110,7 +110,7 @@ class ModuleRegistry
 		$modules_path = str_replace('\\', '/', $this->modules_path);
 		$modules_real_path = str_replace('\\', '/', $this->modules_real_path);
 		
-		$prefix = str_starts_with($path, $modules_real_path)
+		$prefix = '' !== $modules_real_path && str_starts_with($path, $modules_real_path)
 			? $modules_real_path
 			: $modules_path;
 		
