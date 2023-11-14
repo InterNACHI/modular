@@ -11,13 +11,10 @@ class ModuleRegistry
 {
 	protected ?Collection $modules = null;
 	
-	protected string $modules_real_path;
-	
 	public function __construct(
 		protected string $modules_path,
 		protected string $cache_path
 	) {
-		$this->modules_real_path = realpath($this->modules_path);
 	}
 	
 	public function getModulesPath(): string
@@ -108,7 +105,7 @@ class ModuleRegistry
 		$path = str_replace('\\', '/', $path);
 		
 		$modules_path = str_replace('\\', '/', $this->modules_path);
-		$modules_real_path = str_replace('\\', '/', $this->modules_real_path);
+		$modules_real_path = str_replace('\\', '/', realpath($this->modules_path));
 		
 		$prefix = '' !== $modules_real_path && str_starts_with($path, $modules_real_path)
 			? $modules_real_path
