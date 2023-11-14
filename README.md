@@ -1,8 +1,47 @@
-# InterNACHI/Modular
+<img alt="Modular" src="art/modular.png" width="100%" />
 
-[![PHPUnit](https://github.com/InterNACHI/modular/workflows/PHPUnit/badge.svg)](https://github.com/InterNACHI/modular/actions?query=workflow%3APHPUnit) [![Test Coverage](https://api.codeclimate.com/v1/badges/dd927802d52f4f75ea6c/test_coverage)](https://codeclimate.com/github/InterNACHI/modular/test_coverage)
+# `internachi/modular`
 
-`InterNACHI/Modular` is a module system for Laravel applications. It uses
+<div>
+	<a href="https://github.com/InterNACHI/modular/actions?query=workflow%3APHPUnit" target="_blank">
+		<img 
+			src="https://github.com/InterNACHI/modular/workflows/PHPUnit/badge.svg" 
+			alt="Build Status" 
+		/>
+	</a>
+	<a href="https://codeclimate.com/github/InterNACHI/modular/test_coverage" target="_blank">
+		<img 
+			src="https://api.codeclimate.com/v1/badges/dd927802d52f4f75ea6c/test_coverage" 
+			alt="Coverage Status" 
+		/>
+	</a>
+	<a href="https://packagist.org/packages/internachi/modular" target="_blank">
+        <img 
+            src="https://poser.pugx.org/internachi/modular/v/stable" 
+            alt="Latest Stable Release" 
+        />
+	</a>
+	<a href="./LICENSE" target="_blank">
+        <img 
+            src="https://poser.pugx.org/internachi/modular/license" 
+            alt="MIT Licensed" 
+        />
+    </a>
+    <a href="https://twitter.com/inxilpro" target="_blank">
+        <img 
+            src="https://img.shields.io/twitter/follow/inxilpro?style=social" 
+            alt="Follow @inxilpro on Twitter" 
+        />
+    </a>
+    <a href="https://any.dev/@chris" target="_blank">
+        <img 
+            src="https://img.shields.io/mastodon/follow/109584001693739813?domain=https%3A%2F%2Fany.dev&style=social" 
+            alt="Follow @chris@any.dev on Mastodon" 
+        />
+    </a>
+</div>
+
+`internachi/modular` is a module system for Laravel applications. It uses
 [Composer path repositories](https://getcomposer.org/doc/05-repositories.md#path) for autoloading, 
 and [Laravel package discovery](https://laravel.com/docs/7.x/packages#package-discovery) for module
 initialization, and then provides minimal tooling to fill in any gaps.
