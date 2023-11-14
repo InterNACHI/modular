@@ -104,25 +104,14 @@ class ModuleRegistry
 		// Handle Windows-style paths
 		$path = str_replace('\\', '/', $path);
 		
-		$modules_path = str_replace('\\', '/', $this->modules_path);
-		$modules_real_path = str_replace('\\', '/', realpath($this->modules_path));
+		// If the modules directory is symlinked, we may get two paths that are actually
+		// in the same directory, but have different prefixes. This helps resolve that.
+		if (Str::startsWith($path, $this->modules_path)) {
+			$path = trim(Str::after($path, $this->modules_path), '/');
+		} elseif (Str::startsWith($path, $modules_real_path = str_replace('\\', '/', realpath($this->modules_path)))) {
+			$path = trim(Str::after($path, $modules_real_path), '/');
+		}
 		
-		$prefix = '' !== $modules_real_path && str_starts_with($path, $modules_real_path)
-			? $modules_real_path
-			: $modules_path;
-		
-		$relative_path = trim(Str::after($path, $prefix), '/');
-		$segments = explode('/', $relative_path);
-		
-		dump([
-			sprintf('path = %s', $path),
-			sprintf('modules_path = %s', $modules_path),
-			sprintf('modules_real_path = %s', $modules_real_path),
-			sprintf('prefix = %s', $prefix),
-			sprintf('relative_path = %s', $relative_path),
-			sprintf('name = %s', $segments[0]),
-		]);
-		
-		return $segments[0];
+		return explode('/', $path)[0];
 	}
 }
