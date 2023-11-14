@@ -20,7 +20,7 @@
         "ext-simplexml": "*",
         "ext-dom": "*",
         "composer/composer": "^2.1",
-        "illuminate/support": "^9|^10.10|11.x-dev|dev-master"
+        "illuminate/support": "^9|^10|11.x-dev|dev-master"
     },
     "require-dev": {
         "orchestra/testbench": "^7.10|^8|8.x-dev|9.x-dev|dev-master",
