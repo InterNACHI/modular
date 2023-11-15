@@ -7,7 +7,11 @@
 	"require": {},
 	"autoload": {
 		"psr-4": {
-			"StubModuleNamespace\\StubClassNamePrefix\\": "src/",
+			"StubModuleNamespace\\StubClassNamePrefix\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
 			"StubModuleNamespace\\StubClassNamePrefix\\Tests\\": "tests/",
 			"StubModuleNamespace\\StubClassNamePrefix\\Database\\Factories\\": "database/factories/",
 			"StubModuleNamespace\\StubClassNamePrefix\\Database\\Seeders\\": "database/seeders/"

@@ -11,7 +11,11 @@
 			"database/factories"
 		],
 		"psr-4": {
-			"StubModuleNamespace\\StubClassNamePrefix\\": "src/",
+			"StubModuleNamespace\\StubClassNamePrefix\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
 			"StubModuleNamespace\\StubClassNamePrefix\\Tests\\": "tests/"
 		}
 	},
