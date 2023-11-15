@@ -6,10 +6,6 @@
 	"license": "proprietary",
 	"require": {},
 	"autoload": {
-		"classmap": [
-			"database/seeds",
-			"database/factories"
-		],
 		"psr-4": {
 			"StubModuleNamespace\\StubClassNamePrefix\\": "src/"
 		}
@@ -17,7 +13,11 @@
 	"autoload-dev": {
 		"psr-4": {
 			"StubModuleNamespace\\StubClassNamePrefix\\Tests\\": "tests/"
-		}
+		},
+		"classmap": [
+			"database/seeds",
+			"database/factories"
+		]
 	},
 	"minimum-stability": "stable",
 	"extra": {
