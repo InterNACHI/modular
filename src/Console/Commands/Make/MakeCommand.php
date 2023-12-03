@@ -16,10 +16,9 @@ class MakeCommand extends ConsoleMakeCommand
 		
 		if ($module && (! $this->option('command') || 'command:name' === $this->option('command'))) {
 			$cli_name = Str::of($name)->classBasename()->kebab();
-			
-			$find = [
-				"signature = 'command:name'",
-				"signature = 'app:{$cli_name}'",
+
+            $find = [
+				"app:{$cli_name}",
 			];
 			
 			$stub = str_replace($find, "{$module->name}:{$cli_name}", $stub);
