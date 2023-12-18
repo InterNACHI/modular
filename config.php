@@ -17,9 +17,9 @@ return [
 	| If you set the namespace, you should also set the vendor name to match.
 	|
 	*/
-
+	
 	'modules_namespace' => 'Modules',
-
+	
 	/*
 	|--------------------------------------------------------------------------
 	| Composer "Vendor" Name
@@ -30,9 +30,9 @@ return [
 	| generate the kebab-case version for you if kebab casing is enabled (it is by default)).
 	|
 	*/
-
+	
 	'modules_vendor' => null,
-
+	
 	/*
 	|--------------------------------------------------------------------------
 	| Kebab Casing
@@ -42,9 +42,9 @@ return [
 	| command, set kebab_case to false. The default value is true.
 	|
 	*/
-
+	
 	'kebab_case' => true,
-
+	
 	/*
 	|--------------------------------------------------------------------------
 	| Modules Directory
@@ -56,9 +56,9 @@ return [
 	| in an alpha-sorted directory listing.
 	|
 	*/
-
+	
 	'modules_directory' => 'app-modules',
-
+	
 	/*
 	|--------------------------------------------------------------------------
 	| Base Test Case
@@ -68,9 +68,9 @@ return [
 	| extend. By default it assumes the default \Tests\TestCase exists.
 	|
 	*/
-
+	
 	'tests_base' => 'Tests\TestCase',
-
+	
 	/*
 	|--------------------------------------------------------------------------
 	| Custom Stubs
@@ -88,6 +88,6 @@ return [
 	| 	'src/Providers/StubClassNamePrefixServiceProvider.php' => base_path('stubs/app-modules/ServiceProvider.php'),
 	| ],
 	*/
-
+	
 	'stubs' => null,
 ];
