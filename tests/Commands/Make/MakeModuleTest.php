@@ -82,10 +82,10 @@ class MakeModuleTest extends TestCase
 		$this->assertStringContainsString($module_name, $fs->get($path));
 	}
 	
-	public function test_it_scaffolds_a_new_module_with_kebab_case_disabled(): void
+	public function test_it_scaffolds_a_new_module_with_studly_case(): void
 	{
 		$module_name = 'testModule';
-		config()->set('app-modules.kebab_case', false);
+		config()->set('app-modules.name_case', 'camel');
 		
 		$this->artisan(MakeModule::class, [
 			'name' => $module_name,
@@ -107,7 +107,7 @@ class MakeModuleTest extends TestCase
 		
 		$composer_contents = json_decode($fs->get($composer_file), true);
 		
-		$this->assertEquals("Modules/{$module_name}", $composer_contents['name']);
+		$this->assertEquals("modules/{$module_name}", $composer_contents['name']);
 		$this->assertEquals('src/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\']);
 		$this->assertEquals('tests/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Tests\\']);
 		$this->assertContains('Modules\\TestModule\\Providers\\TestModuleServiceProvider', $composer_contents['extra']['laravel']['providers']);
@@ -123,7 +123,7 @@ class MakeModuleTest extends TestCase
 		$app_composer_file = $this->getBasePath().'/composer.json';
 		$app_composer_contents = json_decode($fs->get($app_composer_file), true);
 		
-		$this->assertEquals('*', $app_composer_contents['require']["Modules/{$module_name}"]);
+		$this->assertEquals('*', $app_composer_contents['require']["modules/{$module_name}"]);
 		
 		$repository = [
 			'type' => 'path',

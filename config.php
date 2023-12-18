@@ -25,9 +25,9 @@ return [
 	| Composer "Vendor" Name
 	|--------------------------------------------------------------------------
 	|
-	| This is the prefix used for your composer.json file. This should be the
+	| This is the prefix used for your composer.json file. This is usually the
 	| kebab-case version of your module namespace (if left null, we will
-	| generate the kebab-case version for you if kebab casing is enabled (it is by default)).
+	| generate it for you using the `name_case` preference below).
 	|
 	*/
 	
@@ -35,15 +35,18 @@ return [
 	
 	/*
 	|--------------------------------------------------------------------------
-	| Kebab Casing
+	| Module Name Casing
 	|--------------------------------------------------------------------------
 	|
-	| If you would like for Modular to respect the casing you provide in your
-	| command, set kebab_case to false. The default value is true.
+	| By default, Modular uses kebab-case for module names. For example, a 
+	| module "shopping cart" module would be named "shopping-cart". If you
+	| prefer another style of casing, you can set that here.
+	|
+	| Options: "kebab", "snake", "camel", "studly"
 	|
 	*/
 	
-	'kebab_case' => true,
+	'name_case' => 'kebab',
 	
 	/*
 	|--------------------------------------------------------------------------

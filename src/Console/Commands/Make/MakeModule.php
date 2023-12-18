@@ -9,13 +9,14 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InterNACHI\Modular\Console\Commands\ModulesClear;
+use InterNACHI\Modular\Support\FormatsModuleNames;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Terminal;
 
 class MakeModule extends Command
 {
-	use \InterNACHI\Modular\Console\Commands\Modularize;
+	use FormatsModuleNames;
 	
 	protected $signature = 'make:module
 		{name : The name of the module}
@@ -86,10 +87,10 @@ class MakeModule extends Command
 	
 	public function handle()
 	{
-		$this->module_name = $this->kebabCase($this->argument('name'));
+		$this->module_name = $this->formatModuleName($this->argument('name'));
 		$this->class_name_prefix = Str::studly($this->argument('name'));
 		$this->module_namespace = config('app-modules.modules_namespace', 'Modules');
-		$this->composer_namespace = config('app-modules.modules_vendor') ?? $this->kebabCase($this->module_namespace);
+		$this->composer_namespace = config('app-modules.modules_vendor') ?? $this->formatModuleName($this->module_namespace);
 		$this->composer_name = "{$this->composer_namespace}/{$this->module_name}";
 		$this->base_path = $this->module_registry->getModulesPath().'/'.$this->module_name;
 		
