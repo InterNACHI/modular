@@ -38,7 +38,7 @@ return [
 	| Module Name Casing
 	|--------------------------------------------------------------------------
 	|
-	| By default, Modular uses kebab-case for module names. For example, a 
+	| By default, Modular uses kebab-case for module names. For example, a
 	| module "shopping cart" module would be named "shopping-cart". If you
 	| prefer another style of casing, you can set that here.
 	|
