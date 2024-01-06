@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportConsoleCommands\Commands\MakeCommand;
 use Livewire\Livewire;
-use Livewire\LivewireComponentsFinder;
 
 if (class_exists(MakeCommand::class)) {
 	class MakeLivewire extends MakeCommand
@@ -32,14 +31,14 @@ if (class_exists(MakeCommand::class)) {
 					? '/tmp/storage/bootstrap/cache/livewire-components.php'
 					: $app->bootstrapPath('cache/livewire-components.php');
 
-                if (class_exists(LivewireComponentsFinder::class)) {
-                    $componentsFinder = new LivewireComponentsFinder(
+                if (class_exists("Livewire\LivewireComponentsFinder")) {
+                    $componentsFinder = new \Livewire\LivewireComponentsFinder(
                         new Filesystem(),
                         Config::get('livewire.manifest_path') ?? $defaultManifestPath,
                         $module->path('src/Http/Livewire')
                     );
 
-                    $app->instance(LivewireComponentsFinder::class, $componentsFinder);
+                    $app->instance(\Livewire\LivewireComponentsFinder::class, $componentsFinder);
                 }
 
 			}
