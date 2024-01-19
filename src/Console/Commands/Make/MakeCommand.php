@@ -17,8 +17,8 @@ class MakeCommand extends ConsoleMakeCommand
 		if ($module && (! $this->option('command') || 'command:name' === $this->option('command'))) {
 			$cli_name = Str::of($name)->classBasename()->kebab();
 
-            $find = [
-                "command:name",
+			$find = [
+				'command:name',
 				"app:{$cli_name}",
 			];
 			
