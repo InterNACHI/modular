@@ -98,7 +98,7 @@ class AutoDiscoveryHelper
 
 		$location_v2 = $finder->inOrEmpty($this->base_path.'/*/src/Http/Livewire');
 
-		if($location_v2->isNotEmpty()) {
+		if ($location_v2->isNotEmpty()) {
 			return $location_v2;
 		}
 
