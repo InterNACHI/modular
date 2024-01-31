@@ -86,6 +86,6 @@ class DatabaseFactoryHelper
 		
 		$reflection->setAccessible(true);
 		
-		$reflection->setValue(null);
+		$reflection->setValue( null, null);
 	}
 }
