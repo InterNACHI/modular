@@ -93,8 +93,16 @@ class AutoDiscoveryHelper
 	
 	public function livewireComponentFileFinder(): FinderCollection
 	{
+		$directory = $this->base_path.'/*/src';
+
+		if (str_contains(config('livewire.class_namespace'), '\\Http\\')) {
+			$directory .= '/Http';
+		}
+
+		$directory .= '/Livewire';
+
 		return FinderCollection::forFiles()
 			->name('*.php')
-			->inOrEmpty($this->base_path.'/*/src/Http/Livewire');
+			->inOrEmpty($directory);
 	}
 }
