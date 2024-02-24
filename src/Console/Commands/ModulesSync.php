@@ -73,8 +73,6 @@ class ModulesSync extends Command
 		$directory->addAttribute('suffix', 'Test.php');
 		$directory[0] = "./{$modules_directory}/*/tests";
 		
-		$config->formatOutput = true;
-		
 		$this->filesystem->put($config_path, $config->asXML());
 		$this->info('Added "Modules" PHPUnit test suite.');
 	}
