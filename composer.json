@@ -26,9 +26,9 @@
         "orchestra/testbench": "^7.10|^8|8.x-dev|9.x-dev|dev-master",
         "friendsofphp/php-cs-fixer": "^3.14",
         "mockery/mockery": "^1.5",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9.5|^10.5",
         "ext-json": "*",
-        "livewire/livewire": "^2.5"
+        "livewire/livewire": "^2.5|^3.4"
     },
     "autoload": {
         "psr-4": {
