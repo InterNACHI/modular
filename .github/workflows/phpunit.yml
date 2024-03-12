@@ -55,7 +55,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require --no-progress --no-interaction --prefer-dist --update-with-all-dependencies "laravel/framework:${{ matrix.laravel }}"
+          composer require --no-progress --no-interaction --prefer-dist --update-with-all-dependencies "illuminate/support:${{ matrix.laravel }}"
+          cat composer.json
           composer update --no-progress --no-interaction --prefer-dist --with-all-dependencies --prefer-${{ matrix.dependency-version }}
 
       - name: Execute tests
