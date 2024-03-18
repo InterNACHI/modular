@@ -19,10 +19,10 @@ class MakeCommand extends ConsoleMakeCommand
 			$cli_name = Str::of($name)->classBasename()->kebab();
 			
 			$find = [
-				"{{command}}",
-				"{{ command }}",
-				"dummy:command",
-				"command:name",
+				'{{command}}',
+				'{{ command }}',
+				'dummy:command',
+				'command:name',
 				"app:{$cli_name}",
 			];
 			
