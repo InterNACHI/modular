@@ -11,7 +11,7 @@ trait WritesToAppFilesystem
 	
 	protected string $last_test_modules_root = 'app-modules';
 	
-	#[Before]
+	/** @before */
 	public function cleanUpAppModules(): void
 	{
 		$this->beforeApplicationDestroyed(function() {
