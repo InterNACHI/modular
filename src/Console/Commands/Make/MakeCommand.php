@@ -13,10 +13,13 @@ class MakeCommand extends ConsoleMakeCommand
 	{
 		$module = $this->module();
 		
-		if ($module && 'command:name' === ($this->option('command') ?: 'command:name')) {
+		$stub = parent::replaceClass($stub, $name);
+		
+		if ($module) {
 			$cli_name = Str::of($name)->classBasename()->kebab();
 			
 			$find = [
+				"{{command}}",
 				"{{ command }}",
 				"dummy:command",
 				"command:name",
@@ -26,6 +29,6 @@ class MakeCommand extends ConsoleMakeCommand
 			$stub = str_replace($find, "{$module->name}:{$cli_name}", $stub);
 		}
 		
-		return parent::replaceClass($stub, $name);
+		return $stub;
 	}
 }
