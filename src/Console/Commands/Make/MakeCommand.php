@@ -13,7 +13,7 @@ class MakeCommand extends ConsoleMakeCommand
 	{
 		$module = $this->module();
 		
-		if ($module && (! $this->option('command') || 'command:name' === $this->option('command'))) {
+		if ($module && 'command:name' === ($this->option('command') ?: 'command:name')) {
 			$cli_name = Str::of($name)->classBasename()->kebab();
 			
 			$find = [
