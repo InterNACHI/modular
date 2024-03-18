@@ -22,7 +22,7 @@ class MakeCommand extends ConsoleMakeCommand
 				"signature = 'app:{$cli_name}'",
 			];
 			
-			$stub = str_replace($find, "{$module->name}:{$cli_name}", $stub);
+			$stub = str_replace($find, "signature = '{$module->name}:{$cli_name}'", $stub);
 		}
 		
 		return $stub;
