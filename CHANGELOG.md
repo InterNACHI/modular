@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added support for Laravel 11
+- Added support for event discovery
+
+### Fixed
+
+- Fixed an error with how module command signatures were set
+
+## [2.0.0] - 2023-05-19
 
 ### Changed
 
