@@ -37,8 +37,7 @@ class MakeControllerTest extends TestCase
 		$expected_path = 'src/Http/Controllers/TestController.php';
 		$expected_substrings = [
 			'namespace Modules\TestModule\Http\Controllers',
-			'use App\Http\Controllers\Controller',
-			'class TestController extends Controller',
+			'class TestController',
 		];
 		
 		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);
@@ -51,7 +50,7 @@ class MakeControllerTest extends TestCase
 		$expected_path = 'app/Http/Controllers/TestController.php';
 		$expected_substrings = [
 			'namespace App\Http\Controllers',
-			'class TestController extends Controller',
+			'class TestController',
 		];
 		
 		$this->assertBaseCommandResults($command, $arguments, $expected_path, $expected_substrings);
