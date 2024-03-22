@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The modules sync command now adds modules to PhpStorm exclude path, preventing double-registration of modules
+
+### Added
+
 - Added support for Laravel 11
 - Added support for event discovery
 
