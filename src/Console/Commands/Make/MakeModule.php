@@ -94,14 +94,14 @@ class MakeModule extends Command
 		$this->setUpStyles();
 		
 		$this->newLine();
-		
-		$this->ensureModulesDirectoryExists();
-		
-		if ($this->shouldAbortToPublishConfig()) {
-			return 0;
-		}
-		
-		$this->writeStubs();
+
+        if ($this->shouldAbortToPublishConfig()) {
+            return 0;
+        }
+
+        $this->ensureModulesDirectoryExists();
+
+        $this->writeStubs();
 		$this->updateCoreComposerConfig();
 		
 		$this->call(ModulesClear::class);
