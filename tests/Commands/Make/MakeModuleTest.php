@@ -99,4 +99,17 @@ class MakeModuleTest extends TestCase
 		
 		$this->assertTrue($fs->isDirectory($this->getBasePath().'/app-modules/test-module-two'));
 	}
+
+    public function test_it_does_not_create_an_empty_directory_if_prompt_on_first_module_if_no_custom_namespace_is_set_is_rejected(): void
+    {
+        $fs = $this->filesystem();
+
+        $this->artisan(MakeModule::class, ['name' => 'test-module'])
+            ->expectsQuestion('Would you like to cancel and configure your module namespace first?', true)
+            ->assertExitCode(0);
+
+        Modules::reload();
+
+        $this->assertFalse($fs->isDirectory($this->getBasePath().'/app-modules/test-module'));
+    }
 }
