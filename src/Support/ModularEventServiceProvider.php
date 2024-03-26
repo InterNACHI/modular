@@ -19,8 +19,9 @@ class ModularEventServiceProvider extends EventServiceProvider
 	
 	public function shouldDiscoverEvents()
 	{
-		// We'll enable event discovery if it's enabled in the app namespace
-		return collect($this->app->getProviders(EventServiceProvider::class))
+		// We'll enable event discovery if it's enabled in the app namespace or set in the config
+		return config('app-modules.should_discover_events', false)
+            || collect($this->app->getProviders(EventServiceProvider::class))
 			->filter(fn (EventServiceProvider $provider) => str_starts_with(get_class($provider), $this->app->getNamespace()))
 			->contains(fn (EventServiceProvider $provider) => $provider->shouldDiscoverEvents());
 	}
