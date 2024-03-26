@@ -2,7 +2,9 @@
 
 namespace InterNACHI\Modular\Tests {
 	use App\Tests\ModularEventSeviceProviderTest\ForceEventDiscoveryProvider;
-	use Illuminate\Support\Facades\Event;
+    use App\Tests\ModularEventSeviceProviderTest\InheritedEventDiscoveryServiceProvider;
+    use Illuminate\Support\Facades\Config;
+    use Illuminate\Support\Facades\Event;
 	use InterNACHI\Modular\Support\ModularEventServiceProvider;
 	use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 	
@@ -10,7 +12,7 @@ namespace InterNACHI\Modular\Tests {
 	{
 		use WritesToAppFilesystem;
 		
-		public function test_it_discovers_event_listeners(): void
+		public function test_it_discovers_event_listeners_if_base_service_provider_discovers_events(): void
 		{
 			$module = $this->makeModule();
 			
@@ -41,6 +43,42 @@ namespace InterNACHI\Modular\Tests {
 			
 			$this->artisan('event:clear');
 		}
+
+        public function test_it_discovers_event_listeners_if_it_is_set_in_config(): void
+        {
+            $this->cleanUpAppModules();
+            $module = $this->makeModule();
+
+            $this->artisan('make:event', ['name' => 'TestEvent2', '--module' => $module->name]);
+            $this->artisan('make:listener', ['name' => 'TestEvent2Listener', '--event' => $module->qualify('Events\\TestEvent2'), '--module' => $module->name]);
+
+            // Because these are created after autoloading has finished, we need to manually load them
+            require $module->path('src/Events/TestEvent2.php');
+            require $module->path('src/Listeners/TestEvent2Listener.php');
+
+
+            Config::set('app-modules.should_discover_events', true);
+
+            $this->app->register(new InheritedEventDiscoveryServiceProvider($this->app));
+            $this->app->register(new ModularEventServiceProvider($this->app), true);
+
+            $this->assertNotEmpty(Event::getListeners($module->qualify('Events\\TestEvent2')));
+
+            // Also check that the events are cached correctly
+
+            $this->artisan('event:cache');
+
+            $cache = require $this->app->getCachedEventsPath();
+
+            $this->assertArrayHasKey($module->qualify('Events\\TestEvent2'), $cache[ModularEventServiceProvider::class]);
+
+            $this->assertContains(
+                $module->qualify('Listeners\\TestEvent2Listener@handle'),
+                $cache[ModularEventServiceProvider::class][$module->qualify('Events\\TestEvent2')]
+            );
+
+            $this->artisan('event:clear');
+        }
 	}
 }
 
@@ -56,4 +94,8 @@ namespace App\Tests\ModularEventSeviceProviderTest {
 			return true;
 		}
 	}
+
+    class InheritedEventDiscoveryServiceProvider extends EventServiceProvider
+    {
+    }
 }
