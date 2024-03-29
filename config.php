@@ -78,4 +78,15 @@ return [
 	*/
 	
 	'stubs' => null,
+
+    /*
+	|--------------------------------------------------------------------------
+	| Only installed
+	|--------------------------------------------------------------------------
+	|
+	| This allows you to disable the module completely and only use those
+    | installed in composer. By default, all modules are autoload.
+	|
+	*/
+    'only_installed' => false,
 ];
