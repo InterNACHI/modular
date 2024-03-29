@@ -9,7 +9,7 @@ use Illuminate\Filesystem\Filesystem;
 class AutoDiscoveryHelper
 {
 	protected string $base_path;
-    protected array $installed_packages = [];
+	protected array $installed_packages = [];
 	
 	public function __construct(
 		protected ModuleRegistry $module_registry,
