@@ -5,7 +5,7 @@
 .php-cs-fixer.cache
 .composer-history
 
-/vendor
+/vendor*
 /node_modules
 
 .env
