@@ -125,8 +125,8 @@ return (new PhpCsFixer\Config())
 			->exclude('bin')
 			->exclude('node_modules')
 			->exclude('vendor')
-			->exclude('vendor-10')
-			->exclude('vendor-11')
+			->exclude('vendor-10') // used for local offline testing
+			->exclude('vendor-11') // used for local offline testing
 			->notPath('.phpstorm.meta.php')
 			->notPath('_ide_helper.php')
 			->notPath('artisan')
