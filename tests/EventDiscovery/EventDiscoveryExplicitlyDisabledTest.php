@@ -5,13 +5,13 @@
 
 namespace InterNACHI\Modular\Tests\EventDiscovery {
 	
-	use App\Laravel10EventDiscoveryImplicitlyDisabledTestProvider;
+	use App\EventDiscoveryExplicitlyDisabledTestProvider;
 	use Illuminate\Support\Facades\Event;
 	use InterNACHI\Modular\Support\Facades\Modules;
 	use InterNACHI\Modular\Tests\Concerns\PreloadsAppModules;
 	use InterNACHI\Modular\Tests\TestCase;
 	
-	class Laravel10EventDiscoveryImplicitlyDisabledTest extends TestCase
+	class EventDiscoveryExplicitlyDisabledTest extends TestCase
 	{
 		use PreloadsAppModules;
 		
@@ -20,7 +20,6 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 			parent::setUp();
 			
 			$this->beforeApplicationDestroyed(fn() => $this->artisan('event:clear'));
-			$this->requiresLaravelVersion('11.0.0', '<');
 		}
 		
 		public function test_it_does_not_auto_discover_event_listeners(): void
@@ -35,14 +34,21 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 			
 			$cache = require $this->app->getCachedEventsPath();
 			
-			$this->assertEmpty($cache[Laravel10EventDiscoveryImplicitlyDisabledTestProvider::class]);
+			$this->assertEmpty($cache[EventDiscoveryExplicitlyDisabledTestProvider::class]);
 			
 			$this->artisan('event:clear');
 		}
 		
 		protected function getPackageProviders($app)
 		{
-			return array_merge([Laravel10EventDiscoveryImplicitlyDisabledTestProvider::class], parent::getPackageProviders($app));
+			return array_merge([EventDiscoveryExplicitlyDisabledTestProvider::class], parent::getPackageProviders($app));
+		}
+		
+		protected function resolveApplicationConfiguration($app)
+		{
+			parent::resolveApplicationConfiguration($app);
+			
+			$app['config']['app-modules.should_discover_events'] = false;
 		}
 	}
 }
@@ -53,11 +59,11 @@ namespace App {
 	
 	use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 	
-	class Laravel10EventDiscoveryImplicitlyDisabledTestProvider extends EventServiceProvider
+	class EventDiscoveryExplicitlyDisabledTestProvider extends EventServiceProvider
 	{
 		public function shouldDiscoverEvents()
 		{
-			return false;
+			return true;
 		}
 	}
 }

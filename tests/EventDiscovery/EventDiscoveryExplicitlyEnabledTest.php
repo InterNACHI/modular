@@ -5,13 +5,13 @@
 
 namespace InterNACHI\Modular\Tests\EventDiscovery {
 	
-	use App\Laravel10EventDiscoveryExplicitlyEnabledTestProvider;
+	use App\EventDiscoveryExplicitlyEnabledTestProvider;
 	use Illuminate\Support\Facades\Event;
 	use InterNACHI\Modular\Support\Facades\Modules;
 	use InterNACHI\Modular\Tests\Concerns\PreloadsAppModules;
 	use InterNACHI\Modular\Tests\TestCase;
 	
-	class Laravel10EventDiscoveryExplicitlyEnabledTest extends TestCase
+	class EventDiscoveryExplicitlyEnabledTest extends TestCase
 	{
 		use PreloadsAppModules;
 		
@@ -20,7 +20,6 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 			parent::setUp();
 			
 			$this->beforeApplicationDestroyed(fn() => $this->artisan('event:clear'));
-			$this->requiresLaravelVersion('11.0.0', '<');
 		}
 		
 		public function test_it_auto_discovers_event_listeners(): void
@@ -35,11 +34,11 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 			
 			$cache = require $this->app->getCachedEventsPath();
 			
-			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[Laravel10EventDiscoveryExplicitlyEnabledTestProvider::class]);
+			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[EventDiscoveryExplicitlyEnabledTestProvider::class]);
 			
 			$this->assertContains(
 				$module->qualify('Listeners\\TestEventListener@handle'),
-				$cache[Laravel10EventDiscoveryExplicitlyEnabledTestProvider::class][$module->qualify('Events\\TestEvent')]
+				$cache[EventDiscoveryExplicitlyEnabledTestProvider::class][$module->qualify('Events\\TestEvent')]
 			);
 			
 			$this->artisan('event:clear');
@@ -47,7 +46,7 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 		
 		protected function getPackageProviders($app)
 		{
-			return array_merge([Laravel10EventDiscoveryExplicitlyEnabledTestProvider::class], parent::getPackageProviders($app));
+			return array_merge([EventDiscoveryExplicitlyEnabledTestProvider::class], parent::getPackageProviders($app));
 		}
 		
 		protected function resolveApplicationConfiguration($app)
@@ -65,7 +64,7 @@ namespace App {
 	
 	use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 	
-	class Laravel10EventDiscoveryExplicitlyEnabledTestProvider extends EventServiceProvider
+	class EventDiscoveryExplicitlyEnabledTestProvider extends EventServiceProvider
 	{
 		public function shouldDiscoverEvents()
 		{

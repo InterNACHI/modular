@@ -31,7 +31,9 @@ trait PreloadsAppModules
 						$fqcn
 					);
 					$path = static::applicationBasePath().'/app-modules/test-module/src/'.$path.'.php';
-					include_once $path;
+					if (file_exists($path)) {
+						include_once $path;
+					}
 				}
 			});
 		}
