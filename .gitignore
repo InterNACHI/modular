@@ -6,6 +6,7 @@
 .composer-history
 
 /vendor
+/vendor*
 /node_modules
 
 .env

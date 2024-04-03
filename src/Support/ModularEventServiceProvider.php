@@ -21,6 +21,10 @@ class ModularEventServiceProvider extends ServiceProvider
 			$events = $this->getEvents();
 			$provider = Arr::first($this->app->getProviders(EventServiceProvider::class));
 			
+			if (! $provider) {
+				return;
+			}
+			
 			$listen = new ReflectionProperty($provider, 'listen');
 			$listen->setAccessible(true);
 			$listen->setValue($provider, array_merge_recursive($listen->getValue($provider), $events));

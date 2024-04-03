@@ -12,13 +12,12 @@ trait WritesToAppFilesystem
 	protected string $last_test_modules_root = 'app-modules';
 	
 	/** @before */
-	public function prepareTestModule(): void
+	public function cleanUpAppModules(): void
 	{
-		$src = __DIR__.'/../testbench-core/app-modules';
-		$dest = static::applicationBasePath().'/app-modules';
-		
-		$this->filesystem()->deleteDirectory($dest);
-		$this->filesystem()->copyDirectory($src, $dest);
+		$this->beforeApplicationDestroyed(function() {
+			$modules_path = static::applicationBasePath().'/'.$this->last_test_modules_root;
+			$this->filesystem()->deleteDirectory($modules_path);
+		});
 	}
 	
 	protected function filesystem(): Filesystem

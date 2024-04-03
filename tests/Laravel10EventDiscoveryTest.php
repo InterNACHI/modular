@@ -4,26 +4,26 @@ namespace InterNACHI\Modular\Tests {
 	
 	use App\Tests\ModularEventSeviceProviderTest\ForceEventDiscoveryProvider;
 	use Illuminate\Support\Facades\Event;
+	use InterNACHI\Modular\Support\Facades\Modules;
 	use InterNACHI\Modular\Support\ModularEventServiceProvider;
+	use InterNACHI\Modular\Tests\Concerns\PreloadsAppModules;
 	use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 	
-	class ModularEventServiceProviderTest extends TestCase
+	class Laravel10EventDiscoveryTest extends TestCase
 	{
-		use WritesToAppFilesystem;
+		use PreloadsAppModules;
 		
-		public function test_it_discovers_event_listeners(): void
+		protected function setUp(): void
 		{
-			$module = $this->makeModule();
+			parent::setUp();
 			
-			$this->artisan('make:event', ['name' => 'TestEvent', '--module' => $module->name]);
-			$this->artisan('make:listener', ['name' => 'TestEventListener', '--event' => $module->qualify('Events\\TestEvent'), '--module' => $module->name]);
-			
-			// Because these are created after autoloading has finished, we need to manually load them
-			require $module->path('src/Events/TestEvent.php');
-			require $module->path('src/Listeners/TestEventListener.php');
-			
-			$this->app->register(new ForceEventDiscoveryProvider($this->app));
-			$this->app->register(new ModularEventServiceProvider($this->app), true);
+			$this->beforeApplicationDestroyed(fn() => $this->artisan('event:clear'));
+			$this->requiresLaravelVersion('11.0.0', '<');
+		}
+		
+		public function test_it_auto_discovers_event_listeners(): void
+		{
+			$module = Modules::module('test-module');
 			
 			$this->assertNotEmpty(Event::getListeners($module->qualify('Events\\TestEvent')));
 			
@@ -33,14 +33,19 @@ namespace InterNACHI\Modular\Tests {
 			
 			$cache = require $this->app->getCachedEventsPath();
 			
-			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[ModularEventServiceProvider::class]);
+			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[ForceEventDiscoveryProvider::class]);
 			
 			$this->assertContains(
 				$module->qualify('Listeners\\TestEventListener@handle'),
-				$cache[ModularEventServiceProvider::class][$module->qualify('Events\\TestEvent')]
+				$cache[ForceEventDiscoveryProvider::class][$module->qualify('Events\\TestEvent')]
 			);
 			
 			$this->artisan('event:clear');
+		}
+		
+		protected function getPackageProviders($app)
+		{
+			return array_merge([ForceEventDiscoveryProvider::class], parent::getPackageProviders($app));
 		}
 	}
 }
