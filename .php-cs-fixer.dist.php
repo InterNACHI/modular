@@ -10,6 +10,7 @@ return (new PhpCsFixer\Config())
 		'@PSR2' => true,
 		'function_declaration' => [
 			'closure_function_spacing' => 'none',
+			'closure_fn_spacing' => 'none',
 		],
 		'ordered_imports' => [
 			'sort_algorithm' => 'alpha',
@@ -124,6 +125,8 @@ return (new PhpCsFixer\Config())
 			->exclude('bin')
 			->exclude('node_modules')
 			->exclude('vendor')
+			->exclude('vendor-10')
+			->exclude('vendor-11')
 			->notPath('.phpstorm.meta.php')
 			->notPath('_ide_helper.php')
 			->notPath('artisan')
