@@ -190,7 +190,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		]);
 		
 		$resolved = $this->helper->listenerDirectoryFinder()
-			->map(fn (SplFileInfo $directory) => str_replace('\\', '/', $directory->getPathname()))
+			->map(fn(SplFileInfo $directory) => str_replace('\\', '/', $directory->getPathname()))
 			->all();
 		
 		$this->assertContains($this->module1->path('src/Listeners'), $resolved);
