@@ -95,13 +95,13 @@ class MakeModule extends Command
 		
 		$this->newLine();
 
-        if ($this->shouldAbortToPublishConfig()) {
-            return 0;
-        }
+		if ($this->shouldAbortToPublishConfig()) {
+			return 0;
+		}
 
-        $this->ensureModulesDirectoryExists();
+		$this->ensureModulesDirectoryExists();
 
-        $this->writeStubs();
+		$this->writeStubs();
 		$this->updateCoreComposerConfig();
 		
 		$this->call(ModulesClear::class);
