@@ -21,7 +21,7 @@ class ModularEventServiceProvider extends ServiceProvider
 			$events = $this->getEvents();
 			$provider = Arr::first($this->app->getProviders(EventServiceProvider::class));
 			
-			if (! $provider) {
+			if (! $provider || empty($events)) {
 				return;
 			}
 			

@@ -1,15 +1,17 @@
 <?php
 
-namespace InterNACHI\Modular\Tests {
+// Because we need to preload files before TestBench boots the app,
+// this needs to be its own isolated test file.
+
+namespace InterNACHI\Modular\Tests\EventDiscovery {
 	
-	use App\Tests\ModularEventSeviceProviderTest\ForceEventDiscoveryProvider;
+	use App\Laravel10EventDiscoveryImplicitlyEnabledTestProvider;
 	use Illuminate\Support\Facades\Event;
 	use InterNACHI\Modular\Support\Facades\Modules;
-	use InterNACHI\Modular\Support\ModularEventServiceProvider;
 	use InterNACHI\Modular\Tests\Concerns\PreloadsAppModules;
-	use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
+	use InterNACHI\Modular\Tests\TestCase;
 	
-	class Laravel10EventDiscoveryTest extends TestCase
+	class Laravel10EventDiscoveryImplicitlyEnabledTest extends TestCase
 	{
 		use PreloadsAppModules;
 		
@@ -33,11 +35,11 @@ namespace InterNACHI\Modular\Tests {
 			
 			$cache = require $this->app->getCachedEventsPath();
 			
-			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[ForceEventDiscoveryProvider::class]);
+			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[Laravel10EventDiscoveryImplicitlyEnabledTestProvider::class]);
 			
 			$this->assertContains(
 				$module->qualify('Listeners\\TestEventListener@handle'),
-				$cache[ForceEventDiscoveryProvider::class][$module->qualify('Events\\TestEvent')]
+				$cache[Laravel10EventDiscoveryImplicitlyEnabledTestProvider::class][$module->qualify('Events\\TestEvent')]
 			);
 			
 			$this->artisan('event:clear');
@@ -45,18 +47,18 @@ namespace InterNACHI\Modular\Tests {
 		
 		protected function getPackageProviders($app)
 		{
-			return array_merge([ForceEventDiscoveryProvider::class], parent::getPackageProviders($app));
+			return array_merge([Laravel10EventDiscoveryImplicitlyEnabledTestProvider::class], parent::getPackageProviders($app));
 		}
 	}
 }
 
 // We need to use an "App" namespace to tell modular that this provider should be deferred to
 
-namespace App\Tests\ModularEventSeviceProviderTest {
+namespace App {
 	
 	use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 	
-	class ForceEventDiscoveryProvider extends EventServiceProvider
+	class Laravel10EventDiscoveryImplicitlyEnabledTestProvider extends EventServiceProvider
 	{
 		public function shouldDiscoverEvents()
 		{
