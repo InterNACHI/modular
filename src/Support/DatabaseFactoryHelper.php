@@ -5,7 +5,7 @@ namespace InterNACHI\Modular\Support;
 use Closure;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use ReflectionProperty;
+use ReflectionClass;
 
 class DatabaseFactoryHelper
 {
@@ -73,19 +73,13 @@ class DatabaseFactoryHelper
 	
 	protected function getProperty($target, $property)
 	{
-		$reflection = new ReflectionProperty($target, $property);
-		
-		$reflection->setAccessible(true);
-		
-		return $reflection->getValue();
+		$reflection = new ReflectionClass($target);
+		return $reflection->getStaticPropertyValue($property);
 	}
 	
 	protected function unsetProperty($target, $property): void
 	{
-		$reflection = new ReflectionProperty($target, $property);
-		
-		$reflection->setAccessible(true);
-		
-		$reflection->setValue(null);
+		$reflection = new ReflectionClass($target);
+		$reflection->setStaticPropertyValue($property, null);
 	}
 }
