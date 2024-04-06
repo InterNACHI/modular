@@ -9,6 +9,7 @@ use InterNACHI\Modular\Tests\TestCase;
 use Livewire\Livewire;
 use Livewire\LivewireManager;
 use Livewire\LivewireServiceProvider;
+use Livewire\Mechanisms\Mechanism;
 
 class MakeLivewireTest extends TestCase
 {
@@ -21,6 +22,10 @@ class MakeLivewireTest extends TestCase
 
 		if (! class_exists(Livewire::class)) {
 			$this->markTestSkipped('Livewire is not installed.');
+		}
+		
+		if (class_exists(Mechanism::class)) {
+			$this->markTestSkipped('Livewire 3 is not yet supported.');
 		}
 	}
 	

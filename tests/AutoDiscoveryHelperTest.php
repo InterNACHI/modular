@@ -11,7 +11,9 @@ use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Support\AutoDiscoveryHelper;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
+use Livewire\Livewire;
 use Livewire\LivewireServiceProvider;
+use Livewire\Mechanisms\Mechanism;
 use Symfony\Component\Finder\SplFileInfo;
 
 class AutoDiscoveryHelperTest extends TestCase
@@ -188,7 +190,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		]);
 		
 		$resolved = $this->helper->listenerDirectoryFinder()
-			->map(fn (SplFileInfo $directory) => str_replace('\\', '/', $directory->getPathname()))
+			->map(fn(SplFileInfo $directory) => str_replace('\\', '/', $directory->getPathname()))
 			->all();
 		
 		$this->assertContains($this->module1->path('src/Listeners'), $resolved);
@@ -197,6 +199,14 @@ class AutoDiscoveryHelperTest extends TestCase
 	
 	public function test_it_finds_livewire_component(): void
 	{
+		if (! class_exists(Livewire::class)) {
+			$this->markTestSkipped('Livewire is not installed.');
+		}
+		
+		if (class_exists(Mechanism::class)) {
+			$this->markTestSkipped('Livewire 3 is not yet supported.');
+		}
+		
 		$this->artisan(MakeLivewire::class, [
 			'name' => 'TestComponent',
 			'--module' => $this->module1->name,

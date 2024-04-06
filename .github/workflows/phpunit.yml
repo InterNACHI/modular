@@ -12,21 +12,16 @@ jobs:
       matrix:
         dependency-version: [ stable, lowest ]
         os: [ ubuntu-latest, windows-latest ]
-        laravel: [ ^9.50.2, 10.* ]
-        php: [ 8.0, 8.1, 8.2 ]
-        include:
-          - laravel: ^9.50.2
-            testbench: ^7.22
-          - laravel: 10.*
-            testbench: 8.*
+        laravel: [ 10.*, 11.* ]
+        php: [ 8.1, 8.2, 8.3 ]
         exclude:
-          - php: 8.0
-            laravel: 10.*
+          - php: 8.1
+            laravel: 11.*
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
 
-    name: "${{ matrix.os }} Laravel:${{ matrix.laravel }} PHP:${{ matrix.php }} (${{ matrix.dependency-version }})"
+    name: "${{ matrix.php }} / ${{ matrix.laravel }} (${{ matrix.dependency-version }})"
 
     steps:
       - name: Checkout code
@@ -55,10 +50,9 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer require --no-interaction --prefer-dist --no-update "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}"
-      
-      - name: Set dependency version
-        run: composer update --no-interaction --prefer-dist --with-all-dependencies --prefer-${{ matrix.dependency-version }}
+        run: |
+          composer require --no-progress --no-interaction --prefer-dist --update-with-all-dependencies "illuminate/support:${{ matrix.laravel }}"
+          composer update --no-progress --no-interaction --prefer-dist --with-all-dependencies --prefer-${{ matrix.dependency-version }}
 
       - name: Execute tests
-        run: vendor/bin/phpunit -v
+        run: vendor/bin/phpunit
