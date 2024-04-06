@@ -43,13 +43,13 @@
 
 `internachi/modular` is a module system for Laravel applications. It uses
 [Composer path repositories](https://getcomposer.org/doc/05-repositories.md#path) for autoloading, 
-and [Laravel package discovery](https://laravel.com/docs/7.x/packages#package-discovery) for module
+and [Laravel package discovery](https://laravel.com/docs/11.x/packages#package-discovery) for module
 initialization, and then provides minimal tooling to fill in any gaps.
 
 This project is as much a set of conventions as it is a package. The fundamental idea
 is that you can create “modules” in a separate `app-modules/` directory, which allows you to
 better organize large projects. These modules use the existing 
-[Laravel package system](https://laravel.com/docs/7.x/packages), and follow existing Laravel
+[Laravel package system](https://laravel.com/docs/11.x/packages), and follow existing Laravel
 conventions.
 
 - [Walkthrough Video](#walkthrough-video)
@@ -67,7 +67,7 @@ To get started, run:
 
 ```shell script
 composer require internachi/modular
-``` 
+```
 
 Laravel will auto-discover the package and everything will be automatically set up for you.
 
@@ -89,7 +89,7 @@ php artisan vendor:publish --tag=modular-config
 Next, let's create a module:
 
 ```shell script
-php artisan make:module my-module 
+php artisan make:module my-module
 ```
 
 Modular will scaffold up a new module for you:
@@ -160,7 +160,7 @@ We provide a few helper commands:
 
 We also add a `--module=` option to most Laravel `make:` commands so that you can
 use all the existing tooling that you know. The commands themselves are exactly the
-same, which means you can use your [custom stubs](https://laravel.com/docs/7.x/artisan#stub-customization)
+same, which means you can use your [custom stubs](https://laravel.com/docs/11.x/artisan#stub-customization)
 and everything else Laravel provides:
 
 - `php artisan make:cast MyModuleCast --module=[module name]`
@@ -251,4 +251,4 @@ If you are building a CMS that needs to support 3rd-party modules that can be dy
 enabled and disabled, Laravel Modules will be a better fit.
 
 On the other hand, if you're mostly interested in modules for organization, and want to
-stick closely to Laravel conventions, we’d highly recommend giving InterNACHI/Modular a try! 
+stick closely to Laravel conventions, we’d highly recommend giving InterNACHI/Modular a try!
