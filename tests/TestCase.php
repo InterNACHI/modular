@@ -6,6 +6,7 @@ use Illuminate\Encryption\Encrypter;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
 use InterNACHI\Modular\Support\DatabaseFactoryHelper;
 use InterNACHI\Modular\Support\Facades\Modules;
+use InterNACHI\Modular\Support\ModularEventServiceProvider;
 use InterNACHI\Modular\Support\ModularizedCommandsServiceProvider;
 use InterNACHI\Modular\Support\ModularServiceProvider;
 use InterNACHI\Modular\Support\ModuleConfig;
@@ -45,10 +46,10 @@ abstract class TestCase extends Orchestra
 		return Modules::module($name);
 	}
 	
-	protected function requiresLaravelVersion(string $minimum_version)
+	protected function requiresLaravelVersion(string $minimum_version, string $operator = '>=')
 	{
-		if (version_compare($this->app->version(), $minimum_version, '<')) {
-			$this->markTestSkipped("Only applies to Laravel {$minimum_version} and above.");
+		if (! version_compare($this->app->version(), $minimum_version, $operator)) {
+			$this->markTestSkipped("Only applies to Laravel {$operator} {$minimum_version}.");
 		}
 		
 		return $this;
@@ -59,6 +60,7 @@ abstract class TestCase extends Orchestra
 		return [
 			ModularServiceProvider::class,
 			ModularizedCommandsServiceProvider::class,
+			ModularEventServiceProvider::class,
 		];
 	}
 	
