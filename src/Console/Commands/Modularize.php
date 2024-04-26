@@ -23,7 +23,7 @@ trait Modularize
 		$module = $this->option('module');
 
 		if ($module !== false) {
-			$modules = $this->moduleRegistry()->modules()->keys()->mapWithKeys(fn($module) => [$module => $module])->toArray();
+			$modules = $this->moduleRegistry()->modules()->keys();
 
 			$this->module = (null === $module || $module === '')
 				? (string) select('Which module?', $modules)
