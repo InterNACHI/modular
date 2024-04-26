@@ -4,36 +4,61 @@ namespace InterNACHI\Modular\Console\Commands;
 
 use InterNACHI\Modular\Support\ModuleConfig;
 use InterNACHI\Modular\Support\ModuleRegistry;
+use function Laravel\Prompts\select;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputOption;
 
 trait Modularize
 {
+	protected ?string $module = null;
+
+	private function moduleRegistry(): ModuleRegistry
+	{
+		return $this->getLaravel()->make(ModuleRegistry::class);
+	}
+
+	public function handle()
+	{
+		/** @var false|string|null $module */
+		$module = $this->option('module');
+
+		if ($module !== false) {
+			$modules = $this->moduleRegistry()->modules()->keys()->mapWithKeys(fn($module) => [$module => $module])->toArray();
+
+			$this->module = (null === $module || $module === '')
+				? (string) select('Which module?', $modules)
+				: $module;
+		}
+
+		parent::handle();
+	}
+
 	protected function module(): ?ModuleConfig
 	{
-		if ($name = $this->option('module')) {
-			$registry = $this->getLaravel()->make(ModuleRegistry::class);
-			
-			if ($module = $registry->module($name)) {
-				return $module;
-			}
-			
-			throw new InvalidOptionException(sprintf('The "%s" module does not exist.', $name));
+		if ($this->module === null) {
+			return null;
 		}
-		
-		return null;
+
+		$config = $this->moduleRegistry()->module($this->module);
+
+		if ($config === null) {
+			throw new InvalidOptionException(sprintf('The "%s" module does not exist.', $this->module));
+		}
+
+		return $config;
 	}
-	
+
 	protected function configure()
 	{
 		parent::configure();
-		
+
 		$this->getDefinition()->addOption(
 			new InputOption(
 				'--module',
 				null,
-				InputOption::VALUE_REQUIRED,
-				'Run inside an application module'
+				InputOption::VALUE_OPTIONAL,
+				'Run inside an application module',
+				false
 			)
 		);
 	}
