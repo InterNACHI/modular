@@ -16,18 +16,11 @@ class AutoDiscoveryHelper
 		protected Filesystem $filesystem
 	) {
 		$this->base_path = $module_registry->getModulesPath();
-
-        if (config('app-modules.only_installed')) {
-            $this->installed_packages = InstalledVersions::getInstalledPackages();
-        }
+		$this->installed_packages = InstalledVersions::getInstalledPackages();
 	}
 
     private function dirs(string $postfix): array|string
     {
-        if (!config('app-modules.only_installed')) {
-            return $this->base_path. '/*/' .$postfix;
-        }
-
         $directories = [];
         foreach ($this->installed_packages as $installed_package) {
             if (Str::startsWith($installed_package, config('app-modules.modules_directory'))) {
