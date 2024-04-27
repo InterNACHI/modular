@@ -78,7 +78,7 @@ return [
 	*/
 	
 	'stubs' => null,
-
+	
 	/*
 	|--------------------------------------------------------------------------
 	| Custom override of event discovery
@@ -89,6 +89,6 @@ return [
 	| discovery, set this to true. We will still check the app namespace for
 	| the presence of event discovery.
 	*/
-
+	
 	'should_discover_events' => null,
 ];
