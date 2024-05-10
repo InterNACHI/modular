@@ -19,15 +19,10 @@ trait Modularize
 
 	public function handle()
 	{
-		/** @var false|string|null $module */
-		$module = $this->option('module');
-
-		if ($module !== false) {
+		if ($this->input->hasParameterOption('--module')) {
 			$modules = $this->moduleRegistry()->modules()->keys();
 
-			$this->module = (null === $module || $module === '')
-				? (string) select('Which module?', $modules)
-				: $module;
+			$this->module = $this->option('module') ?: (string) select('Which module?', $modules);
 		}
 
 		parent::handle();
