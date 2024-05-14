@@ -73,15 +73,35 @@ class ModularServiceProvider extends ServiceProvider
 	
 	public function boot(): void
 	{
-		$this->publishVendorFiles();
-		$this->bootPackageCommands();
-		
-		$this->bootRoutes();
-		$this->bootBreadcrumbs();
-		$this->bootViews();
-		$this->bootBladeComponents();
-		$this->bootTranslations();
-		$this->bootLivewireComponents();
+        $this->publishVendorFiles();
+
+        if ($this->shouldDiscover('commands')) {
+            $this->bootPackageCommands();
+        }
+
+        if ($this->shouldDiscover('routes')) {
+            $this->bootRoutes();
+        }
+
+        if ($this->shouldDiscover('breadcrumbs')) {
+            $this->bootBreadcrumbs();
+        }
+
+        if ($this->shouldDiscover('views')) {
+            $this->bootViews();
+        }
+
+        if ($this->shouldDiscover('blade_components')) {
+            $this->bootBladeComponents();
+        }
+
+        if ($this->shouldDiscover('translations')) {
+            $this->bootTranslations();
+        }
+
+        if ($this->shouldDiscover('livewire_components')) {
+            $this->bootLivewireComponents();
+        }
 	}
 	
 	protected function registry(): ModuleRegistry
@@ -92,7 +112,12 @@ class ModularServiceProvider extends ServiceProvider
 	protected function autoDiscoveryHelper(): AutoDiscoveryHelper
 	{
 		return $this->auto_discovery_helper ??= $this->app->make(AutoDiscoveryHelper::class);
-	}
+    }
+
+    protected function shouldDiscover(string $component): bool
+    {
+        return ! in_array($component,  config('app-modules.dont_discover', []));
+    }
 	
 	protected function publishVendorFiles(): void
 	{
@@ -102,7 +127,7 @@ class ModularServiceProvider extends ServiceProvider
 	}
 	
 	protected function bootPackageCommands(): void
-	{
+    {
 		if (! $this->app->runningInConsole()) {
 			return;
 		}

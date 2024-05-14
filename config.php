@@ -77,7 +77,7 @@ return [
 	| ],
 	*/
 	
-	'stubs' => null,
+    'stubs' => null,
 	
 	/*
 	|--------------------------------------------------------------------------
@@ -90,5 +90,27 @@ return [
 	| the presence of event discovery.
 	*/
 	
-	'should_discover_events' => null,
+    'should_discover_events' => null,
+
+    /*
+	|--------------------------------------------------------------------------
+    | Prevent automatic discovery of module components
+	|--------------------------------------------------------------------------
+    |
+    | This package automatically discovers different componets from the modules
+    | like commands, routes, views, translations, blade and livewire
+    | components, and breadcrumbs. If you want to prevent automatic discovery
+    | of specific components you can list them here in the 'dont_discover'
+    | array.
+    */
+
+    'dont_discover' => [
+        // 'commands',
+        // 'routes',
+        // 'views',
+        // 'translations',
+        // 'blade_components',
+        // 'livewire_components',
+        // 'breadcrumbs',
+    ],
 ];
