@@ -50,7 +50,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->app->singleton(ModuleRegistry::class, function() {
 			return new ModuleRegistry(
 				$this->getModulesBasePath(),
-				$this->app->bootstrapPath('cache/modules.php')
+				$this->app->bootstrapPath('cache/app_modules.php')
 			);
 		});
 		
