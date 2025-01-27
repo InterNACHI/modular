@@ -27,7 +27,7 @@ class ModuleRegistry
 		return $this->cache_path;
 	}
 	
-	public function module(string $name = null): ?ModuleConfig
+	public function module(?string $name = null): ?ModuleConfig
 	{
 		// We want to allow for gracefully handling empty/null names
 		return $name
