@@ -32,7 +32,7 @@ class ModuleConfig implements Arrayable
 	public function __construct(
 		public string $name,
 		public string $base_path,
-		Collection $namespaces = null
+		?Collection $namespaces = null
 	) {
 		$this->namespaces = $namespaces ?? new Collection();
 	}
