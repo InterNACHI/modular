@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added support for auto-aliasing module classes in tinker sessions
+
+## [2.2.0] - 2024-04-05
+
+### Added
+
 - The modules sync command now adds modules to PhpStorm exclude path, preventing double-registration of modules
+
+## [2.1.0] - 2024-03-18
 
 ### Added
 
