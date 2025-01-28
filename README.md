@@ -217,6 +217,9 @@ A few examples:
 | `app-modules/demo/resources/components/anonymous/index.blade.php`  | `<x-demo::anonymous />`        |
 | `app-modules/demo/resources/components/anonymous/nested.blade.php` | `<x-demo::anonymous.nested />` |
 
+Similar to how Blade components are accessed with a namespace, you can also retrieve translations from your module-specific language files. For instance, to access a translation key within the demo module, use the following:
+`echo __('demo::messages.welcome');`
+
 #### Customizing the Default Module Structure
 
 When you call `make:module`, Modular will scaffold some basic boilerplate for you. If you 
