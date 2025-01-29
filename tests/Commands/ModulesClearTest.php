@@ -15,7 +15,7 @@ class ModulesClearTest extends TestCase
 	{
 		$this->artisan(ModulesCache::class);
 		
-		$expected_path = $this->getBasePath().$this->normalizeDirectorySeparators('bootstrap/cache/modules.php');
+		$expected_path = $this->getBasePath().$this->normalizeDirectorySeparators('bootstrap/cache/app_modules.php');
 		
 		$this->assertFileExists($expected_path);
 		
