@@ -37,7 +37,7 @@ class MakeSeederTest extends TestCase
 			$expected_substrings[] = 'namespace Modules\TestModule\Database\Seeders;';
 		}
 		
-		$this->filesystem()->deleteDirectory($this->getBasePath().$this->normalizeDirectorySeparators('database/seeds'));
+		$this->filesystem()->deleteDirectory($this->getApplicationBasePath().$this->normalizeDirectorySeparators('database/seeds'));
 		$this->filesystem()->deleteDirectory($this->getModulePath('test-module', 'database/seeds'));
 		
 		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);
@@ -59,7 +59,7 @@ class MakeSeederTest extends TestCase
 			$expected_substrings[] = 'namespace Database\Seeders;';
 		}
 		
-		$this->filesystem()->deleteDirectory($this->getBasePath().$this->normalizeDirectorySeparators('database/seeds'));
+		$this->filesystem()->deleteDirectory($this->getApplicationBasePath().$this->normalizeDirectorySeparators('database/seeds'));
 		
 		$this->assertBaseCommandResults($command, $arguments, $expected_path, $expected_substrings);
 	}
