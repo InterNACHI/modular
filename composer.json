@@ -20,10 +20,10 @@
         "ext-simplexml": "*",
         "ext-dom": "*",
         "composer/composer": "^2.1",
-        "illuminate/support": "^9|^10|^11|12.x-dev|dev-master"
+        "illuminate/support": "10.*"
     },
     "require-dev": {
-        "orchestra/testbench": ">=7.10|dev-master",
+        "orchestra/testbench": "^7.52|^8.33|^9.11|dev-master|dev-main",
         "friendsofphp/php-cs-fixer": "^3.14",
         "mockery/mockery": "^1.5",
         "phpunit/phpunit": "^9.5|^10.5",

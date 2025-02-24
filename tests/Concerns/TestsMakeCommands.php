@@ -50,7 +50,7 @@ trait TestsMakeCommands
 	
 	protected function assertBaseFile($expected_path, $expected_substrings = [])
 	{
-		$full_path = $this->getBasePath().$this->normalizeDirectorySeparators($expected_path);
+		$full_path = $this->getApplicationBasePath().$this->normalizeDirectorySeparators($expected_path);
 		
 		$directory = dirname($full_path);
 		$files = implode(', ', glob($directory.'/*') ?? []);
