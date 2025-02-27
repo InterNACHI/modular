@@ -35,6 +35,7 @@ class DatabaseFactoryHelper
 			// Temporarily disable the modular resolver if we're not in a module
 			try {
 				$this->unsetProperty(Factory::class, 'modelNameResolver');
+				$this->unsetProperty(Factory::class, 'modelNameResolvers');
 				return $factory->modelName();
 			} finally {
 				Factory::guessModelNamesUsing($this->modelNameResolver());
@@ -80,6 +81,8 @@ class DatabaseFactoryHelper
 	protected function unsetProperty($target, $property): void
 	{
 		$reflection = new ReflectionClass($target);
-		$reflection->setStaticPropertyValue($property, null);
+		if ($reflection->hasProperty($property)) {
+			$reflection->setStaticPropertyValue($property, null);
+		}
 	}
 }
