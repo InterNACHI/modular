@@ -81,6 +81,8 @@ class DatabaseFactoryHelper
 	protected function unsetProperty($target, $property): void
 	{
 		$reflection = new ReflectionClass($target);
-		$reflection->setStaticPropertyValue($property, null);
+		if ($reflection->hasProperty($property)) {
+			$reflection->setStaticPropertyValue($property, null);
+		}
 	}
 }
