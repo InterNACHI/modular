@@ -23,7 +23,7 @@
         "illuminate/support": "^9|^10|^11|^12|13.x-dev|dev-master|dev-main"
     },
     "require-dev": {
-        "orchestra/testbench": "^7.52|^8.33|^9.11|dev-master|dev-main",
+        "orchestra/testbench": "^7.52|^8.33|^9.11|^10.0|dev-master|dev-main",
         "friendsofphp/php-cs-fixer": "^3.14",
         "mockery/mockery": "^1.5",
         "phpunit/phpunit": "^9.5|^10.5",
