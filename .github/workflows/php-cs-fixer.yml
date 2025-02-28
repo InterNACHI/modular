@@ -15,7 +15,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, bcmath, intl, iconv
 
       - name: Cache dependencies
@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         env:
           COMPOSER_DISCARD_CHANGES: true
-        run: composer require --no-suggest --no-progress --no-interaction --prefer-dist --update-with-all-dependencies "laravel/framework:^10.0" "orchestra/testbench:^8.0"
+        run: composer install --no-progress --no-interaction --prefer-dist
 
       - name: Run PHP CS Fixer
         run: ./vendor/bin/php-cs-fixer fix --diff --dry-run
