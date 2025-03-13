@@ -91,4 +91,15 @@ return [
 	*/
 	
 	'should_discover_events' => null,
+
+	/*
+	|--------------------------------------------------------------------------
+	| Custom cache filename
+	|--------------------------------------------------------------------------
+	|
+	| This is the filename of the cache file that will be used to store the modules configuration.
+	| 
+	*/
+
+	'cache_filename' => 'modules.php',
 ];
