@@ -202,7 +202,7 @@ that we support is Livewire. If you have Livewire installed, you can run:
 
 - `php artisan make:livewire counter --module=[module name]`
 
-#### Blade Components
+### Blade Components
 
 Your [Laravel Blade components](https://laravel.com/docs/blade#components) will be
 automatically registered for you under a [component namespace](https://laravel.com/docs/9.x/blade#manually-registering-package-components).
@@ -217,7 +217,17 @@ A few examples:
 | `app-modules/demo/resources/components/anonymous/index.blade.php`  | `<x-demo::anonymous />`        |
 | `app-modules/demo/resources/components/anonymous/nested.blade.php` | `<x-demo::anonymous.nested />` |
 
-#### Customizing the Default Module Structure
+### Translations
+
+Your [Laravel Translations](https://laravel.com/docs/11.x/localization#defining-translation-strings) will also
+be automatically registered under a component namespace for you. For example, if you have a translation file
+at:
+
+`app-modules/demo/resources/lang/en/messages.php`
+
+You could access those translations with: `__('demo::messages.welcome');`
+
+### Customizing the Default Module Structure
 
 When you call `make:module`, Modular will scaffold some basic boilerplate for you. If you 
 would like to customize this behavior, you can do so by publishing the `app-modules.php`

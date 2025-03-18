@@ -10,6 +10,7 @@ use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Translation\Translator;
@@ -68,7 +69,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->registerLazily(Gate::class, [$this, 'registerPolicies']);
 		
 		// Look for and register all our commands in the CLI context
-		Artisan::starting(Closure::fromCallable([$this, 'registerCommands']));
+		Artisan::starting(Closure::fromCallable([$this, 'onArtisanStart']));
 	}
 	
 	public function boot(): void
@@ -300,6 +301,12 @@ class ModularServiceProvider extends ServiceProvider
 			});
 	}
 	
+	protected function onArtisanStart(Artisan $artisan): void
+	{
+		$this->registerCommands($artisan);
+		$this->registerNamespacesInTinker();
+	}
+	
 	protected function registerCommands(Artisan $artisan): void
 	{
 		$this->autoDiscoveryHelper()
@@ -311,6 +318,22 @@ class ModularServiceProvider extends ServiceProvider
 					$artisan->resolve($class_name);
 				}
 			});
+	}
+	
+	protected function registerNamespacesInTinker()
+	{
+		if (! class_exists('Laravel\\Tinker\\TinkerServiceProvider')) {
+			return;
+		}
+		
+		$namespaces = app(ModuleRegistry::class)
+			->modules()
+			->flatMap(fn(ModuleConfig $config) => $config->namespaces)
+			->reject(fn($ns) => Str::endsWith($ns, ['Tests\\', 'Database\\Factories\\', 'Database\\Seeders\\']))
+			->values()
+			->all();
+		
+		Config::set('tinker.alias', array_merge($namespaces, Config::get('tinker.alias', [])));
 	}
 	
 	protected function registerLazily(string $class_name, callable $callback): self

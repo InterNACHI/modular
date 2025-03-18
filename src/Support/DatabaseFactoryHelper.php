@@ -4,6 +4,7 @@ namespace InterNACHI\Modular\Support;
 
 use Closure;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Str;
 use ReflectionClass;
 
@@ -18,8 +19,13 @@ class DatabaseFactoryHelper
 	
 	public function resetResolvers(): void
 	{
-		$this->unsetProperty(Factory::class, 'modelNameResolver');
-		$this->unsetProperty(Factory::class, 'factoryNameResolver');
+		if (version_compare(Application::VERSION, '11.43.0', '>=')) {
+			Factory::flushState();
+		} else {
+			$this->unsetProperty(Factory::class, 'modelNameResolver');
+			$this->unsetProperty(Factory::class, 'modelNameResolvers');
+			$this->unsetProperty(Factory::class, 'factoryNameResolver');
+		}
 	}
 	
 	public function modelNameResolver(): Closure
@@ -35,6 +41,7 @@ class DatabaseFactoryHelper
 			// Temporarily disable the modular resolver if we're not in a module
 			try {
 				$this->unsetProperty(Factory::class, 'modelNameResolver');
+				$this->unsetProperty(Factory::class, 'modelNameResolvers');
 				return $factory->modelName();
 			} finally {
 				Factory::guessModelNamesUsing($this->modelNameResolver());
@@ -80,6 +87,8 @@ class DatabaseFactoryHelper
 	protected function unsetProperty($target, $property): void
 	{
 		$reflection = new ReflectionClass($target);
-		$reflection->setStaticPropertyValue($property, null);
+		if ($reflection->hasProperty($property)) {
+			$reflection->setStaticPropertyValue($property, $reflection->getProperty($property)->getDefaultValue());
+		}
 	}
 }
