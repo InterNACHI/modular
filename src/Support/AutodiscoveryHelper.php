@@ -6,9 +6,10 @@ use Closure;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Translation\Translator;
@@ -26,7 +27,7 @@ class AutodiscoveryHelper
 	
 	public function __construct(
 		protected FinderFactory $finders,
-		protected Filesystem $filesystem,
+		protected Filesystem $fs,
 		protected string $cache_path,
 	) {
 	}
@@ -42,36 +43,38 @@ class AutodiscoveryHelper
 			$this->migrations(...),
 			$this->commands(...),
 			$this->policies(...),
-			function() use ($app) {
-				if (class_exists(LivewireManager::class)) {
-					$this->livewire($app->make(LivewireManager::class));
-				}
-			},
+			$this->livewire(...),
 		];
 		
 		foreach ($helpers as $helper) {
-			$app->call($helper);
+			try {
+				$app->call($helper);
+			} catch (BindingResolutionException) {
+				//
+			}
 		}
 		
 		$cache = Collection::make($this->data)->toArray();
 		$php = '<?php return '.var_export($cache, true).";".PHP_EOL;
 		
-		if (! $this->filesystem->put($this->cache_path, $php)) {
+		$this->fs->ensureDirectoryExists($this->fs->dirname($this->cache_path));
+		
+		if (! $this->fs->put($this->cache_path, $php)) {
 			throw new RuntimeException('Unable to write cache file.');
 		}
 		
 		try {
 			require $this->cache_path;
 		} catch (Throwable $e) {
-			$this->filesystem->delete($this->cache_path);
+			$this->fs->delete($this->cache_path);
 			throw new RuntimeException('Attempted to write invalid cache file.', $e->getCode(), $e);
 		}
 	}
 	
 	public function clearCache(): void
 	{
-		if ($this->filesystem->exists($this->cache_path)) {
-			$this->filesystem->delete($this->cache_path);
+		if ($this->fs->exists($this->cache_path)) {
+			$this->fs->delete($this->cache_path);
 		}
 	}
 	
@@ -86,24 +89,26 @@ class AutodiscoveryHelper
 			key: 'modules',
 			default: fn() => $this->finders
 				->moduleComposerFileFinder()
-				->map(function(SplFileInfo $file) {
+				->values()
+				->mapWithKeys(function(SplFileInfo $file) {
 					$composer_config = json_decode($file->getContents(), true, 16, JSON_THROW_ON_ERROR);
 					$base_path = rtrim(str_replace('\\', '/', $file->getPath()), '/');
+					$name = basename($base_path);
 					
 					return [
-						'name' => basename($base_path),
-						'base_path' => $base_path,
-						'namespaces' => Collection::make($composer_config['autoload']['psr-4'] ?? [])
-							->mapWithKeys(fn($src, $namespace) => ["{$base_path}/{$src}" => $namespace])
-							->all(),
+						$name => [
+							'name' => $name,
+							'base_path' => $base_path,
+							'namespaces' => Collection::make($composer_config['autoload']['psr-4'] ?? [])
+								->mapWithKeys(fn($src, $namespace) => ["{$base_path}/{$src}" => $namespace])
+								->all(),
+						],
 					];
 				}),
 		);
 		
 		return Collection::make($data)
-			->mapWithKeys(fn(array $data) => [
-				$data['name'] => new ModuleConfig($data['name'], $data['base_path'], new Collection($data['namespaces'])),
-			]);
+			->map(fn(array $d) => new ModuleConfig($d['name'], $d['base_path'], new Collection($d['namespaces'])));
 	}
 	
 	public function routes(): void
@@ -112,6 +117,7 @@ class AutodiscoveryHelper
 			key: 'route_files',
 			default: fn() => $this->finders
 				->routeFileFinder()
+				->values()
 				->map(fn(SplFileInfo $file) => $file->getRealPath()),
 			each: fn(string $filename) => require $filename
 		);
@@ -124,6 +130,7 @@ class AutodiscoveryHelper
 			default: fn() => $this->finders
 				->viewDirectoryFinder()
 				->withModuleInfo()
+				->values()
 				->map(fn(ModuleFileInfo $dir) => [
 					'namespace' => $dir->module()->name,
 					'path' => $dir->getRealPath(),
@@ -140,6 +147,7 @@ class AutodiscoveryHelper
 			default: fn() => $this->finders
 				->bladeComponentFileFinder()
 				->withModuleInfo()
+				->values()
 				->map(fn(ModuleFileInfo $component) => [
 					'prefix' => $component->module()->name,
 					'fqcn' => $component->fullyQualifiedClassName(),
@@ -153,6 +161,7 @@ class AutodiscoveryHelper
 			default: fn() => $this->finders
 				->bladeComponentDirectoryFinder()
 				->withModuleInfo()
+				->values()
 				->map(fn(ModuleFileInfo $component) => [
 					'prefix' => $component->module()->name,
 					'namespace' => $component->module()->qualify('View\\Components'),
@@ -168,6 +177,7 @@ class AutodiscoveryHelper
 			default: fn() => $this->finders
 				->langDirectoryFinder()
 				->withModuleInfo()
+				->values()
 				->map(fn(ModuleFileInfo $dir) => [
 					'namespace' => $dir->module()->name,
 					'path' => $dir->getRealPath(),
@@ -185,6 +195,7 @@ class AutodiscoveryHelper
 			key: 'migration_files',
 			default: fn() => $this->finders
 				->migrationDirectoryFinder()
+				->values()
 				->map(fn(SplFileInfo $file) => $file->getRealPath()),
 			each: fn(string $path) => $migrator->path($path),
 		);
@@ -197,6 +208,7 @@ class AutodiscoveryHelper
 			default: fn() => $this->finders
 				->commandFileFinder()
 				->withModuleInfo()
+				->values()
 				->map(fn(ModuleFileInfo $file) => $file->fullyQualifiedClassName())
 				->filter($this->isInstantiableCommand(...)),
 			each: fn(string $fqcn) => $artisan->resolve($fqcn),
@@ -210,6 +222,7 @@ class AutodiscoveryHelper
 			default: fn() => $this->finders
 				->modelFileFinder()
 				->withModuleInfo()
+				->values()
 				->map(function(ModuleFileInfo $file) use ($gate) {
 					$fqcn = $file->fullyQualifiedClassName();
 					$namespace = rtrim($file->module()->namespaces->first(), '\\');
@@ -242,6 +255,7 @@ class AutodiscoveryHelper
 			default: fn() => $this->finders
 				->livewireComponentFileFinder()
 				->withModuleInfo()
+				->values()
 				->map(fn(ModuleFileInfo $file) => [
 					'name' => sprintf(
 						'%s::%s',
@@ -275,7 +289,7 @@ class AutodiscoveryHelper
 	protected function readData(): array
 	{
 		try {
-			return $this->filesystem->exists($this->cache_path)
+			return $this->fs->exists($this->cache_path)
 				? require $this->cache_path
 				: [];
 		} catch (Throwable) {

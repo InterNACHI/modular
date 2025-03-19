@@ -2,6 +2,7 @@
 
 namespace InterNACHI\Modular\Support;
 
+use Closure;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -17,7 +18,7 @@ class Cache
 	) {
 	}
 	
-	public function get(string $key, \Closure $callback): Enumerable
+	public function get(string $key, Closure $callback): Enumerable
 	{
 		return Collection::make($this->data($key, $callback));
 	}

@@ -5,7 +5,6 @@ namespace InterNACHI\Modular\Support;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InterNACHI\Modular\Exceptions\CannotFindModuleForPathException;
-use Symfony\Component\Finder\SplFileInfo;
 
 class ModuleRegistry
 {
@@ -30,7 +29,9 @@ class ModuleRegistry
 	public function module(?string $name = null): ?ModuleConfig
 	{
 		// We want to allow for gracefully handling empty/null names
-		return $name ? $this->modules()->get($name) : null;
+		return $name
+			? $this->modules()->get($name)
+			: null;
 	}
 	
 	public function moduleForPath(string $path): ?ModuleConfig

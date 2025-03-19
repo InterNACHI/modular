@@ -2,8 +2,6 @@
 
 namespace InterNACHI\Modular\Support;
 
-use Symfony\Component\Finder\SplFileInfo;
-
 class FinderFactory
 {
 	public function __construct(
@@ -98,13 +96,13 @@ class FinderFactory
 	public function livewireComponentFileFinder(): FinderCollection
 	{
 		$directory = $this->base_path.'/*/src';
-
+		
 		if (str_contains(config('livewire.class_namespace'), '\\Http\\')) {
 			$directory .= '/Http';
 		}
-
+		
 		$directory .= '/Livewire';
-
+		
 		return FinderCollection::forFiles()
 			->name('*.php')
 			->inOrEmpty($directory);

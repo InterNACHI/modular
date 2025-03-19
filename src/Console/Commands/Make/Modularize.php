@@ -8,6 +8,16 @@ trait Modularize
 {
 	use \InterNACHI\Modular\Console\Commands\Modularize;
 	
+	public function call($command, array $arguments = [])
+	{
+		// Pass the --module flag on to subsequent commands
+		if ($module = $this->option('module')) {
+			$arguments['--module'] = $module;
+		}
+		
+		return $this->runCommand($command, $arguments, $this->output);
+	}
+	
 	protected function getDefaultNamespace($rootNamespace)
 	{
 		$namespace = parent::getDefaultNamespace($rootNamespace);
@@ -79,15 +89,5 @@ trait Modularize
 		}
 		
 		return $path;
-	}
-	
-	public function call($command, array $arguments = [])
-	{
-		// Pass the --module flag on to subsequent commands
-		if ($module = $this->option('module')) {
-			$arguments['--module'] = $module;
-		}
-		
-		return $this->runCommand($command, $arguments, $this->output);
 	}
 }

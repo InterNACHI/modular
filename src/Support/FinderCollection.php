@@ -2,6 +2,7 @@
 
 namespace InterNACHI\Modular\Support;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use IteratorAggregate;
@@ -14,7 +15,7 @@ use Traversable;
  * @mixin \Illuminate\Support\LazyCollection
  * @mixin \Symfony\Component\Finder\Finder
  */
-class FinderCollection implements IteratorAggregate
+class FinderCollection implements Arrayable, IteratorAggregate
 {
 	use ForwardsCalls;
 	
@@ -56,6 +57,11 @@ class FinderCollection implements IteratorAggregate
 	public function getIterator(): Traversable
 	{
 		return $this->forwardCollection()->getIterator();
+	}
+	
+	public function toArray(): array
+	{
+		return $this->forwardCollection()->toArray();
 	}
 	
 	public function __call($name, $arguments)
