@@ -21,11 +21,6 @@ class ModuleRegistry
 		return $this->modules_path;
 	}
 	
-	public function getCachePath(): string
-	{
-		// FIXME
-	}
-	
 	public function module(?string $name = null): ?ModuleConfig
 	{
 		// We want to allow for gracefully handling empty/null names
