@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\Str;
 use Illuminate\Translation\Translator;
@@ -27,6 +28,33 @@ class AutodiscoveryHelper
 		protected Filesystem $filesystem,
 		protected string $cache_path,
 	) {
+	}
+	
+	/** @return Collection<string, \InterNACHI\Modular\Support\ModuleConfig> */
+	public function modules(): Collection
+	{
+		$data = $this->withCache(
+			key: 'modules',
+			default: fn() => $this->finders
+				->moduleComposerFileFinder()
+				->map(function(SplFileInfo $file) {
+					$composer_config = json_decode($file->getContents(), true, 16, JSON_THROW_ON_ERROR);
+					$base_path = rtrim(str_replace('\\', '/', $file->getPath()), '/');
+					
+					return [
+						'name' => basename($base_path),
+						'base_path' => $base_path,
+						'namespaces' => Collection::make($composer_config['autoload']['psr-4'] ?? [])
+							->mapWithKeys(fn($src, $namespace) => ["{$base_path}/{$src}" => $namespace])
+							->all(),
+					];
+				}),
+		);
+		
+		return Collection::make($data)
+			->mapWithKeys(fn(array $data) => [
+				$data['name'] => new ModuleConfig($data['name'], $data['base_path'], new Collection($data['namespaces'])),
+			]);
 	}
 	
 	public function routes(): void

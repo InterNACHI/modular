@@ -2,11 +2,21 @@
 
 namespace InterNACHI\Modular\Support;
 
+use Symfony\Component\Finder\SplFileInfo;
+
 class FinderFactory
 {
 	public function __construct(
 		protected string $base_path
 	) {
+	}
+	
+	public function moduleComposerFileFinder(): FinderCollection
+	{
+		return FinderCollection::forFiles()
+			->depth('== 1')
+			->name('composer.json')
+			->in($this->base_path);
 	}
 	
 	public function commandFileFinder(): FinderCollection

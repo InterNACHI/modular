@@ -13,7 +13,7 @@ class ModuleRegistry
 	
 	public function __construct(
 		protected string $modules_path,
-		protected string $cache_path
+		protected AutodiscoveryHelper $autodiscovery_helper,
 	) {
 	}
 	
@@ -24,15 +24,13 @@ class ModuleRegistry
 	
 	public function getCachePath(): string
 	{
-		return $this->cache_path;
+		// FIXME
 	}
 	
 	public function module(?string $name = null): ?ModuleConfig
 	{
 		// We want to allow for gracefully handling empty/null names
-		return $name
-			? $this->modules()->get($name)
-			: null;
+		return $name ? $this->modules()->get($name) : null;
 	}
 	
 	public function moduleForPath(string $path): ?ModuleConfig
@@ -64,39 +62,14 @@ class ModuleRegistry
 	
 	public function modules(): Collection
 	{
-		return $this->modules ??= $this->loadModules();
+		return $this->modules ??= $this->autodiscovery_helper->modules();
 	}
 	
 	public function reload(): Collection
 	{
 		$this->modules = null;
 		
-		return $this->loadModules();
-	}
-	
-	protected function loadModules(): Collection
-	{
-		if (file_exists($this->cache_path)) {
-			return Collection::make(require $this->cache_path)
-				->mapWithKeys(function(array $cached) {
-					$config = new ModuleConfig($cached['name'], $cached['base_path'], new Collection($cached['namespaces']));
-					return [$config->name => $config];
-				});
-		}
-		
-		if (! is_dir($this->modules_path)) {
-			return new Collection();
-		}
-		
-		return FinderCollection::forFiles()
-			->depth('== 1')
-			->name('composer.json')
-			->in($this->modules_path)
-			->collect()
-			->mapWithKeys(function(SplFileInfo $path) {
-				$config = ModuleConfig::fromComposerFile($path);
-				return [$config->name => $config];
-			});
+		return $this->modules();
 	}
 	
 	protected function extractModuleNameFromPath(string $path): string

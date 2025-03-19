@@ -5,6 +5,7 @@ namespace InterNACHI\Modular\Support;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
@@ -44,10 +45,10 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->mergeConfigFrom("{$this->base_dir}/config.php", 'app-modules');
 		
-		$this->app->singleton(ModuleRegistry::class, function() {
+		$this->app->singleton(ModuleRegistry::class, function(Application $app) {
 			return new ModuleRegistry(
 				$this->getModulesBasePath(),
-				$this->app->bootstrapPath('cache/modules.php') // FIXME
+				$app->make(AutodiscoveryHelper::class),
 			);
 		});
 		
@@ -55,7 +56,7 @@ class ModularServiceProvider extends ServiceProvider
 			return new FinderFactory($this->getModulesBasePath());
 		});
 		
-		$this->app->singleton(AutodiscoveryHelper::class, function($app) {
+		$this->app->singleton(AutodiscoveryHelper::class, function(Application $app) {
 			return new AutodiscoveryHelper(
 				$app->make(FinderFactory::class),
 				$app->make(Filesystem::class),
@@ -63,7 +64,7 @@ class ModularServiceProvider extends ServiceProvider
 			);
 		});
 		
-		$this->app->singleton(MakeMigration::class, function($app) {
+		$this->app->singleton(MakeMigration::class, function(Application $app) {
 			return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
 		});
 		
