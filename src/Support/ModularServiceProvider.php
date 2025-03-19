@@ -43,7 +43,7 @@ class ModularServiceProvider extends ServiceProvider
 	
 	public function register(): void
 	{
-		$this->mergeConfigFrom("{$this->base_dir}/config.php", 'app-modules');
+		$this->mergeConfigFrom("{$this->base_dir}/config/app-modules.php", 'app-modules');
 		
 		$this->app->singleton(ModuleRegistry::class, function(Application $app) {
 			return new ModuleRegistry(
@@ -104,7 +104,7 @@ class ModularServiceProvider extends ServiceProvider
 	protected function publishVendorFiles(): void
 	{
 		$this->publishes([
-			"{$this->base_dir}/config.php" => $this->app->configPath('app-modules.php'),
+			"{$this->base_dir}/config/app-modules.php" => $this->app->configPath('app-modules.php'),
 		], 'modular-config');
 	}
 	
