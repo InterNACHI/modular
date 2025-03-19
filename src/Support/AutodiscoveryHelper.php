@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
@@ -245,6 +246,29 @@ class AutodiscoveryHelper
 				})
 				->filter(),
 			each: fn(array $row) => $gate->policy($row['fqcn'], $row['policy']),
+		);
+	}
+	
+	public function events(Dispatcher $events, bool $autodiscover = true): void
+	{
+		$this->withCache(
+			key: 'events',
+			default: fn() => $autodiscover
+				? $this->finders
+					->listenerDirectoryFinder()
+					->withModuleInfo()
+					->reduce(function(array $discovered, ModuleFileInfo $file) {
+						return array_merge_recursive(
+							$discovered,
+							DiscoverEvents::within($file->getPathname(), $file->module()->path('src'))
+						);
+					}, [])
+				: [],
+			each: function(array $listeners, string $event) use ($events) {
+				foreach (array_unique($listeners, SORT_REGULAR) as $listener) {
+					$events->listen($event, $listener);
+				}
+			},
 		);
 	}
 	

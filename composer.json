@@ -48,8 +48,7 @@
         "laravel": {
             "providers": [
                 "InterNACHI\\Modular\\Support\\ModularServiceProvider",
-                "InterNACHI\\Modular\\Support\\ModularizedCommandsServiceProvider",
-                "InterNACHI\\Modular\\Support\\ModularEventServiceProvider"
+                "InterNACHI\\Modular\\Support\\ModularizedCommandsServiceProvider"
             ],
             "aliases": {
                 "Modules": "InterNACHI\\Modular\\Support\\Facades\\Modules"

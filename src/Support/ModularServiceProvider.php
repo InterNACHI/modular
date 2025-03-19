@@ -4,12 +4,14 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -88,6 +90,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->bootViews();
 		$this->bootBladeComponents();
 		$this->bootTranslations();
+		$this->bootEvents();
 		$this->bootLivewireComponents();
 	}
 	
@@ -151,6 +154,13 @@ class ModularServiceProvider extends ServiceProvider
 		});
 	}
 	
+	protected function bootEvents(): void
+	{
+		$this->callAfterResolving(Dispatcher::class, function(Dispatcher $events) {
+			$this->autodiscover()->events($events, $this->shouldDiscoverEvents());
+		});
+	}
+	
 	protected function bootLivewireComponents(): void
 	{
 		if (class_exists(LivewireManager::class)) {
@@ -190,5 +200,19 @@ class ModularServiceProvider extends ServiceProvider
 		}
 		
 		return $this->modules_path;
+	}
+	
+	protected function shouldDiscoverEvents(): bool
+	{
+		return $this->app->make('config')
+			->get('app-modules.should_discover_events') ?? $this->appIsConfiguredToDiscoverEvents();
+	}
+	
+	protected function appIsConfiguredToDiscoverEvents(): bool
+	{
+		return collect($this->app->getProviders(EventServiceProvider::class))
+			->filter(fn(EventServiceProvider $provider) => $provider::class === EventServiceProvider::class
+				|| str_starts_with(get_class($provider), $this->app->getNamespace()))
+			->contains(fn(EventServiceProvider $provider) => $provider->shouldDiscoverEvents());
 	}
 }

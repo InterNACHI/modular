@@ -60,7 +60,6 @@ abstract class TestCase extends Orchestra
 		return [
 			ModularServiceProvider::class,
 			ModularizedCommandsServiceProvider::class,
-			ModularEventServiceProvider::class,
 		];
 	}
 	
