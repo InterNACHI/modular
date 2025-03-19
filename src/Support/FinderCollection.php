@@ -6,6 +6,7 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @mixin \Illuminate\Support\LazyCollection
@@ -15,7 +16,7 @@ class FinderCollection
 {
 	use ForwardsCalls;
 	
-	protected const PREFER_COLLECTION_METHODS = ['filter', 'each', 'map'];
+	protected const array PREFER_COLLECTION_METHODS = ['filter', 'each', 'map'];
 	
 	public static function forFiles(): self
 	{
@@ -43,6 +44,15 @@ class FinderCollection
 		} catch (DirectoryNotFoundException) {
 			return new static();
 		}
+	}
+	
+	public function withModuleInfo(): static
+	{
+		return $this->map(fn(SplFileInfo $file) => new ModuleFileInfo(
+			$file->getFilename(),
+			$file->getRelativePath(),
+			$file->getRelativePathname(),
+		));
 	}
 	
 	public function __call($name, $arguments)

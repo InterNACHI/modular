@@ -2,17 +2,11 @@
 
 namespace InterNACHI\Modular\Support;
 
-use Illuminate\Filesystem\Filesystem;
-
-class AutoDiscoveryHelper
+class FinderFactory
 {
-	protected string $base_path;
-	
 	public function __construct(
-		protected ModuleRegistry $module_registry,
-		protected Filesystem $filesystem
+		protected string $base_path
 	) {
-		$this->base_path = $module_registry->getModulesPath();
 	}
 	
 	public function commandFileFinder(): FinderCollection

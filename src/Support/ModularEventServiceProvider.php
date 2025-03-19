@@ -52,7 +52,7 @@ class ModularEventServiceProvider extends ServiceProvider
 	{
 		$modules = $this->app->make(ModuleRegistry::class);
 		
-		return $this->app->make(AutoDiscoveryHelper::class)
+		return $this->app->make(FinderFactory::class)
 			->listenerDirectoryFinder()
 			->map(fn(SplFileInfo $directory) => $directory->getPathname())
 			->reduce(function($discovered, string $directory) use ($modules) {
