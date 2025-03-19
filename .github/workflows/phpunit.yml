@@ -35,23 +35,21 @@ jobs:
           tools: composer:v2
       
       - name: Register composer cache directory
-        id: composer-cache-files-dir
+        id: composer-cache
         run: |
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT  
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
-          path: |
-            vendor
-            ${{ steps.composer-cache-files-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
         run: |
-          composer require --no-progress --no-interaction --prefer-dist --update-with-all-dependencies --prefer-${{ matrix.dependency-version }} "illuminate/support:${{ matrix.laravel }}"
+          composer require --no-interaction --prefer-dist --update-with-all-dependencies --prefer-${{ matrix.dependency-version }} "illuminate/support:${{ matrix.laravel }}"
 
       - name: Execute tests
         run: vendor/bin/phpunit
