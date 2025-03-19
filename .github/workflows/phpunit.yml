@@ -40,7 +40,7 @@ jobs:
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
           
       - name: Debug composer cache directory
-        run: composer config cache-files-dir
+        run: echo ${{ steps.composer-cache.outputs.dir }}
 
       - name: Cache dependencies
         uses: actions/cache@v4
