@@ -16,7 +16,7 @@ class FinderFactory
 		return FinderCollection::forFiles()
 			->depth('== 1')
 			->name('composer.json')
-			->in($this->base_path);
+			->inOrEmpty($this->base_path);
 	}
 	
 	public function commandFileFinder(): FinderCollection

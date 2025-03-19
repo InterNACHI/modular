@@ -4,15 +4,17 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
+use IteratorAggregate;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Traversable;
 
 /**
  * @mixin \Illuminate\Support\LazyCollection
  * @mixin \Symfony\Component\Finder\Finder
  */
-class FinderCollection
+class FinderCollection implements IteratorAggregate
 {
 	use ForwardsCalls;
 	
@@ -48,11 +50,12 @@ class FinderCollection
 	
 	public function withModuleInfo(): static
 	{
-		return $this->map(fn(SplFileInfo $file) => new ModuleFileInfo(
-			$file->getFilename(),
-			$file->getRelativePath(),
-			$file->getRelativePathname(),
-		));
+		return $this->map(fn(SplFileInfo $file) => new ModuleFileInfo($file));
+	}
+	
+	public function getIterator(): Traversable
+	{
+		return $this->forwardCollection()->getIterator();
 	}
 	
 	public function __call($name, $arguments)

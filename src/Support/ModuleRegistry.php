@@ -69,7 +69,7 @@ class ModuleRegistry
 	{
 		$this->modules = null;
 		
-		return $this->modules();
+		return $this->modules ??= $this->autodiscovery_helper->modules(reload: true);
 	}
 	
 	protected function extractModuleNameFromPath(string $path): string
