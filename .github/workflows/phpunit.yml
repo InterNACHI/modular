@@ -2,6 +2,9 @@ name: PHPUnit
 
 on:
   push:
+    branches:
+      - main
+      - 3.x
   pull_request:
   schedule:
     - cron: '0 14 * * 3' # Run Wednesdays at 2pm EST
