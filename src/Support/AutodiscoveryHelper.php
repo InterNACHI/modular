@@ -50,12 +50,12 @@ class AutodiscoveryHelper
 			try {
 				$app->call($helper);
 			} catch (BindingResolutionException) {
-				//
+				
 			}
 		}
 		
 		$cache = Collection::make($this->data)->toArray();
-		$php = '<?php return '.var_export($cache, true).";".PHP_EOL;
+		$php = '<?php return '.var_export($cache, true).';'.PHP_EOL;
 		
 		$this->fs->ensureDirectoryExists($this->fs->dirname($this->cache_path));
 		

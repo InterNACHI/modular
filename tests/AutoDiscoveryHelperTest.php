@@ -9,7 +9,6 @@ use InterNACHI\Modular\Console\Commands\Make\MakeListener;
 use InterNACHI\Modular\Console\Commands\Make\MakeLivewire;
 use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Support\FinderFactory;
-use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use Livewire\Livewire;
 use Livewire\LivewireServiceProvider;
