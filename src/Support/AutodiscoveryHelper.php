@@ -51,7 +51,6 @@ class AutodiscoveryHelper
 			try {
 				$app->call($helper);
 			} catch (BindingResolutionException) {
-				
 			}
 		}
 		
