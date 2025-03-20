@@ -94,13 +94,13 @@ class MakeModule extends Command
 		$this->setUpStyles();
 		
 		$this->newLine();
-
+		
 		if ($this->shouldAbortToPublishConfig()) {
 			return 0;
 		}
-
+		
 		$this->ensureModulesDirectoryExists();
-
+		
 		$this->writeStubs();
 		$this->updateCoreComposerConfig();
 		
@@ -113,6 +113,11 @@ class MakeModule extends Command
 		$this->module_registry->reload();
 		
 		return 0;
+	}
+	
+	public function newLine($count = 1)
+	{
+		$this->getOutput()->newLine($count);
 	}
 	
 	protected function shouldAbortToPublishConfig(): bool
@@ -313,11 +318,6 @@ class MakeModule extends Command
 	protected function title($title)
 	{
 		$this->getOutput()->title($title);
-	}
-	
-	public function newLine($count = 1)
-	{
-		$this->getOutput()->newLine($count);
 	}
 	
 	protected function getStubs(): array

@@ -12,18 +12,24 @@ class ModulesCacheTest extends TestCase
 	
 	public function test_it_writes_to_cache_file(): void
 	{
-		$this->makeModule('test-module');
-		$this->makeModule('test-module-two');
+		$expected_path = $this->getApplicationBasePath().$this->normalizeDirectorySeparators('bootstrap/cache/app-modules.php');
 		
-		$this->artisan(ModulesCache::class);
-		
-		$expected_path = $this->getApplicationBasePath().$this->normalizeDirectorySeparators('bootstrap/cache/modules.php');
-		
-		$this->assertFileExists($expected_path);
-		
-		$cache = include $expected_path;
-		
-		$this->assertArrayHasKey('test-module', $cache);
-		$this->assertArrayHasKey('test-module-two', $cache);
+		try {
+			$this->makeModule('test-module');
+			$this->makeModule('test-module-two');
+			
+			$this->artisan(ModulesCache::class);
+			
+			$this->assertFileExists($expected_path);
+			
+			$cache = include $expected_path;
+			
+			$this->assertArrayHasKey('test-module', $cache['modules']);
+			$this->assertArrayHasKey('test-module-two', $cache['modules']);
+		} finally {
+			if (file_exists($expected_path)) {
+				unlink($expected_path);
+			}
+		}
 	}
 }
