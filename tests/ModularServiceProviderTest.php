@@ -163,4 +163,28 @@ class ModularServiceProviderTest extends TestCase
 		$this->assertEquals('Test JSON translation', $translator->get('Test JSON string'));
 		$this->assertEquals('Test PHP translation', $translator->get('test-module::foo.bar'));
 	}
+	
+	public function test_it_loads_translations_from_module_when_lang_directory_is_in_module_root_directory(): void
+	{
+		$module = $this->makeModule();
+		
+		$this->filesystem()->ensureDirectoryExists($module->path('lang'));
+		$this->filesystem()->ensureDirectoryExists($module->path('lang/en'));
+		
+		$this->filesystem()->put($module->path('lang/en.json'), json_encode([
+			'Test JSON string' => 'Test JSON translation',
+		], JSON_THROW_ON_ERROR));
+		
+		$this->filesystem()->put(
+			$module->path('lang/en/foo.php'),
+			'<?php return ["bar" => "Test PHP translation"];'
+		);
+		
+		$this->app->setLocale('en');
+		
+		$translator = $this->app->make('translator');
+		
+		$this->assertEquals('Test JSON translation', $translator->get('Test JSON string'));
+		$this->assertEquals('Test PHP translation', $translator->get('test-module::foo.bar'));
+	}
 }
