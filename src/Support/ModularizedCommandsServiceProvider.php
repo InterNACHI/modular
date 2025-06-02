@@ -38,10 +38,10 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 {
 	protected array $overrides = [
 		'command.cast.make' => MakeCast::class,
-		'command.enum.make' => MakeEnum::class,
 		'command.controller.make' => MakeController::class,
 		'command.console.make' => MakeCommand::class,
 		'command.channel.make' => MakeChannel::class,
+		'command.enum.make' => MakeEnum::class,
 		'command.event.make' => MakeEvent::class,
 		'command.exception.make' => MakeException::class,
 		'command.factory.make' => MakeFactory::class,
