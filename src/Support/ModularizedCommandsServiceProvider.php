@@ -12,6 +12,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeChannel;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeController;
+use InterNACHI\Modular\Console\Commands\Make\MakeEnum;
 use InterNACHI\Modular\Console\Commands\Make\MakeEvent;
 use InterNACHI\Modular\Console\Commands\Make\MakeException;
 use InterNACHI\Modular\Console\Commands\Make\MakeFactory;
@@ -37,6 +38,7 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 {
 	protected array $overrides = [
 		'command.cast.make' => MakeCast::class,
+		'command.enum.make' => MakeEnum::class,
 		'command.controller.make' => MakeController::class,
 		'command.console.make' => MakeCommand::class,
 		'command.channel.make' => MakeChannel::class,
