@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use InterNACHI\Modular\Console\Commands\Database\SeedCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeCast;
 use InterNACHI\Modular\Console\Commands\Make\MakeChannel;
+use InterNACHI\Modular\Console\Commands\Make\MakeClass;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeController;
@@ -37,6 +38,7 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 {
 	protected array $overrides = [
 		'command.cast.make' => MakeCast::class,
+		'command.class.make' => MakeClass::class,
 		'command.controller.make' => MakeController::class,
 		'command.console.make' => MakeCommand::class,
 		'command.channel.make' => MakeChannel::class,
