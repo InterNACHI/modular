@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Migrations\Migrator;
@@ -16,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Translation\Translator;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Factory as ViewFactory;
+use InterNACHI\Modular\Support\Autodiscovery\Plugin;
 use Livewire\LivewireManager;
 use ReflectionClass;
 use RuntimeException;
@@ -26,32 +26,20 @@ class AutodiscoveryHelper
 {
 	protected ?array $data = null;
 	
+	protected array $plugins = [];
+	
 	public function __construct(
 		protected FinderFactory $finders,
 		protected Filesystem $fs,
+		protected Container $app,
 		protected string $cache_path,
 	) {
 	}
 	
 	public function writeCache(Container $app): void
 	{
-		$helpers = [
-			$this->modules(...),
-			$this->routes(...),
-			$this->views(...),
-			$this->blade(...),
-			$this->translations(...),
-			$this->migrations(...),
-			$this->commands(...),
-			$this->policies(...),
-			$this->livewire(...),
-		];
-		
-		foreach ($helpers as $helper) {
-			try {
-				$app->call($helper);
-			} catch (BindingResolutionException) {
-			}
+		foreach ($this->plugins as $plugin) {
+			$this->discover($plugin);
 		}
 		
 		$cache = Collection::make($this->data)->toArray();
@@ -76,6 +64,36 @@ class AutodiscoveryHelper
 		if ($this->fs->exists($this->cache_path)) {
 			$this->fs->delete($this->cache_path);
 		}
+	}
+	
+	/** @param class-string<Plugin> $plugin */
+	public function register(string $plugin): static
+	{
+		$this->plugins[$plugin] ??= null;
+		
+		return $this;
+	}
+	
+	/** @param class-string<Plugin> $plugin */
+	public function boot(string $plugin): Closure
+	{
+		return fn(...$args) => $this->plugin($plugin)->boot(...$args);
+	}
+	
+	/** @param class-string<Plugin> $name */
+	public function discover(string $name): Collection
+	{
+		$this->data ??= $this->readData();
+		$this->data[$name] ??= $this->plugin($name)->discover($this->finders);
+		
+		return collect($this->data[$name]);
+	}
+	
+	/** @param class-string<Plugin> $name */
+	public function handle(string $name): mixed
+	{
+		return $this->plugin($name)
+			->handle($this->discover($name));
 	}
 	
 	/** @return Collection<string, \InterNACHI\Modular\Support\ModuleConfig> */
@@ -109,84 +127,6 @@ class AutodiscoveryHelper
 		
 		return Collection::make($data)
 			->map(fn(array $d) => new ModuleConfig($d['name'], $d['base_path'], new Collection($d['namespaces'])));
-	}
-	
-	public function routes(): void
-	{
-		$this->withCache(
-			key: 'route_files',
-			default: fn() => $this->finders
-				->routeFileFinder()
-				->values()
-				->map(fn(SplFileInfo $file) => $file->getRealPath()),
-			each: fn(string $filename) => require $filename
-		);
-	}
-	
-	public function views(ViewFactory $factory): void
-	{
-		$this->withCache(
-			key: 'view_namespaces',
-			default: fn() => $this->finders
-				->viewDirectoryFinder()
-				->withModuleInfo()
-				->values()
-				->map(fn(ModuleFileInfo $dir) => [
-					'namespace' => $dir->module()->name,
-					'path' => $dir->getRealPath(),
-				]),
-			each: fn(array $row) => $factory->addNamespace($row['namespace'], $row['path']),
-		);
-	}
-	
-	public function blade(BladeCompiler $blade): void
-	{
-		// Handle individual Blade components (old syntax: `<x-module-* />`)
-		$this->withCache(
-			key: 'blade_component_files',
-			default: fn() => $this->finders
-				->bladeComponentFileFinder()
-				->withModuleInfo()
-				->values()
-				->map(fn(ModuleFileInfo $component) => [
-					'prefix' => $component->module()->name,
-					'fqcn' => $component->fullyQualifiedClassName(),
-				]),
-			each: fn(array $row) => $blade->component($row['fqcn'], null, $row['prefix']),
-		);
-		
-		// Handle Blade component namespaces (new syntax: `<x-module::* />`)
-		$this->withCache(
-			key: 'blade_component_dirs',
-			default: fn() => $this->finders
-				->bladeComponentDirectoryFinder()
-				->withModuleInfo()
-				->values()
-				->map(fn(ModuleFileInfo $component) => [
-					'prefix' => $component->module()->name,
-					'namespace' => $component->module()->qualify('View\\Components'),
-				]),
-			each: fn(array $row) => $blade->componentNamespace($row['namespace'], $row['prefix']),
-		);
-	}
-	
-	public function translations(Translator $translator): void
-	{
-		$this->withCache(
-			key: 'translation_files',
-			default: fn() => $this->finders
-				->langDirectoryFinder()
-				->withModuleInfo()
-				->values()
-				->map(fn(ModuleFileInfo $dir) => [
-					'namespace' => $dir->module()->name,
-					'path' => $dir->getRealPath(),
-				]),
-			each: function(array $row) use ($translator) {
-				$translator->addNamespace($row['namespace'], $row['path']);
-				$translator->addJsonPath($row['path']);
-			},
-		);
 	}
 	
 	public function migrations(Migrator $migrator): void
@@ -294,6 +234,16 @@ class AutodiscoveryHelper
 				]),
 			each: fn(array $row) => $livewire->component($row['name'], $row['fqcn']),
 		);
+	}
+	
+	/**
+	 * @template TPlugin of Plugin
+	 * @param class-string<TPlugin> $plugin
+	 * @return TPlugin
+	 */
+	public function plugin(string $plugin): Plugin
+	{
+		return $this->plugins[$plugin] ??= $this->app->make($plugin);
 	}
 	
 	protected function withCache(
