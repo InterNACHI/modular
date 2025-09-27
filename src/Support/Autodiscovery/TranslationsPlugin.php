@@ -14,11 +14,11 @@ class TranslationsPlugin extends Plugin
 {
 	protected Translator $translator;
 	
-	public function boot(BladeCompiler $blade)
+	public function boot(TranslatorContract $translator)
 	{
 		if ($translator instanceof Translator) {
 			$this->translator = $translator;
-			
+
 			app(AutodiscoveryHelper::class)->handle(static::class);
 		}
 	}
@@ -31,7 +31,7 @@ class TranslationsPlugin extends Plugin
 		});
 	}
 	
-	public function discover(FinderFactory $finders): array
+	public function discover(FinderFactory $finders): iterable
 	{
 		return $finders
 			->langDirectoryFinder()

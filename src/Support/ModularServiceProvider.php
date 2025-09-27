@@ -95,7 +95,7 @@ class ModularServiceProvider extends ServiceProvider
 		}
 		
 		$this->callAfterResolving('view', $this->autodiscover()->boot(ViewPlugin::class));
-		$this->callAfterResolving(BladeCompiler::class, $this->autodiscover()->boot(BladeCompiler::class));
+		$this->callAfterResolving(BladeCompiler::class, $this->autodiscover()->boot(BladePlugin::class));
 		$this->callAfterResolving('translator', $this->autodiscover()->boot(TranslationsPlugin::class));
 		
 		$this->bootEvents();
