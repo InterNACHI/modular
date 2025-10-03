@@ -4,19 +4,16 @@ namespace InterNACHI\Modular\Support\Autodiscovery;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Compilers\BladeCompiler;
-use InterNACHI\Modular\Support\AutodiscoveryHelper;
+use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 
+#[AfterResolving(BladeCompiler::class)]
 class BladePlugin extends Plugin
 {
-	protected BladeCompiler $blade;
-	
-	public function boot(BladeCompiler $blade)
-	{
-		$this->blade = $blade;
-		
-		app(AutodiscoveryHelper::class)->handle(static::class);
+	public function __construct(
+		protected BladeCompiler $blade
+	) {
 	}
 	
 	public function discover(FinderFactory $finders): iterable

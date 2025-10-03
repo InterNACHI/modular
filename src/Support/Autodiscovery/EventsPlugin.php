@@ -7,35 +7,19 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Support\Collection;
-use InterNACHI\Modular\Support\AutodiscoveryHelper;
+use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\DiscoverEvents;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 
+#[AfterResolving(Dispatcher::class)]
 class EventsPlugin extends Plugin
 {
-	protected Application $app;
-	
-	protected Dispatcher $events;
-	
-	protected Repository $config;
-	
-	public function boot(Application $app, Dispatcher $events, Repository $config)
-	{
-		$this->app = $app;
-		$this->events = $events;
-		$this->config = $config;
-		
-		app(AutodiscoveryHelper::class)->handle(static::class);
-	}
-	
-	public function handle(Collection $data): void
-	{
-		$data->each(function(array $listeners, string $event) {
-			foreach (array_unique($listeners, SORT_REGULAR) as $listener) {
-				$this->events->listen($event, $listener);
-			}
-		});
+	public function __construct(
+		protected Application $app,
+		protected Dispatcher $events,
+		protected Repository $config,
+	) {
 	}
 	
 	public function discover(FinderFactory $finders): array
@@ -47,12 +31,19 @@ class EventsPlugin extends Plugin
 		return $finders
 			->listenerDirectoryFinder()
 			->withModuleInfo()
-			->reduce(function(array $discovered, ModuleFileInfo $file) {
-				return array_merge_recursive(
-					$discovered,
-					DiscoverEvents::within($file->getPathname(), $file->module()->path('src'))
-				);
-			}, []);
+			->reduce(fn(array $discovered, ModuleFileInfo $file) => array_merge_recursive(
+				$discovered,
+				DiscoverEvents::within($file->getPathname(), $file->module()->path('src'))
+			), []);
+	}
+	
+	public function handle(Collection $data): void
+	{
+		$data->each(function(array $listeners, string $event) {
+			foreach (array_unique($listeners, SORT_REGULAR) as $listener) {
+				$this->events->listen($event, $listener);
+			}
+		});
 	}
 	
 	protected function shouldDiscoverEvents(): bool

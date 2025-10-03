@@ -3,23 +3,23 @@
 namespace InterNACHI\Modular\Support\Autodiscovery;
 
 use Illuminate\Support\Collection;
-use Illuminate\View\Factory as ViewFactory;
+use Illuminate\Translation\Translator;
 use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 
-#[AfterResolving(ViewFactory::class)]
-class ViewPlugin extends Plugin
+#[AfterResolving(Translator::class)]
+class TranslatorPlugin extends Plugin
 {
 	public function __construct(
-		protected ViewFactory $factory,
+		protected Translator $translator,
 	) {
 	}
 	
-	public function discover(FinderFactory $finders): iterable
+	public function discover(FinderFactory $finders): array
 	{
 		return $finders
-			->viewDirectoryFinder()
+			->langDirectoryFinder()
 			->withModuleInfo()
 			->values()
 			->map(fn(ModuleFileInfo $dir) => [
@@ -28,8 +28,11 @@ class ViewPlugin extends Plugin
 			]);
 	}
 	
-	public function handle(Collection $data)
+	public function handle(Collection $data): void
 	{
-		$data->each(fn(array $d) => $this->factory->addNamespace($d['namespace'], $d['path']));
+		$data->each(function(array $row) {
+			$this->translator->addNamespace($row['namespace'], $row['path']);
+			$this->translator->addJsonPath($row['path']);
+		});
 	}
 }

@@ -12,9 +12,8 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Translation\Translator;
-use Illuminate\View\Compilers\BladeCompiler;
-use Illuminate\View\Factory as ViewFactory;
+use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
+use InterNACHI\Modular\Support\Autodiscovery\Attributes\OnBoot;
 use InterNACHI\Modular\Support\Autodiscovery\Plugin;
 use Livewire\LivewireManager;
 use ReflectionClass;
@@ -74,10 +73,26 @@ class AutodiscoveryHelper
 		return $this;
 	}
 	
-	/** @param class-string<Plugin> $plugin */
-	public function boot(string $plugin): Closure
+	public function bootPlugins(): void
 	{
-		return fn(...$args) => $this->plugin($plugin)->boot(...$args);
+		foreach ($this->plugins as $class => $_) {
+			$attributes = (new ReflectionClass($class))->getAttributes();
+			foreach ($attributes as $attribute) {
+				if (AfterResolving::class === $attribute->getName()) {
+					$abstract = $attribute->getArguments()[0];
+					$this->app->afterResolving($abstract, fn() => $this->handle($class));
+					if ($this->app->resolved($abstract)) {
+						$this->handle($class);
+					}
+					return;
+				}
+				
+				if (OnBoot::class === $attribute->getName()) {
+					$this->handle($class);
+					return;
+				}
+			}
+		}
 	}
 	
 	/** @param class-string<Plugin> $name */
@@ -92,8 +107,16 @@ class AutodiscoveryHelper
 	/** @param class-string<Plugin> $name */
 	public function handle(string $name): mixed
 	{
-		return $this->plugin($name)
-			->handle($this->discover($name));
+		return $this->plugin($name)->handle($this->discover($name));
+	}
+	
+	public function handleIf(string $name, bool $condition): mixed
+	{
+		if ($condition) {
+			return $this->handle($name);
+		}
+		
+		return null;
 	}
 	
 	/** @return Collection<string, \InterNACHI\Modular\Support\ModuleConfig> */
@@ -129,18 +152,6 @@ class AutodiscoveryHelper
 			->map(fn(array $d) => new ModuleConfig($d['name'], $d['base_path'], new Collection($d['namespaces'])));
 	}
 	
-	public function migrations(Migrator $migrator): void
-	{
-		$this->withCache(
-			key: 'migration_files',
-			default: fn() => $this->finders
-				->migrationDirectoryFinder()
-				->values()
-				->map(fn(SplFileInfo $file) => $file->getRealPath()),
-			each: fn(string $path) => $migrator->path($path),
-		);
-	}
-	
 	public function commands(Artisan $artisan): void
 	{
 		$this->withCache(
@@ -152,39 +163,6 @@ class AutodiscoveryHelper
 				->map(fn(ModuleFileInfo $file) => $file->fullyQualifiedClassName())
 				->filter($this->isInstantiableCommand(...)),
 			each: fn(string $fqcn) => $artisan->resolve($fqcn),
-		);
-	}
-	
-	public function policies(Gate $gate): void
-	{
-		$this->withCache(
-			key: 'model_policy_files',
-			default: fn() => $this->finders
-				->modelFileFinder()
-				->withModuleInfo()
-				->values()
-				->map(function(ModuleFileInfo $file) use ($gate) {
-					$fqcn = $file->fullyQualifiedClassName();
-					$namespace = rtrim($file->module()->namespaces->first(), '\\');
-					
-					$candidates = [
-						$namespace.'\\Policies\\'.Str::after($fqcn, 'Models\\').'Policy', // Policies/Foo/BarPolicy
-						$namespace.'\\Policies\\'.Str::afterLast($fqcn, '\\').'Policy',   // Policies/BarPolicy
-					];
-					
-					foreach ($candidates as $candidate) {
-						if (class_exists($candidate)) {
-							return [
-								'fqcn' => $fqcn,
-								'policy' => $candidate,
-							];
-						}
-					}
-					
-					return null;
-				})
-				->filter(),
-			each: fn(array $row) => $gate->policy($row['fqcn'], $row['policy']),
 		);
 	}
 	
