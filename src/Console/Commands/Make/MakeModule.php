@@ -9,6 +9,8 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InterNACHI\Modular\Console\Commands\ModulesClear;
+use InterNACHI\Modular\Support\Autodiscovery\ModulesPlugin;
+use InterNACHI\Modular\Support\AutodiscoveryHelper;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Terminal;
@@ -110,7 +112,7 @@ class MakeModule extends Command
 		$this->line("Please run <kbd>composer update {$this->composer_name}</kbd>");
 		$this->newLine();
 		
-		$this->module_registry->reload();
+		$this->getLaravel()->make(ModuleRegistry::class)->reload();
 		
 		return 0;
 	}

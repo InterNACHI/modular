@@ -5,6 +5,7 @@ namespace InterNACHI\Modular\Support;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InterNACHI\Modular\Exceptions\CannotFindModuleForPathException;
+use InterNACHI\Modular\Support\Autodiscovery\ModulesPlugin;
 
 class ModuleRegistry
 {
@@ -56,16 +57,22 @@ class ModuleRegistry
 		});
 	}
 	
+	public function setModules(Collection $modules): static
+	{
+		$this->modules = $modules->ensure(ModulesPlugin::class);
+		
+		return $this;
+	}
+	
+	/** @return Collection<int, \InterNACHI\Modular\Support\ModuleConfig> */
 	public function modules(): Collection
 	{
-		return $this->modules ??= $this->autodiscovery_helper->modules();
+		return $this->modules ??= $this->autodiscovery_helper->handle(ModulesPlugin::class);
 	}
 	
 	public function reload(): Collection
 	{
-		$this->modules = null;
-		
-		return $this->modules ??= $this->autodiscovery_helper->modules(reload: true);
+		return $this->modules = $this->autodiscovery_helper->handle(ModulesPlugin::class);
 	}
 	
 	protected function extractModuleNameFromPath(string $path): string

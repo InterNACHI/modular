@@ -2,23 +2,14 @@
 
 namespace InterNACHI\Modular\Support;
 
-use Closure;
-use Illuminate\Console\Application as Artisan;
-use Illuminate\Console\Command;
-use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\Autodiscovery\Attributes\OnBoot;
 use InterNACHI\Modular\Support\Autodiscovery\Plugin;
-use Livewire\LivewireManager;
 use ReflectionClass;
 use RuntimeException;
-use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
 class AutodiscoveryHelper
@@ -35,7 +26,7 @@ class AutodiscoveryHelper
 	) {
 	}
 	
-	public function writeCache(Container $app): void
+	public function writeCache(): void
 	{
 		foreach ($this->plugins as $plugin) {
 			$this->discover($plugin);
@@ -119,101 +110,6 @@ class AutodiscoveryHelper
 		return null;
 	}
 	
-	/** @return Collection<string, \InterNACHI\Modular\Support\ModuleConfig> */
-	public function modules(bool $reload = false): Collection
-	{
-		if ($reload) {
-			unset($this->data['modules']);
-		}
-		
-		$data = $this->withCache(
-			key: 'modules',
-			default: fn() => $this->finders
-				->moduleComposerFileFinder()
-				->values()
-				->mapWithKeys(function(SplFileInfo $file) {
-					$composer_config = json_decode($file->getContents(), true, 16, JSON_THROW_ON_ERROR);
-					$base_path = rtrim(str_replace('\\', '/', $file->getPath()), '/');
-					$name = basename($base_path);
-					
-					return [
-						$name => [
-							'name' => $name,
-							'base_path' => $base_path,
-							'namespaces' => Collection::make($composer_config['autoload']['psr-4'] ?? [])
-								->mapWithKeys(fn($src, $namespace) => ["{$base_path}/{$src}" => $namespace])
-								->all(),
-						],
-					];
-				}),
-		);
-		
-		return Collection::make($data)
-			->map(fn(array $d) => new ModuleConfig($d['name'], $d['base_path'], new Collection($d['namespaces'])));
-	}
-	
-	public function commands(Artisan $artisan): void
-	{
-		$this->withCache(
-			key: 'command_files',
-			default: fn() => $this->finders
-				->commandFileFinder()
-				->withModuleInfo()
-				->values()
-				->map(fn(ModuleFileInfo $file) => $file->fullyQualifiedClassName())
-				->filter($this->isInstantiableCommand(...)),
-			each: fn(string $fqcn) => $artisan->resolve($fqcn),
-		);
-	}
-	
-	public function events(Dispatcher $events, bool $autodiscover = true): void
-	{
-		$this->withCache(
-			key: 'events',
-			default: fn() => $autodiscover
-				? $this->finders
-					->listenerDirectoryFinder()
-					->withModuleInfo()
-					->reduce(function(array $discovered, ModuleFileInfo $file) {
-						return array_merge_recursive(
-							$discovered,
-							DiscoverEvents::within($file->getPathname(), $file->module()->path('src'))
-						);
-					}, [])
-				: [],
-			each: function(array $listeners, string $event) use ($events) {
-				foreach (array_unique($listeners, SORT_REGULAR) as $listener) {
-					$events->listen($event, $listener);
-				}
-			},
-		);
-	}
-	
-	public function livewire(LivewireManager $livewire): void
-	{
-		$this->withCache(
-			key: 'livewire_component_files',
-			default: fn() => $this->finders
-				->livewireComponentFileFinder()
-				->withModuleInfo()
-				->values()
-				->map(fn(ModuleFileInfo $file) => [
-					'name' => sprintf(
-						'%s::%s',
-						$file->module()->name,
-						Str::of($file->getRelativePath())
-							->explode('/')
-							->filter()
-							->push($file->getBasename('.php'))
-							->map([Str::class, 'kebab'])
-							->implode('.')
-					),
-					'fqcn' => $file->fullyQualifiedClassName(),
-				]),
-			each: fn(array $row) => $livewire->component($row['name'], $row['fqcn']),
-		);
-	}
-	
 	/**
 	 * @template TPlugin of Plugin
 	 * @param class-string<TPlugin> $plugin
@@ -222,19 +118,6 @@ class AutodiscoveryHelper
 	public function plugin(string $plugin): Plugin
 	{
 		return $this->plugins[$plugin] ??= $this->app->make($plugin);
-	}
-	
-	protected function withCache(
-		string $key,
-		Closure $default,
-		?Closure $each = null,
-	): iterable {
-		$this->data ??= $this->readData();
-		$this->data[$key] ??= value($default);
-		
-		return $each
-			? Collection::make($this->data[$key])->each($each)
-			: $this->data[$key];
 	}
 	
 	protected function readData(): array
@@ -246,11 +129,5 @@ class AutodiscoveryHelper
 		} catch (Throwable) {
 			return [];
 		}
-	}
-	
-	protected function isInstantiableCommand($command): bool
-	{
-		return is_subclass_of($command, Command::class)
-			&& ! (new ReflectionClass($command))->isAbstract();
 	}
 }

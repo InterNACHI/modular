@@ -7,6 +7,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
@@ -20,6 +21,7 @@ use InterNACHI\Modular\Support\Autodiscovery\EventsPlugin;
 use InterNACHI\Modular\Support\Autodiscovery\GatePlugin;
 use InterNACHI\Modular\Support\Autodiscovery\LivewirePlugin;
 use InterNACHI\Modular\Support\Autodiscovery\MigratorPlugin;
+use InterNACHI\Modular\Support\Autodiscovery\ModulesPlugin;
 use InterNACHI\Modular\Support\Autodiscovery\PluginRegistry;
 use InterNACHI\Modular\Support\Autodiscovery\RoutesPlugin;
 use InterNACHI\Modular\Support\Autodiscovery\TranslatorPlugin;
@@ -28,8 +30,6 @@ use Livewire\LivewireManager;
 
 class ModularServiceProvider extends ServiceProvider
 {
-	protected ?ModuleRegistry $registry = null;
-	
 	protected ?AutodiscoveryHelper $autodiscovery_helper = null;
 	
 	protected string $base_dir;
@@ -83,49 +83,15 @@ class ModularServiceProvider extends ServiceProvider
 			GatePlugin::class,
 		);
 		
-		$this->app->booting(function() {
-			$plugins = PluginRegistry::instance()->all();
-			
-			foreach ($plugins as $class) {
-				$this->autodiscover()->plugin($class);
-			}
-			
-			$this->autodiscover()->bootPlugins();
-		});
-		
-		Artisan::starting(fn() => $this->autodiscover()->handle(ArtisanPlugin::class));
+		$this->app->booting($this->bootPlugins(...));
 	}
 	
 	public function boot(): void
 	{
-		$this->publishVendorFiles();
-		$this->bootPackageCommands();
-		
-		$this->autodiscover()->handleIf(RoutesPlugin::class, condition: ! $this->app->routesAreCached());
-		$this->autodiscover()->handleIf(LivewirePlugin::class, condition: class_exists(LivewireManager::class));
-		
-		$this->autodiscover()->bootPlugins();
-	}
-	
-	protected function registry(): ModuleRegistry
-	{
-		return $this->registry ??= $this->app->make(ModuleRegistry::class);
-	}
-	
-	protected function autodiscover(): AutodiscoveryHelper
-	{
-		return $this->autodiscovery_helper ??= $this->app->make(AutodiscoveryHelper::class);
-	}
-	
-	protected function publishVendorFiles(): void
-	{
 		$this->publishes([
 			"{$this->base_dir}/config/app-modules.php" => $this->app->configPath('app-modules.php'),
 		], 'modular-config');
-	}
-	
-	protected function bootPackageCommands(): void
-	{
+		
 		if ($this->app->runningInConsole()) {
 			$this->commands([
 				MakeModule::class,
@@ -137,9 +103,32 @@ class ModularServiceProvider extends ServiceProvider
 		}
 	}
 	
+	protected function bootPlugins(): void
+	{
+		$plugins = PluginRegistry::instance()->all();
+		
+		// First register all plugins with the auto-discovery helper
+		foreach ($plugins as $class) {
+			$this->autodiscover()->plugin($class);
+		}
+		
+		// Then boot all plugins that have annotations
+		$this->autodiscover()->bootPlugins();
+		
+		// Finally, handle some special plugin cases
+		$this->autodiscover()->handleIf(RoutesPlugin::class, condition: ! $this->app->routesAreCached());
+		$this->autodiscover()->handleIf(LivewirePlugin::class, condition: class_exists(LivewireManager::class));
+		Artisan::starting(fn() => $this->autodiscover()->handle(ArtisanPlugin::class));
+	}
+	
+	protected function autodiscover(): AutodiscoveryHelper
+	{
+		return $this->autodiscovery_helper ??= $this->app->make(AutodiscoveryHelper::class);
+	}
+	
 	protected function registerEloquentFactories(): void
 	{
-		$helper = new DatabaseFactoryHelper($this->registry());
+		$helper = new DatabaseFactoryHelper($this->app->make(ModuleRegistry::class));
 		
 		EloquentFactory::guessModelNamesUsing($helper->modelNameResolver());
 		EloquentFactory::guessFactoryNamesUsing($helper->factoryNameResolver());
