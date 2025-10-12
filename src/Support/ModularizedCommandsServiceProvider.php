@@ -5,8 +5,10 @@ namespace InterNACHI\Modular\Support;
 use Illuminate\Console\Application;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand as OriginalMakeMigrationCommand;
+use Illuminate\Foundation\Console\VendorPublishCommand as OriginalVendorPublishCommand;
 use Illuminate\Support\ServiceProvider;
 use InterNACHI\Modular\Console\Commands\Database\SeedCommand;
+use InterNACHI\Modular\Console\Commands\Foundation\VendorPublishCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeCast;
 use InterNACHI\Modular\Console\Commands\Make\MakeChannel;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
@@ -60,7 +62,7 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 		'command.component.make' => MakeComponent::class,
 		'command.seed' => SeedCommand::class,
 	];
-	
+
 	public function register(): void
 	{
 		// Register our overrides via the "booted" event to ensure that we override
@@ -71,10 +73,11 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 				$this->registerMakeCommandOverrides();
 				$this->registerMigrationCommandOverrides();
 				$this->registerLivewireOverrides($artisan);
+				$this->registerVendorPuslishCommandOverride();
 			});
 		});
 	}
-	
+
 	protected function registerMakeCommandOverrides()
 	{
 		foreach ($this->overrides as $alias => $class_name) {
@@ -82,30 +85,30 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 			$this->app->singleton(get_parent_class($class_name), $class_name);
 		}
 	}
-	
+
 	protected function registerMigrationCommandOverrides()
 	{
 		// Laravel 8
 		$this->app->singleton('command.migrate.make', function($app) {
 			return new MakeMigration($app['migration.creator'], $app['composer']);
 		});
-		
+
 		// Laravel 9
 		$this->app->singleton(OriginalMakeMigrationCommand::class, function($app) {
 			return new MakeMigration($app['migration.creator'], $app['composer']);
 		});
 	}
-	
+
 	protected function registerLivewireOverrides(Artisan $artisan)
 	{
 		// Don't register commands if Livewire isn't installed
 		if (! class_exists(Livewire\MakeCommand::class)) {
 			return;
 		}
-		
+
 		// Replace the resolved command with our subclass
 		$artisan->resolveCommands([MakeLivewire::class]);
-		
+
 		// Ensure that if 'make:livewire' or 'livewire:make' is resolved from the container
 		// in the future, our subclass is used instead
 		$this->app->extend(Livewire\MakeCommand::class, function() {
@@ -113,6 +116,13 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 		});
 		$this->app->extend(Livewire\MakeLivewireCommand::class, function() {
 			return new MakeLivewire();
+		});
+	}
+
+	protected function registerVendorPuslishCommandOverride()
+	{
+		$this->app->singleton(OriginalVendorPublishCommand::class, function($app) {
+			return new VendorPublishCommand($app['files']);
 		});
 	}
 }
