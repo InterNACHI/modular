@@ -46,6 +46,21 @@ return [
 	*/
 	
 	'modules_directory' => 'app-modules',
+
+	/*
+    |--------------------------------------------------------------------------
+    | Migrations
+    |--------------------------------------------------------------------------
+    |
+    | Here you can specify which modules should be ignored by the migrator.
+    | This is useful if you want to disable migrations for a specific
+    | module.
+    |
+    */
+
+	'migrations' => [
+		'ignore' => [],
+	],
 	
 	/*
 	|--------------------------------------------------------------------------

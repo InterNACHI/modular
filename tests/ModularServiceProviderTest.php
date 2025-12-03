@@ -3,6 +3,7 @@
 namespace InterNACHI\Modular\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 
@@ -162,5 +163,28 @@ class ModularServiceProviderTest extends TestCase
 		
 		$this->assertEquals('Test JSON translation', $translator->get('Test JSON string'));
 		$this->assertEquals('Test PHP translation', $translator->get('test-module::foo.bar'));
+	}
+
+	public function test_it_does_not_load_migrations_from_ignored_modules(): void
+	{
+		$this->makeModule('module-a');
+		$this->makeModule('module-b');
+
+		$this->artisan('make:migration', ['name' => 'create_module_a_table', '--module' => 'module-a']);
+		$this->artisan('make:migration', ['name' => 'create_module_b_table', '--module' => 'module-b']);
+
+		$this->app['config']->set('app-modules.migrations.ignore', ['module-b']);
+
+		$this->artisan('migrate');
+
+		$migrations = DB::table('migrations')->get()->pluck('migration');
+
+		$this->assertTrue($migrations->contains(function ($migration) {
+			return str_contains($migration, 'create_module_a_table');
+		}));
+
+		$this->assertFalse($migrations->contains(function ($migration) {
+			return str_contains($migration, 'create_module_b_table');
+		}));
 	}
 }

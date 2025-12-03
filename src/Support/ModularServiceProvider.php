@@ -234,6 +234,10 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->autoDiscoveryHelper()
 			->migrationDirectoryFinder()
+			->reject(function (SplFileInfo $path) {
+				$module = $this->registry()->moduleForPathOrFail($path->getPath());
+				return in_array($module->name, Config::get('app-modules.migrations.ignore', []));
+			})
 			->each(function(SplFileInfo $path) use ($migrator) {
 				$migrator->path($path->getRealPath());
 			});
