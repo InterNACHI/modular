@@ -26,7 +26,7 @@ class ModulesSyncTest extends TestCase
 		
 		$this->assertCount(1, $nodes);
 	}
-	
+
 	public function test_it_updates_phpstorm_plugin_config(): void
 	{
 		$config_path = $this->copyStub('laravel-plugin.xml', '.idea');
@@ -119,5 +119,22 @@ class ModulesSyncTest extends TestCase
 		$nodes = $config->xpath('//component[@name="NewModuleRootManager"]//content[@url="file://$MODULE_DIR$"]//sourceFolder');
 		
 		$this->assertCount(6, $nodes);
+	}
+
+	public function test_it_skips_updating_phpunit_config_with_flag(): void
+	{
+		$config_path = $this->copyStub('phpunit.xml', '/');
+
+		$config = simplexml_load_string($this->filesystem->get($config_path));
+		$nodes = $config->xpath("//phpunit//testsuites//testsuite//directory[text()='./app-modules/*/tests']");
+
+		$this->assertCount(0, $nodes);
+
+		$this->artisan(ModulesSync::class, ['--no-phpunit' => true]);
+
+		$config = simplexml_load_string($this->filesystem->get($config_path));
+		$nodes = $config->xpath("//phpunit//testsuites//testsuite//directory[text()='./app-modules/*/tests']");
+
+		$this->assertCount(0, $nodes);
 	}
 }
