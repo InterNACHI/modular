@@ -8,7 +8,7 @@ use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 
-#[AfterResolving(BladeCompiler::class)]
+#[AfterResolving(BladeCompiler::class, parameter: 'blade')]
 class BladePlugin extends Plugin
 {
 	public function __construct(

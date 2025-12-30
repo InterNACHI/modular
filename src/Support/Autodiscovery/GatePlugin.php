@@ -9,7 +9,7 @@ use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 
-#[AfterResolving(Gate::class)]
+#[AfterResolving(Gate::class, parameter: 'gate')]
 class GatePlugin extends Plugin
 {
 	public function __construct(

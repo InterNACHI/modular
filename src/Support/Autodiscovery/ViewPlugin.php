@@ -8,7 +8,7 @@ use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 
-#[AfterResolving(ViewFactory::class)]
+#[AfterResolving(ViewFactory::class, parameter: 'factory')]
 class ViewPlugin extends Plugin
 {
 	public function __construct(

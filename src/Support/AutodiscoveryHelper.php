@@ -75,8 +75,8 @@ class AutodiscoveryHelper
 			$attributes = (new ReflectionClass($class))->getAttributes();
 			foreach ($attributes as $attribute) {
 				if (AfterResolving::class === $attribute->getName()) {
-					$abstract = $attribute->getArguments()[0];
-					$this->app->afterResolving($abstract, fn($resolved) => $this->handle($class, $resolved));
+					[$abstract, $parameter] = array_values($attribute->getArguments());
+					$this->app->afterResolving($abstract, fn($resolved) => $this->handle($class, [$parameter => $resolved]));
 					if ($this->app->resolved($abstract)) {
 						$this->handle($class);
 					}
@@ -101,9 +101,9 @@ class AutodiscoveryHelper
 	}
 	
 	/** @param class-string<Plugin> $name */
-	public function handle(string $name, ?object $dependency = null): mixed
+	public function handle(string $name, array $parameters = []): mixed
 	{
-		return $this->handled[$name] ??= $this->plugin($name, $dependency)->handle($this->discover($name));
+		return $this->handled[$name] ??= $this->plugin($name, $parameters)->handle($this->discover($name));
 	}
 	
 	public function handleIf(string $name, bool $condition): mixed
@@ -120,16 +120,9 @@ class AutodiscoveryHelper
 	 * @param class-string<TPlugin> $plugin
 	 * @return TPlugin
 	 */
-	public function plugin(string $plugin, ?object $dependency = null): Plugin
+	public function plugin(string $plugin, array $parameters = []): Plugin
 	{
-		if (! isset($this->plugins[$plugin]) && $dependency) {
-			$this->app
-				->when($plugin)
-				->needs($dependency::class)
-				->give(fn() => $dependency);
-		}
-		
-		return $this->plugins[$plugin] ??= $this->app->make($plugin);
+		return $this->plugins[$plugin] ??= $this->app->make($plugin, $parameters);
 	}
 	
 	protected function readData(): array

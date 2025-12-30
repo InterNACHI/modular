@@ -8,7 +8,7 @@ use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\FinderFactory;
 use Symfony\Component\Finder\SplFileInfo;
 
-#[AfterResolving(Migrator::class)]
+#[AfterResolving(Migrator::class, parameter: 'migrator')]
 class MigratorPlugin extends Plugin
 {
 	public function __construct(

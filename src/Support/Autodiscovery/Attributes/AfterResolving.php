@@ -8,7 +8,8 @@ use Attribute;
 class AfterResolving
 {
 	public function __construct(
-		public string $abstract
+		public string $abstract,
+		public string $parameter,
 	) {
 	}
 }

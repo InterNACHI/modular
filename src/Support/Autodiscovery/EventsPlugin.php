@@ -12,7 +12,7 @@ use InterNACHI\Modular\Support\DiscoverEvents;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 
-#[AfterResolving(Dispatcher::class)]
+#[AfterResolving(Dispatcher::class, parameter: 'events')]
 class EventsPlugin extends Plugin
 {
 	public function __construct(

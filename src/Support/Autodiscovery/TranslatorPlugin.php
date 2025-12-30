@@ -8,7 +8,7 @@ use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 
-#[AfterResolving(Translator::class)]
+#[AfterResolving(Translator::class, parameter: 'translator')]
 class TranslatorPlugin extends Plugin
 {
 	public function __construct(

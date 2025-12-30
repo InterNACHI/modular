@@ -116,7 +116,7 @@ class ModularServiceProvider extends ServiceProvider
 		// Finally, handle some special plugin cases
 		$this->autodiscover()->handleIf(RoutesPlugin::class, condition: ! $this->app->routesAreCached());
 		$this->autodiscover()->handleIf(LivewirePlugin::class, condition: class_exists(LivewireManager::class));
-		Artisan::starting(fn($artisan) => $this->autodiscover()->handle(ArtisanPlugin::class, $artisan));
+		Artisan::starting(fn($artisan) => $this->autodiscover()->handle(ArtisanPlugin::class, ['artisan' => $artisan]));
 	}
 	
 	protected function autodiscover(): AutodiscoveryHelper
