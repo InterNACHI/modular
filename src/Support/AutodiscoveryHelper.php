@@ -57,6 +57,7 @@ class AutodiscoveryHelper
 			$this->fs->delete($this->cache_path);
 		}
 		
+		$this->handled = [];
 		$this->data = null;
 	}
 	
