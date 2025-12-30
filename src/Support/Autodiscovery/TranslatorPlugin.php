@@ -16,7 +16,7 @@ class TranslatorPlugin extends Plugin
 	) {
 	}
 	
-	public function discover(FinderFactory $finders): array
+	public function discover(FinderFactory $finders): iterable
 	{
 		return $finders
 			->langDirectoryFinder()

@@ -18,6 +18,8 @@ class AutodiscoveryHelper
 	
 	protected array $plugins = [];
 	
+	protected array $handled = [];
+	
 	public function __construct(
 		protected FinderFactory $finders,
 		protected Filesystem $fs,
@@ -28,7 +30,7 @@ class AutodiscoveryHelper
 	
 	public function writeCache(): void
 	{
-		foreach ($this->plugins as $plugin) {
+		foreach (array_keys($this->plugins) as $plugin) {
 			$this->discover($plugin);
 		}
 		
@@ -54,6 +56,8 @@ class AutodiscoveryHelper
 		if ($this->fs->exists($this->cache_path)) {
 			$this->fs->delete($this->cache_path);
 		}
+		
+		$this->data = null;
 	}
 	
 	/** @param class-string<Plugin> $plugin */
@@ -71,7 +75,7 @@ class AutodiscoveryHelper
 			foreach ($attributes as $attribute) {
 				if (AfterResolving::class === $attribute->getName()) {
 					$abstract = $attribute->getArguments()[0];
-					$this->app->afterResolving($abstract, fn() => $this->handle($class));
+					$this->app->afterResolving($abstract, fn($resolved) => $this->handle($class, $resolved));
 					if ($this->app->resolved($abstract)) {
 						$this->handle($class);
 					}
@@ -96,9 +100,9 @@ class AutodiscoveryHelper
 	}
 	
 	/** @param class-string<Plugin> $name */
-	public function handle(string $name): mixed
+	public function handle(string $name, ?object $dependency = null): mixed
 	{
-		return $this->plugin($name)->handle($this->discover($name));
+		return $this->handled[$name] ??= $this->plugin($name, $dependency)->handle($this->discover($name));
 	}
 	
 	public function handleIf(string $name, bool $condition): mixed
@@ -115,8 +119,15 @@ class AutodiscoveryHelper
 	 * @param class-string<TPlugin> $plugin
 	 * @return TPlugin
 	 */
-	public function plugin(string $plugin): Plugin
+	public function plugin(string $plugin, ?object $dependency = null): Plugin
 	{
+		if (! isset($this->plugins[$plugin]) && $dependency) {
+			$this->app
+				->when($plugin)
+				->needs($dependency::class)
+				->give(fn() => $dependency);
+		}
+		
 		return $this->plugins[$plugin] ??= $this->app->make($plugin);
 	}
 	

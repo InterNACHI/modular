@@ -7,7 +7,6 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
 use InterNACHI\Modular\Console\Commands\Make\MakeModule;
@@ -21,7 +20,6 @@ use InterNACHI\Modular\Support\Autodiscovery\EventsPlugin;
 use InterNACHI\Modular\Support\Autodiscovery\GatePlugin;
 use InterNACHI\Modular\Support\Autodiscovery\LivewirePlugin;
 use InterNACHI\Modular\Support\Autodiscovery\MigratorPlugin;
-use InterNACHI\Modular\Support\Autodiscovery\ModulesPlugin;
 use InterNACHI\Modular\Support\Autodiscovery\PluginRegistry;
 use InterNACHI\Modular\Support\Autodiscovery\RoutesPlugin;
 use InterNACHI\Modular\Support\Autodiscovery\TranslatorPlugin;
@@ -109,7 +107,7 @@ class ModularServiceProvider extends ServiceProvider
 		
 		// First register all plugins with the auto-discovery helper
 		foreach ($plugins as $class) {
-			$this->autodiscover()->plugin($class);
+			$this->autodiscover()->register($class);
 		}
 		
 		// Then boot all plugins that have annotations
@@ -118,7 +116,7 @@ class ModularServiceProvider extends ServiceProvider
 		// Finally, handle some special plugin cases
 		$this->autodiscover()->handleIf(RoutesPlugin::class, condition: ! $this->app->routesAreCached());
 		$this->autodiscover()->handleIf(LivewirePlugin::class, condition: class_exists(LivewireManager::class));
-		Artisan::starting(fn() => $this->autodiscover()->handle(ArtisanPlugin::class));
+		Artisan::starting(fn($artisan) => $this->autodiscover()->handle(ArtisanPlugin::class, $artisan));
 	}
 	
 	protected function autodiscover(): AutodiscoveryHelper
