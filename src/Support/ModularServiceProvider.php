@@ -141,5 +141,4 @@ class ModularServiceProvider extends ServiceProvider
 		
 		return $this->modules_path;
 	}
-	
 }
