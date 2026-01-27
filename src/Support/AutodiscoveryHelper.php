@@ -5,9 +5,9 @@ namespace InterNACHI\Modular\Support;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
-use InterNACHI\Modular\Support\Autodiscovery\Attributes\OnBoot;
+use InterNACHI\Modular\Support\Autodiscovery\Attributes\HandlesAutodiscovery;
 use InterNACHI\Modular\Support\Autodiscovery\Plugin;
+use ReflectionAttribute;
 use ReflectionClass;
 use RuntimeException;
 use Throwable;
@@ -72,21 +72,9 @@ class AutodiscoveryHelper
 	public function bootPlugins(): void
 	{
 		foreach ($this->plugins as $class => $_) {
-			$attributes = (new ReflectionClass($class))->getAttributes();
-			foreach ($attributes as $attribute) {
-				if (AfterResolving::class === $attribute->getName()) {
-					[$abstract, $parameter] = array_values($attribute->getArguments());
-					$this->app->afterResolving($abstract, fn($resolved) => $this->handle($class, [$parameter => $resolved]));
-					if ($this->app->resolved($abstract)) {
-						$this->handle($class);
-					}
-					return;
-				}
-				
-				if (OnBoot::class === $attribute->getName()) {
-					$this->handle($class);
-					return;
-				}
+			$attributes = (new ReflectionClass($class))->getAttributes(HandlesAutodiscovery::class, ReflectionAttribute::IS_INSTANCEOF);
+			if (count($attributes)) {
+				$attributes[0]->newInstance()->boot($class, $this->handle(...), $this->app);
 			}
 		}
 	}

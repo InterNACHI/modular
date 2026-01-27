@@ -8,6 +8,7 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 	use Illuminate\Support\Facades\Event;
 	use InterNACHI\Modular\Console\Commands\ModulesCache;
 	use InterNACHI\Modular\Console\Commands\ModulesClear;
+	use InterNACHI\Modular\Support\Autodiscovery\EventsPlugin;
 	use InterNACHI\Modular\Support\Facades\Modules;
 	use InterNACHI\Modular\Tests\Concerns\PreloadsAppModules;
 	use InterNACHI\Modular\Tests\TestCase;
@@ -35,11 +36,11 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 			
 			$cache = require $this->app->bootstrapPath('cache/app-modules.php');
 			
-			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache['events']);
-			
+			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[EventsPlugin::class]);
+
 			$this->assertContains(
 				$module->qualify('Listeners\\TestEventListener@handle'),
-				$cache['events'][$module->qualify('Events\\TestEvent')]
+				$cache[EventsPlugin::class][$module->qualify('Events\\TestEvent')]
 			);
 		}
 		
