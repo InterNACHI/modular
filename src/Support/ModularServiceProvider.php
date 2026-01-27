@@ -69,6 +69,11 @@ class ModularServiceProvider extends ServiceProvider
 			return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
 		});
 		
+		// The Migrator is bound in the container only as 'migrator' so we need to wire it up this way
+		$this->app->singleton(MigratorPlugin::class, function(Application $app) {
+			return new MigratorPlugin($app->make('migrator'));
+		});
+		
 		$this->registerEloquentFactories();
 		
 		PluginRegistry::register(

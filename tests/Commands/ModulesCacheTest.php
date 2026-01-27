@@ -3,6 +3,7 @@
 namespace InterNACHI\Modular\Tests\Commands;
 
 use InterNACHI\Modular\Console\Commands\ModulesCache;
+use InterNACHI\Modular\Support\Autodiscovery\ModulesPlugin;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use InterNACHI\Modular\Tests\TestCase;
 
@@ -24,8 +25,9 @@ class ModulesCacheTest extends TestCase
 			
 			$cache = include $expected_path;
 			
-			$this->assertArrayHasKey('test-module', $cache['modules']);
-			$this->assertArrayHasKey('test-module-two', $cache['modules']);
+			$this->assertArrayHasKey(ModulesPlugin::class, $cache);
+			$this->assertArrayHasKey('test-module', $cache[ModulesPlugin::class]);
+			$this->assertArrayHasKey('test-module-two', $cache[ModulesPlugin::class]);
 		} finally {
 			if (file_exists($expected_path)) {
 				unlink($expected_path);
