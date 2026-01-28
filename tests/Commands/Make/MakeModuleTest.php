@@ -40,13 +40,8 @@ class MakeModuleTest extends TestCase
 		$this->assertEquals('tests/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Tests\\']);
 		$this->assertContains('Modules\\TestModule\\Providers\\TestModuleServiceProvider', $composer_contents['extra']['laravel']['providers']);
 		
-		if (version_compare($this->app->version(), '8.0.0', '>=')) {
-			$this->assertEquals('database/factories/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Database\\Factories\\']);
-			$this->assertEquals('database/seeders/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Database\\Seeders\\']);
-		} else {
-			$this->assertContains('database/factories', $composer_contents['autoload']['classmap']);
-			$this->assertContains('database/seeds', $composer_contents['autoload']['classmap']);
-		}
+		$this->assertEquals('database/factories/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Database\\Factories\\']);
+		$this->assertEquals('database/seeders/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Database\\Seeders\\']);
 		
 		$app_composer_file = $this->getApplicationBasePath().'/composer.json';
 		$app_composer_contents = json_decode($fs->get($app_composer_file), true);

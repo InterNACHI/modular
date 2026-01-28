@@ -20,7 +20,6 @@ class Laravel11EventDiscoveryImplicitlyEnabledTest extends TestCase
 		parent::setUp();
 		
 		$this->beforeApplicationDestroyed(fn() => $this->artisan(ModulesClear::class));
-		$this->requiresLaravelVersion('11.0.0');
 	}
 	
 	public function test_it_auto_discovers_event_listeners(): void
