@@ -82,7 +82,7 @@ class AutodiscoveryHelper
 	/** @param class-string<Plugin> $name */
 	public function discover(string $name): Collection
 	{
-		$this->data ??= $this->readData();
+		$this->data ??= $this->readCacheIfExists();
 		$this->data[$name] ??= $this->plugin($name)->discover($this->finders);
 		
 		return collect($this->data[$name]);
@@ -113,7 +113,7 @@ class AutodiscoveryHelper
 		return $this->plugins[$plugin] ??= $this->app->make($plugin, $parameters);
 	}
 	
-	protected function readData(): array
+	protected function readCacheIfExists(): array
 	{
 		try {
 			return $this->fs->exists($this->cache_path)
