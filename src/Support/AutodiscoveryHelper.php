@@ -6,10 +6,8 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
-use InterNACHI\Modular\Support\Autodiscovery\Attributes\HandlesAutodiscovery;
 use InterNACHI\Modular\Support\Autodiscovery\Plugin;
-use ReflectionAttribute;
-use ReflectionClass;
+use InterNACHI\Modular\Support\Autodiscovery\PluginRegistry;
 use RuntimeException;
 use Throwable;
 
@@ -17,12 +15,10 @@ class AutodiscoveryHelper
 {
 	protected ?array $data = null;
 	
-	/** @var array<class-string<Plugin>, Plugin|null> */
-	protected array $plugins = [];
-	
 	protected array $handled = [];
 	
 	public function __construct(
+		protected PluginRegistry $registry,
 		protected FinderFactory $finders,
 		protected Filesystem $fs,
 		protected Container $app,
@@ -32,7 +28,7 @@ class AutodiscoveryHelper
 	
 	public function writeCache(): void
 	{
-		foreach (array_keys($this->plugins) as $plugin) {
+		foreach ($this->registry->all() as $plugin) {
 			$this->discover($plugin);
 		}
 		
@@ -63,17 +59,9 @@ class AutodiscoveryHelper
 		$this->data = null;
 	}
 	
-	/** @param class-string<Plugin> $plugin */
-	public function register(string $plugin): static
-	{
-		$this->plugins[$plugin] ??= null;
-		
-		return $this;
-	}
-	
 	public function bootPlugins(Application $app): void
 	{
-		foreach ($this->plugins as $class => $_) {
+		foreach ($this->registry->all() as $class) {
 			$class::boot($this->handle(...), $app);
 		}
 	}
@@ -82,7 +70,7 @@ class AutodiscoveryHelper
 	public function discover(string $name): Collection
 	{
 		$this->data ??= $this->readCacheIfExists();
-		$this->data[$name] ??= $this->plugin($name)->discover($this->finders);
+		$this->data[$name] ??= $this->registry->plugin($name)->discover($this->finders);
 		
 		return collect($this->data[$name]);
 	}
@@ -90,26 +78,7 @@ class AutodiscoveryHelper
 	/** @param class-string<Plugin> $name */
 	public function handle(string $name, array $parameters = []): mixed
 	{
-		return $this->handled[$name] ??= $this->plugin($name, $parameters)->handle($this->discover($name));
-	}
-	
-	public function handleIf(string $name, bool $condition): mixed
-	{
-		if ($condition) {
-			return $this->handle($name);
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * @template TPlugin of Plugin
-	 * @param class-string<TPlugin> $plugin
-	 * @return TPlugin
-	 */
-	public function plugin(string $plugin, array $parameters = []): Plugin
-	{
-		return $this->plugins[$plugin] ??= $this->app->make($plugin, $parameters);
+		return $this->handled[$name] ??= $this->registry->plugin($name, $parameters)->handle($this->discover($name));
 	}
 	
 	protected function readCacheIfExists(): array

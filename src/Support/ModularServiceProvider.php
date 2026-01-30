@@ -19,6 +19,7 @@ use InterNACHI\Modular\Support\Autodiscovery\EventsPlugin;
 use InterNACHI\Modular\Support\Autodiscovery\GatePlugin;
 use InterNACHI\Modular\Support\Autodiscovery\LivewirePlugin;
 use InterNACHI\Modular\Support\Autodiscovery\MigratorPlugin;
+use InterNACHI\Modular\Support\Autodiscovery\ModulesPlugin;
 use InterNACHI\Modular\Support\Autodiscovery\PluginRegistry;
 use InterNACHI\Modular\Support\Autodiscovery\RoutesPlugin;
 use InterNACHI\Modular\Support\Autodiscovery\TranslatorPlugin;
@@ -55,8 +56,11 @@ class ModularServiceProvider extends ServiceProvider
 			return new FinderFactory($this->getModulesBasePath());
 		});
 		
+		$this->app->singleton(PluginRegistry::class);
+		
 		$this->app->singleton(AutodiscoveryHelper::class, function(Application $app) {
 			return new AutodiscoveryHelper(
+				$app->make(PluginRegistry::class),
 				$app->make(FinderFactory::class),
 				$app->make(Filesystem::class),
 				$app,
@@ -82,6 +86,7 @@ class ModularServiceProvider extends ServiceProvider
 			GatePlugin::class,
 			LivewirePlugin::class,
 			MigratorPlugin::class,
+			ModulesPlugin::class,
 			RoutesPlugin::class,
 			TranslatorPlugin::class,
 			ViewPlugin::class,
@@ -91,7 +96,7 @@ class ModularServiceProvider extends ServiceProvider
 			PluginRegistry::register(LivewirePlugin::class);
 		}
 		
-		$this->app->booting($this->bootPlugins(...));
+		$this->app->booting(fn() => $this->autodiscover()->bootPlugins($this->app));
 	}
 	
 	public function boot(): void
@@ -109,19 +114,6 @@ class ModularServiceProvider extends ServiceProvider
 				ModulesList::class,
 			]);
 		}
-	}
-	
-	protected function bootPlugins(): void
-	{
-		$plugins = PluginRegistry::instance()->all();
-		
-		// First register all plugins with the auto-discovery helper
-		foreach ($plugins as $class) {
-			$this->autodiscover()->register($class);
-		}
-		
-		// Then boot all plugins that have annotations
-		$this->autodiscover()->bootPlugins($this->app);
 	}
 	
 	protected function autodiscover(): AutodiscoveryHelper
