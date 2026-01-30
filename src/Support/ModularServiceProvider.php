@@ -69,7 +69,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->app->singleton(PluginHandler::class);
 		
 		// Because of the way migration dependencies are registered (as strings rather than class names),
-		// we need to wire up our dependencies manually for migration-specific features 
+		// we need to wire up our dependencies manually for migration-specific features
 		$this->app->singleton(MakeMigration::class, fn(Application $app) => new MigrateMakeCommand($app['migration.creator'], $app['composer']));
 		$this->app->singleton(MigratorPlugin::class, fn(Application $app) => new MigratorPlugin($app->make('migrator')));
 		
@@ -86,6 +86,9 @@ class ModularServiceProvider extends ServiceProvider
 		], 'modular-config');
 		
 		if ($this->app->runningInConsole()) {
+			if (method_exists($this, 'optimizes')) {
+				$this->optimizes('modules:cache', 'modules:clear', 'app-modules');
+			}
 			$this->commands([
 				MakeModule::class,
 				ModulesCache::class,

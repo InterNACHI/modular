@@ -3,7 +3,6 @@
 namespace InterNACHI\Modular\Support\Autodiscovery;
 
 use Closure;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
 use InterNACHI\Modular\Support\Autodiscovery\Attributes\HandlesAutodiscovery;

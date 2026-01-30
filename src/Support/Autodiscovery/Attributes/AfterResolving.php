@@ -4,7 +4,6 @@ namespace InterNACHI\Modular\Support\Autodiscovery\Attributes;
 
 use Attribute;
 use Closure;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application;
 
 #[Attribute(Attribute::TARGET_CLASS)]
