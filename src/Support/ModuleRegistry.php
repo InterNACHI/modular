@@ -57,13 +57,6 @@ class ModuleRegistry
 		});
 	}
 	
-	public function setModules(Collection $modules): static
-	{
-		$this->modules = $modules->ensure(ModulesPlugin::class);
-		
-		return $this;
-	}
-	
 	/** @return Collection<int, \InterNACHI\Modular\Support\ModuleConfig> */
 	public function modules(): Collection
 	{
