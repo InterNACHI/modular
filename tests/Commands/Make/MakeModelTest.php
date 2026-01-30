@@ -35,7 +35,7 @@ class MakeModelTest extends TestCase
 	public function test_it_scaffolds_a_model_in_the_app_when_module_option_is_missing(): void
 	{
 		$command = MakeModel::class;
-		$arguments = ['name' => 'TestModel'];
+		$arguments = ['name' => 'TestModel', '--force' => true];
 		$expected_path = 'app/Models/TestModel.php';
 		$expected_substrings = [
 			'namespace App\Models',

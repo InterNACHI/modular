@@ -115,11 +115,6 @@ class MakeModule extends Command
 		return 0;
 	}
 	
-	public function newLine($count = 1)
-	{
-		$this->getOutput()->newLine($count);
-	}
-	
 	protected function shouldAbortToPublishConfig(): bool
 	{
 		if (
@@ -199,11 +194,6 @@ class MakeModule extends Command
 		}
 		
 		$this->newLine();
-	}
-	
-	protected function seedersDirectory(): string
-	{
-		return 'seeders';
 	}
 	
 	protected function updateCoreComposerConfig()
@@ -327,16 +317,12 @@ class MakeModule extends Command
 		return [
 			'composer.json' => $this->pathToStub('composer-stub-latest.json'),
 			'src/Providers/StubClassNamePrefixServiceProvider.php' => $this->pathToStub('ServiceProvider.php'),
-			'tests/Feature/Providers/StubClassNamePrefixServiceProviderTest.php' => $this->pathToStub('ServiceProviderTest.php'),
-			'database/migrations/StubMigrationPrefix_set_up_StubModuleName_module.php' => $this->pathToStub('migration.php'),
 			'routes/StubModuleName-routes.php' => $this->pathToStub('web-routes.php'),
-			'resources/views/index.blade.php' => $this->pathToStub('view.blade.php'),
-			'resources/views/create.blade.php' => $this->pathToStub('view.blade.php'),
-			'resources/views/show.blade.php' => $this->pathToStub('view.blade.php'),
-			'resources/views/edit.blade.php' => $this->pathToStub('view.blade.php'),
+			'resources/views/.gitkeep' => $this->pathToStub('.gitkeep'),
 			'database/factories/.gitkeep' => $this->pathToStub('.gitkeep'),
 			'database/migrations/.gitkeep' => $this->pathToStub('.gitkeep'),
-			'database/'.$this->seedersDirectory().'/.gitkeep' => $this->pathToStub('.gitkeep'),
+			'database/seeders/.gitkeep' => $this->pathToStub('.gitkeep'),
+			'tests/.gitkeep' => $this->pathToStub('.gitkeep'),
 		];
 	}
 	
