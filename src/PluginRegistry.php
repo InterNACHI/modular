@@ -3,14 +3,14 @@
 namespace InterNACHI\Modular;
 
 use Illuminate\Container\Container;
-use InterNACHI\Modular\Support\Autodiscovery\Plugin as TPlugin;
+use InterNACHI\Modular\Plugins\Plugin as TPlugin;
 use InvalidArgumentException;
 
 class PluginRegistry
 {
 	protected array $plugins = [];
 	
-	/** @param class-string<\InterNACHI\Modular\Support\Autodiscovery\Plugin> ...$class */
+	/** @param class-string<\InterNACHI\Modular\Plugins\Plugin> ...$class */
 	public static function register(string ...$class): void
 	{
 		app(static::class)->add(...$class);
@@ -21,7 +21,7 @@ class PluginRegistry
 	) {
 	}
 	
-	/** @param class-string<\InterNACHI\Modular\Support\Autodiscovery\Plugin> ...$class */
+	/** @param class-string<\InterNACHI\Modular\Plugins\Plugin> ...$class */
 	public function add(string ...$class): static
 	{
 		foreach ($class as $fqcn) {
@@ -45,7 +45,7 @@ class PluginRegistry
 		return $this->plugins[$plugin] ??= $this->container->make($plugin, $parameters);
 	}
 	
-	/** @return class-string<\InterNACHI\Modular\Support\Autodiscovery\Plugin>[] */
+	/** @return class-string<\InterNACHI\Modular\Plugins\Plugin>[] */
 	public function all(): array
 	{
 		return array_keys($this->plugins);

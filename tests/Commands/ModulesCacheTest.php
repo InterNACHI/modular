@@ -2,8 +2,8 @@
 
 namespace InterNACHI\Modular\Tests\Commands;
 
+use InterNACHI\Modular\Plugins\ModulesPlugin;
 use InterNACHI\Modular\Console\Commands\ModulesCache;
-use InterNACHI\Modular\Support\Autodiscovery\ModulesPlugin;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use InterNACHI\Modular\Tests\TestCase;
 

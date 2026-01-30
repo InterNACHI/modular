@@ -4,11 +4,12 @@
 // this needs to be its own isolated test file.
 
 namespace InterNACHI\Modular\Tests\EventDiscovery {
+	
 	use App\EventDiscoveryImplicitlyEnabledTestProvider;
 	use Illuminate\Support\Facades\Event;
+	use InterNACHI\Modular\Plugins\EventsPlugin;
 	use InterNACHI\Modular\Console\Commands\ModulesCache;
 	use InterNACHI\Modular\Console\Commands\ModulesClear;
-	use InterNACHI\Modular\Support\Autodiscovery\EventsPlugin;
 	use InterNACHI\Modular\Support\Facades\Modules;
 	use InterNACHI\Modular\Tests\Concerns\PreloadsAppModules;
 	use InterNACHI\Modular\Tests\TestCase;
@@ -54,6 +55,7 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 // We need to use an "App" namespace to tell modular that this provider should be deferred to
 
 namespace App {
+	
 	use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 	
 	class EventDiscoveryImplicitlyEnabledTestProvider extends EventServiceProvider

@@ -1,6 +1,6 @@
 <?php
 
-namespace InterNACHI\Modular\Support\Autodiscovery;
+namespace InterNACHI\Modular\Plugins;
 
 use Closure;
 use Illuminate\Foundation\Application;

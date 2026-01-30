@@ -3,8 +3,8 @@
 namespace InterNACHI\Modular\Support;
 
 use Illuminate\Foundation\Application;
+use InterNACHI\Modular\Plugins\Plugin;
 use InterNACHI\Modular\PluginRegistry;
-use InterNACHI\Modular\Support\Autodiscovery\Plugin;
 
 class PluginHandler
 {

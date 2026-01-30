@@ -1,11 +1,11 @@
 <?php
 
-namespace InterNACHI\Modular\Support\Autodiscovery;
+namespace InterNACHI\Modular\Plugins;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
+use InterNACHI\Modular\Plugins\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 

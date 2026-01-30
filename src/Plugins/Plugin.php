@@ -1,11 +1,11 @@
 <?php
 
-namespace InterNACHI\Modular\Support\Autodiscovery;
+namespace InterNACHI\Modular\Plugins;
 
 use Closure;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
-use InterNACHI\Modular\Support\Autodiscovery\Attributes\HandlesAutodiscovery;
+use InterNACHI\Modular\Plugins\Attributes\HandlesAutodiscovery;
 use InterNACHI\Modular\Support\FinderFactory;
 use ReflectionAttribute;
 use ReflectionClass;

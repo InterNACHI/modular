@@ -1,10 +1,10 @@
 <?php
 
-namespace InterNACHI\Modular\Support\Autodiscovery;
+namespace InterNACHI\Modular\Plugins;
 
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Collection;
-use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
+use InterNACHI\Modular\Plugins\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\FinderFactory;
 use Symfony\Component\Finder\SplFileInfo;
 

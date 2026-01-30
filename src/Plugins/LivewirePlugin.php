@@ -1,10 +1,10 @@
 <?php
 
-namespace InterNACHI\Modular\Support\Autodiscovery;
+namespace InterNACHI\Modular\Plugins;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use InterNACHI\Modular\Support\Autodiscovery\Attributes\OnBoot;
+use InterNACHI\Modular\Plugins\Attributes\OnBoot;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 use Livewire\LivewireManager;

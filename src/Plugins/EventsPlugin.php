@@ -1,13 +1,13 @@
 <?php
 
-namespace InterNACHI\Modular\Support\Autodiscovery;
+namespace InterNACHI\Modular\Plugins;
 
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Support\Collection;
-use InterNACHI\Modular\Support\Autodiscovery\Attributes\AfterResolving;
+use InterNACHI\Modular\Plugins\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\DiscoverEvents;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;

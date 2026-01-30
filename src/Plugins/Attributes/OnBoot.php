@@ -1,6 +1,6 @@
 <?php
 
-namespace InterNACHI\Modular\Support\Autodiscovery\Attributes;
+namespace InterNACHI\Modular\Plugins\Attributes;
 
 use Attribute;
 use Closure;
