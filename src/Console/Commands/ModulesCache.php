@@ -3,7 +3,8 @@
 namespace InterNACHI\Modular\Console\Commands;
 
 use Illuminate\Console\Command;
-use InterNACHI\Modular\Support\AutodiscoveryHelper;
+use InterNACHI\Modular\Support\Cache;
+use InterNACHI\Modular\Support\PluginDataRepository;
 
 class ModulesCache extends Command
 {
@@ -11,11 +12,11 @@ class ModulesCache extends Command
 	
 	protected $description = 'Create a cache file for faster module loading';
 	
-	public function handle(AutodiscoveryHelper $helper)
+	public function handle(Cache $cache, PluginDataRepository $data)
 	{
 		$this->call(ModulesClear::class);
 		
-		$helper->writeCache();
+		$cache->write($data->all());
 		
 		$this->info('Modules cached successfully!');
 	}

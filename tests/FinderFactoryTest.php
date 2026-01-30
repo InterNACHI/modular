@@ -15,7 +15,7 @@ use Livewire\LivewireServiceProvider;
 use Livewire\Mechanisms\Mechanism;
 use Symfony\Component\Finder\SplFileInfo;
 
-class AutoDiscoveryHelperTest extends TestCase
+class FinderFactoryTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	

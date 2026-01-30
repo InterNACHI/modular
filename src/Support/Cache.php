@@ -4,10 +4,10 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use RuntimeException;
+use InterNACHI\Modular\Exceptions\CannotWriteCacheException;
 use Throwable;
 
-class CacheHelper
+class Cache
 {
 	public function __construct(
 		protected Filesystem $fs,
@@ -18,9 +18,7 @@ class CacheHelper
 	public function read(): array
 	{
 		try {
-			return $this->fs->exists($this->cache_path)
-				? require $this->cache_path
-				: [];
+			return $this->fs->exists($this->cache_path) ? require $this->cache_path : [];
 		} catch (Throwable) {
 			return [];
 		}
@@ -34,14 +32,14 @@ class CacheHelper
 		$this->fs->ensureDirectoryExists($this->fs->dirname($this->cache_path));
 		
 		if (! $this->fs->put($this->cache_path, $php)) {
-			throw new RuntimeException('Unable to write cache file.');
+			throw new CannotWriteCacheException($this->cache_path);
 		}
 		
 		try {
 			require $this->cache_path;
 		} catch (Throwable $e) {
 			$this->fs->delete($this->cache_path);
-			throw new RuntimeException('Attempted to write invalid cache file.', $e->getCode(), $e);
+			throw new CannotWriteCacheException($this->cache_path, $e);
 		}
 		
 		return true;

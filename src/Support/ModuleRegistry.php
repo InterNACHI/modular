@@ -2,10 +2,10 @@
 
 namespace InterNACHI\Modular\Support;
 
+use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InterNACHI\Modular\Exceptions\CannotFindModuleForPathException;
-use InterNACHI\Modular\Support\Autodiscovery\ModulesPlugin;
 
 class ModuleRegistry
 {
@@ -13,7 +13,7 @@ class ModuleRegistry
 	
 	public function __construct(
 		protected string $modules_path,
-		protected AutodiscoveryHelper $autodiscovery_helper,
+		protected Closure $modules_loader,
 	) {
 	}
 	
@@ -25,9 +25,7 @@ class ModuleRegistry
 	public function module(?string $name = null): ?ModuleConfig
 	{
 		// We want to allow for gracefully handling empty/null names
-		return $name
-			? $this->modules()->get($name)
-			: null;
+		return $name ? $this->modules()->get($name) : null;
 	}
 	
 	public function moduleForPath(string $path): ?ModuleConfig
@@ -60,12 +58,14 @@ class ModuleRegistry
 	/** @return Collection<int, \InterNACHI\Modular\Support\ModuleConfig> */
 	public function modules(): Collection
 	{
-		return $this->modules ??= $this->autodiscovery_helper->handle(ModulesPlugin::class);
+		return $this->modules ??= call_user_func($this->modules_loader);
 	}
 	
 	public function reload(): Collection
 	{
-		return $this->modules = $this->autodiscovery_helper->handle(ModulesPlugin::class);
+		$this->modules = null;
+		
+		return $this->modules();
 	}
 	
 	protected function extractModuleNameFromPath(string $path): string

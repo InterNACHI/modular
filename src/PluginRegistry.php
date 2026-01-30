@@ -1,8 +1,9 @@
 <?php
 
-namespace InterNACHI\Modular\Support\Autodiscovery;
+namespace InterNACHI\Modular;
 
 use Illuminate\Container\Container;
+use InterNACHI\Modular\Support\Autodiscovery\Plugin as TPlugin;
 use InvalidArgumentException;
 
 class PluginRegistry
@@ -31,11 +32,11 @@ class PluginRegistry
 	}
 	
 	/**
-	 * @template TPlugin of Plugin
+	 * @template TPlugin of TPlugin
 	 * @param class-string<TPlugin> $plugin
 	 * @return TPlugin
 	 */
-	public function plugin(string $plugin, array $parameters = []): Plugin
+	public function get(string $plugin, array $parameters = []): TPlugin
 	{
 		if (! array_key_exists($plugin, $this->plugins)) {
 			throw new InvalidArgumentException("The plugin '{$plugin}' has not been registered.");

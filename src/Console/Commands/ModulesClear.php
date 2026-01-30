@@ -3,7 +3,9 @@
 namespace InterNACHI\Modular\Console\Commands;
 
 use Illuminate\Console\Command;
-use InterNACHI\Modular\Support\AutodiscoveryHelper;
+use InterNACHI\Modular\Support\Cache;
+use InterNACHI\Modular\Support\PluginDataRepository;
+use InterNACHI\Modular\Support\PluginHandler;
 
 class ModulesClear extends Command
 {
@@ -11,9 +13,11 @@ class ModulesClear extends Command
 	
 	protected $description = 'Remove the module cache file';
 	
-	public function handle(AutodiscoveryHelper $helper)
+	public function handle(Cache $cache, PluginDataRepository $data, PluginHandler $handler)
 	{
-		$helper->clearCache();
+		$cache->clear();
+		$data->reset();
+		$handler->reset();
 		
 		$this->info('Module cache cleared!');
 	}

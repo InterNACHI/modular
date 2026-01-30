@@ -21,68 +21,26 @@ class MakeModule extends Command
 	
 	protected $description = 'Create a new Laravel module';
 	
-	/**
-	 * This is the base path of the module
-	 *
-	 * @var string
-	 */
-	protected $base_path;
+	protected string $base_path;
 	
-	/**
-	 * This is the PHP namespace for all modules
-	 *
-	 * @var string
-	 */
-	protected $module_namespace;
+	protected string $module_namespace;
 	
-	/**
-	 * This is the composer namespace for all modules
-	 *
-	 * @var string
-	 */
-	protected $composer_namespace;
+	protected string $composer_namespace;
 	
-	/**
-	 * This is the name of the module
-	 *
-	 * @var string
-	 */
-	protected $module_name;
+	protected string $module_name;
 	
-	/**
-	 * This is the module name as a StudlyCase'd name
-	 *
-	 * @var string
-	 */
-	protected $class_name_prefix;
+	protected string $class_name_prefix;
 	
-	/**
-	 * This is the name of the module as a composer package
-	 * i.e. modules/my-module
-	 *
-	 * @var string
-	 */
-	protected $composer_name;
+	protected string $composer_name;
 	
-	/**
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $filesystem;
-	
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry
-	 */
-	protected $module_registry;
-	
-	public function __construct(Filesystem $filesystem, ModuleRegistry $module_registry)
-	{
+	public function __construct(
+		protected Filesystem $filesystem,
+		protected ModuleRegistry $module_registry
+	) {
 		parent::__construct();
-		
-		$this->filesystem = $filesystem;
-		$this->module_registry = $module_registry;
 	}
 	
-	public function handle()
+	public function handle(): int
 	{
 		$this->module_name = Str::kebab($this->argument('name'));
 		$this->class_name_prefix = Str::studly($this->argument('name'));
@@ -144,15 +102,15 @@ class MakeModule extends Command
 		return $this->confirm('Would you like to cancel and configure your module namespace first?', true);
 	}
 	
-	protected function ensureModulesDirectoryExists()
+	protected function ensureModulesDirectoryExists(): void
 	{
-		if (!$this->filesystem->isDirectory($this->base_path)) {
+		if (! $this->filesystem->isDirectory($this->base_path)) {
 			$this->filesystem->makeDirectory($this->base_path, 0777, true);
 			$this->line(" - Created <info>{$this->base_path}</info>");
 		}
 	}
 	
-	protected function writeStubs()
+	protected function writeStubs(): void
 	{
 		$this->title('Creating initial module files');
 		
@@ -196,7 +154,7 @@ class MakeModule extends Command
 		$this->newLine();
 	}
 	
-	protected function updateCoreComposerConfig()
+	protected function updateCoreComposerConfig(): void
 	{
 		$this->title('Updating application composer.json file');
 		
@@ -209,11 +167,11 @@ class MakeModule extends Command
 		$json_file = new JsonFile(Factory::getComposerFile());
 		$definition = $json_file->read();
 		
-		if (!isset($definition['repositories'])) {
+		if (! isset($definition['repositories'])) {
 			$definition['repositories'] = [];
 		}
 		
-		if (!isset($definition['require'])) {
+		if (! isset($definition['require'])) {
 			$definition['require'] = [];
 		}
 		
@@ -243,7 +201,7 @@ class MakeModule extends Command
 			}
 		}
 		
-		if (!isset($definition['require'][$this->composer_name])) {
+		if (! isset($definition['require'][$this->composer_name])) {
 			$this->line(" - Adding require statement for <info>{$this->composer_name}:*</info>");
 			$has_changes = true;
 			
@@ -294,16 +252,16 @@ class MakeModule extends Command
 		return $packages;
 	}
 	
-	protected function setUpStyles()
+	protected function setUpStyles(): void
 	{
 		$formatter = $this->getOutput()->getFormatter();
 		
-		if (!$formatter->hasStyle('kbd')) {
+		if (! $formatter->hasStyle('kbd')) {
 			$formatter->setStyle('kbd', new OutputFormatterStyle('cyan'));
 		}
 	}
 	
-	protected function title($title)
+	protected function title($title): void
 	{
 		$this->getOutput()->title($title);
 	}
