@@ -2,8 +2,10 @@
 
 namespace InterNACHI\Modular\Support\Autodiscovery;
 
+use Closure;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
@@ -15,6 +17,11 @@ use ReflectionClass;
 
 class ArtisanPlugin extends Plugin
 {
+	public static function boot(Closure $handler, Application $app): void
+	{
+		Artisan::starting(fn($artisan) => $handler(static::class, ['artisan' => $artisan]));
+	}
+	
 	public function __construct(
 		protected Artisan $artisan,
 		protected ModuleRegistry $registry,

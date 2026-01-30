@@ -2,7 +2,6 @@
 
 namespace InterNACHI\Modular\Support;
 
-use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
@@ -77,14 +76,20 @@ class ModularServiceProvider extends ServiceProvider
 		$this->registerEloquentFactories();
 		
 		PluginRegistry::register(
+			ArtisanPlugin::class,
+			BladePlugin::class,
+			EventsPlugin::class,
+			GatePlugin::class,
+			LivewirePlugin::class,
+			MigratorPlugin::class,
 			RoutesPlugin::class,
 			TranslatorPlugin::class,
 			ViewPlugin::class,
-			BladePlugin::class,
-			EventsPlugin::class,
-			MigratorPlugin::class,
-			GatePlugin::class,
 		);
+		
+		if (class_exists(LivewireManager::class)) {
+			PluginRegistry::register(LivewirePlugin::class);
+		}
 		
 		$this->app->booting($this->bootPlugins(...));
 	}
@@ -116,12 +121,7 @@ class ModularServiceProvider extends ServiceProvider
 		}
 		
 		// Then boot all plugins that have annotations
-		$this->autodiscover()->bootPlugins();
-		
-		// Finally, handle some special plugin cases
-		$this->autodiscover()->handleIf(RoutesPlugin::class, condition: ! $this->app->routesAreCached());
-		$this->autodiscover()->handleIf(LivewirePlugin::class, condition: class_exists(LivewireManager::class));
-		Artisan::starting(fn($artisan) => $this->autodiscover()->handle(ArtisanPlugin::class, ['artisan' => $artisan]));
+		$this->autodiscover()->bootPlugins($this->app);
 	}
 	
 	protected function autodiscover(): AutodiscoveryHelper

@@ -4,10 +4,12 @@ namespace InterNACHI\Modular\Support\Autodiscovery;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InterNACHI\Modular\Support\Autodiscovery\Attributes\OnBoot;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
 use Livewire\LivewireManager;
 
+#[OnBoot]
 class LivewirePlugin extends Plugin
 {
 	public function __construct(

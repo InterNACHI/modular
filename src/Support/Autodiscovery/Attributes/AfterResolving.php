@@ -5,6 +5,7 @@ namespace InterNACHI\Modular\Support\Autodiscovery\Attributes;
 use Attribute;
 use Closure;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Foundation\Application;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 class AfterResolving implements HandlesAutodiscovery
@@ -15,7 +16,7 @@ class AfterResolving implements HandlesAutodiscovery
 	) {
 	}
 	
-	public function boot(string $plugin, Closure $handler, Container $app)
+	public function boot(string $plugin, Closure $handler, Application $app)
 	{
 		$app->afterResolving($this->abstract, fn($resolved) => $handler($plugin, [$this->parameter => $resolved]));
 		

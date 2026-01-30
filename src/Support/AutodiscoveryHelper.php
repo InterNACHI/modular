@@ -4,6 +4,7 @@ namespace InterNACHI\Modular\Support;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
 use InterNACHI\Modular\Support\Autodiscovery\Attributes\HandlesAutodiscovery;
 use InterNACHI\Modular\Support\Autodiscovery\Plugin;
@@ -16,6 +17,7 @@ class AutodiscoveryHelper
 {
 	protected ?array $data = null;
 	
+	/** @var array<class-string<Plugin>, Plugin|null> */
 	protected array $plugins = [];
 	
 	protected array $handled = [];
@@ -69,13 +71,10 @@ class AutodiscoveryHelper
 		return $this;
 	}
 	
-	public function bootPlugins(): void
+	public function bootPlugins(Application $app): void
 	{
 		foreach ($this->plugins as $class => $_) {
-			$attributes = (new ReflectionClass($class))->getAttributes(HandlesAutodiscovery::class, ReflectionAttribute::IS_INSTANCEOF);
-			if (count($attributes)) {
-				$attributes[0]->newInstance()->boot($class, $this->handle(...), $this->app);
-			}
+			$class::boot($this->handle(...), $app);
 		}
 	}
 	
