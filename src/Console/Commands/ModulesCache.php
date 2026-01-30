@@ -15,7 +15,7 @@ class ModulesCache extends Command
 	{
 		$this->call(ModulesClear::class);
 		
-		$helper->writeCache($this->getLaravel());
+		$helper->writeCache();
 		
 		$this->info('Modules cached successfully!');
 	}

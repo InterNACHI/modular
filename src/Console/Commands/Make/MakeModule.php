@@ -110,7 +110,7 @@ class MakeModule extends Command
 		$this->line("Please run <kbd>composer update {$this->composer_name}</kbd>");
 		$this->newLine();
 		
-		$this->module_registry->reload();
+		$this->getLaravel()->make(ModuleRegistry::class)->reload();
 		
 		return 0;
 	}
@@ -203,9 +203,7 @@ class MakeModule extends Command
 	
 	protected function seedersDirectory(): string
 	{
-		return version_compare($this->getLaravel()->version(), '8.0.0', '>=')
-			? 'seeders'
-			: 'seeds';
+		return 'seeders';
 	}
 	
 	protected function updateCoreComposerConfig()
@@ -326,12 +324,8 @@ class MakeModule extends Command
 			return $custom_stubs;
 		}
 		
-		$composer_stub = version_compare($this->getLaravel()->version(), '8.0.0', '<')
-			? 'composer-stub-v7.json'
-			: 'composer-stub-latest.json';
-		
 		return [
-			'composer.json' => $this->pathToStub($composer_stub),
+			'composer.json' => $this->pathToStub('composer-stub-latest.json'),
 			'src/Providers/StubClassNamePrefixServiceProvider.php' => $this->pathToStub('ServiceProvider.php'),
 			'tests/Feature/Providers/StubClassNamePrefixServiceProviderTest.php' => $this->pathToStub('ServiceProviderTest.php'),
 			'database/migrations/StubMigrationPrefix_set_up_StubModuleName_module.php' => $this->pathToStub('migration.php'),
