@@ -56,17 +56,16 @@ class ModularServiceProvider extends ServiceProvider
 			return new FinderFactory($this->getModulesBasePath());
 		});
 		
-		$this->app->singleton(PluginRegistry::class);
-		
-		$this->app->singleton(AutodiscoveryHelper::class, function(Application $app) {
-			return new AutodiscoveryHelper(
-				$app->make(PluginRegistry::class),
-				$app->make(FinderFactory::class),
+		$this->app->singleton(CacheHelper::class, function(Application $app) {
+			return new CacheHelper(
 				$app->make(Filesystem::class),
-				$app,
 				$this->app->bootstrapPath('cache/app-modules.php')
 			);
 		});
+		
+		$this->app->singleton(PluginRegistry::class);
+		
+		$this->app->singleton(AutodiscoveryHelper::class);
 		
 		$this->app->singleton(MakeMigration::class, function(Application $app) {
 			return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
