@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Foundation\Application;
 
 #[Attribute(Attribute::TARGET_CLASS)]
-class OnBoot implements HandlesAutodiscovery
+class OnBoot implements HandlesBoot
 {
 	public function boot(string $plugin, Closure $handler, Application $app)
 	{

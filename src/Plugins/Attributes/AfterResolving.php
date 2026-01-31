@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Foundation\Application;
 
 #[Attribute(Attribute::TARGET_CLASS)]
-class AfterResolving implements HandlesAutodiscovery
+class AfterResolving implements HandlesBoot
 {
 	public function __construct(
 		public string $abstract,
