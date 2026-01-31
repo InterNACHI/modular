@@ -11,7 +11,7 @@ class TestModelPolicy
 
 	public function view($user, TestModel $model): bool
 	{
-		return true;
+		return false;
 	}
 
 	public function create($user): bool
