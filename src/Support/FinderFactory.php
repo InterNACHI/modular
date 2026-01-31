@@ -92,19 +92,4 @@ class FinderFactory
 			->name('Listeners')
 			->inOrEmpty($this->base_path.'/*/src');
 	}
-	
-	public function livewireComponentFileFinder(): FinderCollection
-	{
-		$directory = $this->base_path.'/*/src';
-		
-		if (str_contains(config('livewire.class_namespace'), '\\Http\\')) {
-			$directory .= '/Http';
-		}
-		
-		$directory .= '/Livewire';
-		
-		return FinderCollection::forFiles()
-			->name('*.php')
-			->inOrEmpty($directory);
-	}
 }

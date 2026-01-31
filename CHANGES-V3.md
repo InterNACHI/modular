@@ -68,7 +68,6 @@ This attribute-based approach replaces the previous `$this->callAfterResolving()
 | `MigratorPlugin`   | `AfterResolving(Migrator)`                    | Registers migration paths                                          |
 | `GatePlugin`       | `AfterResolving(Gate)`                        | Auto-registers model policies                                      |
 | `ArtisanPlugin`    | `Artisan::starting()`                         | Registers console commands + Tinker namespaces                     |
-| `LivewirePlugin`   | Conditional (`class_exists(LivewireManager)`) | Registers Livewire components                                      |
 
 ## Key Design Decisions
 

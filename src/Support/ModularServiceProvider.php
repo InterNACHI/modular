@@ -18,13 +18,11 @@ use InterNACHI\Modular\Plugins\ArtisanPlugin;
 use InterNACHI\Modular\Plugins\BladePlugin;
 use InterNACHI\Modular\Plugins\EventsPlugin;
 use InterNACHI\Modular\Plugins\GatePlugin;
-use InterNACHI\Modular\Plugins\LivewirePlugin;
 use InterNACHI\Modular\Plugins\MigratorPlugin;
 use InterNACHI\Modular\Plugins\ModulesPlugin;
 use InterNACHI\Modular\Plugins\RoutesPlugin;
 use InterNACHI\Modular\Plugins\TranslatorPlugin;
 use InterNACHI\Modular\Plugins\ViewPlugin;
-use Livewire\LivewireManager;
 
 class ModularServiceProvider extends ServiceProvider
 {
@@ -112,10 +110,6 @@ class ModularServiceProvider extends ServiceProvider
 			TranslatorPlugin::class,
 			ViewPlugin::class,
 		);
-		
-		if (class_exists(LivewireManager::class)) {
-			$registry->add(LivewirePlugin::class);
-		}
 	}
 	
 	protected function registerEloquentFactories(): void
