@@ -26,6 +26,9 @@ class MigratorPluginTest extends TestCase
 		$files = $migrator->getMigrationFiles($migrator->paths());
 		
 		$this->assertArrayHasKey('2024_04_03_133130_set_up_test_module', $files);
-		$this->assertStringContainsString('app-modules/test-module/database/migrations', $files['2024_04_03_133130_set_up_test_module']);
+		$this->assertStringContainsString(
+			'app-modules/test-module/database/migrations',
+			str_replace('\\', '/', $files['2024_04_03_133130_set_up_test_module'])
+		);
 	}
 }
