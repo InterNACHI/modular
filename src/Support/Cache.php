@@ -11,14 +11,14 @@ class Cache
 {
 	public function __construct(
 		protected Filesystem $fs,
-		protected string $cache_path,
+		protected string $path,
 	) {
 	}
 	
 	public function read(): array
 	{
 		try {
-			return $this->fs->exists($this->cache_path) ? require $this->cache_path : [];
+			return $this->fs->exists($this->path) ? require $this->path : [];
 		} catch (Throwable) {
 			return [];
 		}
@@ -29,17 +29,17 @@ class Cache
 		$cache = Collection::make($data)->toArray();
 		$php = '<?php return '.var_export($cache, true).';'.PHP_EOL;
 		
-		$this->fs->ensureDirectoryExists($this->fs->dirname($this->cache_path));
+		$this->fs->ensureDirectoryExists($this->fs->dirname($this->path));
 		
-		if (! $this->fs->put($this->cache_path, $php)) {
-			throw new CannotWriteCacheException($this->cache_path);
+		if (! $this->fs->put($this->path, $php)) {
+			throw new CannotWriteCacheException($this->path);
 		}
 		
 		try {
-			require $this->cache_path;
+			require $this->path;
 		} catch (Throwable $e) {
-			$this->fs->delete($this->cache_path);
-			throw new CannotWriteCacheException($this->cache_path, $e);
+			$this->fs->delete($this->path);
+			throw new CannotWriteCacheException($this->path, $e);
 		}
 		
 		return true;
@@ -47,8 +47,8 @@ class Cache
 	
 	public function clear(): void
 	{
-		if ($this->fs->exists($this->cache_path)) {
-			$this->fs->delete($this->cache_path);
+		if ($this->fs->exists($this->path)) {
+			$this->fs->delete($this->path);
 		}
 	}
 }
