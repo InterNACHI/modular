@@ -16,7 +16,7 @@ class MigratorPluginTest extends TestCase
 		
 		$this->assertTrue(
 			collect($paths)->contains(fn($path) => str_contains($path, 'test-module/database/migrations')),
-			'Module migration path should be registered'
+			'Module migration path should be registered: '.json_encode($paths)
 		);
 	}
 	
