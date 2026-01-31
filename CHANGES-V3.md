@@ -34,14 +34,24 @@ Each plugin implements a two-phase lifecycle:
 1. **`discover()`** - Scan filesystem and return serializable discovery data
 2. **`handle()`** - Process the discovered data (register with Laravel services)
 
-**`AutodiscoveryHelper`** - Orchestrates plugin lifecycle:
+**`PluginHandler`** - Orchestrates plugin lifecycle:
 
-- Manages plugin registration and instantiation
-- Handles caching (read/write) for all plugins in a single file
+- Iterates through registered plugins and calls their static `boot()` method
 - Uses PHP 8 attributes to determine plugin boot timing
 - Prevents duplicate `handle()` execution via `$handled` tracking
 
-**`PluginRegistry`** - Static registration point for plugins (enables third-party plugins)
+**`PluginDataRepository`** - Manages discovery data:
+
+- Initialized with cached data from `Cache` class (if available)
+- Lazily discovers plugin data on first access when not cached
+- Provides data to plugins via `get($pluginClass)` method
+
+**`Cache`** - Handles file I/O for the unified cache:
+
+- Reads/writes all plugin discovery data to `bootstrap/cache/app-modules.php`
+- Used by `modules:cache` and `modules:clear` commands
+
+**`PluginRegistry`** - Registration point for plugins (enables third-party plugins)
 
 ### PHP 8 Attributes for Lifecycle Control
 
@@ -75,29 +85,28 @@ This attribute-based approach replaces the previous `$this->callAfterResolving()
 2. **Lazy instantiation** - Plugins are only instantiated when their trigger fires. The `$handled` array ensures each plugin's `handle()` runs at most once per request.
 3. **Separation of concerns** - `FinderFactory` now only creates `FinderCollection` instances. The business logic of what to do with discovered files lives in plugins.
 4. **`ModuleFileInfo` decorator** - New wrapper around `SplFileInfo` that provides `module()` and `fullyQualifiedClassName()` helpers, reducing boilerplate in plugins.
-5. **`ModuleRegistry` simplified** - No longer responsible for caching; delegates to `AutodiscoveryHelper`. The `modules()` method now returns the result of `ModulesPlugin::handle()`.
+5. **`ModuleRegistry` simplified** - No longer responsible for caching; delegates to `PluginHandler`. The `modules()` method now returns the result of `ModulesPlugin::handle()`.
 
 ## Flow Diagram
 
 ```
 ModularServiceProvider::register()
     │
-    ├─→ Register singletons (ModuleRegistry, FinderFactory, AutodiscoveryHelper)
+    ├─→ Register singletons (ModuleRegistry, FinderFactory, Cache,
+    │                        PluginDataRepository, PluginRegistry, PluginHandler)
     │
-    └─→ PluginRegistry::register(plugins...)
-           │
-           └─→ $app->booting(bootPlugins)
-                   │
-                   ├─→ AutodiscoveryHelper::register() for each plugin
-                   │
-                   ├─→ AutodiscoveryHelper::bootPlugins()
-                   │       │
-                   │       └─→ For each plugin, read attributes:
-                   │               • AfterResolving → $app->afterResolving(callback)
-                   │               • OnBoot → handle() immediately
-                   │
-                   └─→ Conditional plugin handling (Routes, Livewire)
-                       Artisan::starting() callback for ArtisanPlugin
+    ├─→ PluginRegistry::add(plugins...)
+    │
+    └─→ $app->booting(PluginHandler::boot)
+            │
+            └─→ For each registered plugin:
+                    │
+                    └─→ Plugin::boot(handler, app)
+                            │
+                            └─→ Read attributes from plugin class:
+                                    • AfterResolving → $app->afterResolving(callback)
+                                    • OnBoot → handler() immediately
+                                    • No attribute → plugin boots via explicit call
 ```
 
 ## Extensibility
