@@ -1,126 +1,120 @@
-# Architecture Changes Summary: Plugin-Based Autodiscovery System
+# Version 3.0 Architecture Changes
 
 ## Overview
 
-This release introduces a **plugin-based architecture** for module auto-discovery, replacing the monolithic `ModularServiceProvider` 
-with a collection of focused, composable `Plugin` classes. This is a significant architectural refactoring that improves extensibility, 
-testability, and separation of concerns.
+Version 3.0 introduces a **plugin-based architecture** for module auto-discovery. The monolithic `ModularServiceProvider` has been refactored into a collection of focused, composable `Plugin` classes.
+This improves extensibility, testability, and separation of concerns.
 
 ## Breaking Changes
 
-1. **PHP 8.3+ required** (was 8.0+)
-2. **Laravel 11+ required** (dropped Laravel 9/10 support)
-3. **`ModularEventServiceProvider` removed** from auto-registered providers
-4. **Cache file location changed**: `bootstrap/cache/modules.php` → `bootstrap/cache/app-modules.php`
-5. **Cache format changed**: Now stores all plugin discovery data, keyed by plugin FQCN
-6. **`ModuleRegistry::getCachePath()` removed**
-7. **`AutoDiscoveryHelper` renamed** to `FinderFactory` (breaking for any code that type-hinted it)
+### Requirements
 
-## New Plugin Architecture
+- **PHP 8.3+** (was 8.0+)
+- **Laravel 11+** (dropped Laravel 9/10 support)
 
-### Core Abstractions
+### Removed Features
 
-**`Plugin` (abstract base class)**
+| Removed                          | Replacement                           |
+|----------------------------------|---------------------------------------|
+| `ModularEventServiceProvider`    | `EventsPlugin` (auto-registered)      |
+| `AutoDiscoveryHelper`            | `FinderFactory`                       |
+| `ModuleRegistry::getCachePath()` | `Cache::path()`                       |
+| `make:livewire --module`         | Install `internachi/modular-livewire` |
+| Breadcrumbs integration          | Load manually in service provider     |
+
+### Cache Changes
+
+| Before                        | After                             |
+|-------------------------------|-----------------------------------|
+| `bootstrap/cache/modules.php` | `bootstrap/cache/app-modules.php` |
+| Module paths only             | All plugin discovery data         |
+
+## Plugin Architecture
+
+### Core Classes
+
+```
+PluginRegistry       → Registration point for plugins
+PluginHandler        → Orchestrates plugin lifecycle
+PluginDataRepository → Manages discovery data (cached or fresh)
+Cache                → File I/O for unified cache
+FinderFactory        → Creates FinderCollection instances
+ModuleFileInfo       → Decorator with module() and fullyQualifiedClassName()
+```
+
+### Plugin Base Class
 
 ```php
-abstract class Plugin {
+abstract class Plugin
+{
     abstract public function discover(FinderFactory $finders): iterable;
     abstract public function handle(Collection $data);
 }
 ```
 
-Each plugin implements a two-phase lifecycle:
+### PHP 8 Attributes
 
-1. **`discover()`** - Scan filesystem and return serializable discovery data
-2. **`handle()`** - Process the discovered data (register with Laravel services)
-
-**`PluginHandler`** - Orchestrates plugin lifecycle:
-
-- Iterates through registered plugins and calls their static `boot()` method
-- Uses PHP 8 attributes to determine plugin boot timing
-- Prevents duplicate `handle()` execution via `$handled` tracking
-
-**`PluginDataRepository`** - Manages discovery data:
-
-- Initialized with cached data from `Cache` class (if available)
-- Lazily discovers plugin data on first access when not cached
-- Provides data to plugins via `get($pluginClass)` method
-
-**`Cache`** - Handles file I/O for the unified cache:
-
-- Reads/writes all plugin discovery data to `bootstrap/cache/app-modules.php`
-- Used by `modules:cache` and `modules:clear` commands
-
-**`PluginRegistry`** - Registration point for plugins (enables third-party plugins)
-
-### PHP 8 Attributes for Lifecycle Control
-
-```php
-#[AfterResolving(BladeCompiler::class, parameter: 'blade')]
-class BladePlugin extends Plugin { ... }
-```
-
-- **`#[AfterResolving]`** - Defers plugin execution until a specific service is resolved from the container. The `parameter` argument enables dependency injection of the resolved service.
-- **`#[OnBoot]`** - Executes plugin immediately during `booting()` hook
-
-This attribute-based approach replaces the previous `$this->callAfterResolving()` and `$this->app->resolving()` patterns with a declarative system.
+| Attribute                           | Behavior                                    |
+|-------------------------------------|---------------------------------------------|
+| `#[AfterResolving(Service::class)]` | Defer until service resolved                |
+| `#[OnBoot]`                         | Execute during `booting()` hook             |
+| *(none)*                            | Explicit call via `PluginHandler::handle()` |
 
 ### Built-in Plugins
 
-| Plugin             | Trigger                                       | Responsibility                                                     |
-|--------------------|-----------------------------------------------|--------------------------------------------------------------------|
-| `ModulesPlugin`    | Eager                                         | Discovers `composer.json` files, creates `ModuleConfig` instances  |
-| `RoutesPlugin`     | Conditional (`!routesAreCached()`)            | Loads route files from modules                                     |
-| `ViewPlugin`       | `AfterResolving(ViewFactory)`                 | Registers view namespaces                                          |
-| `BladePlugin`      | `AfterResolving(BladeCompiler)`               | Registers Blade components with module prefixes                    |
-| `TranslatorPlugin` | `AfterResolving(Translator)`                  | Registers translation namespaces + JSON paths                      |
-| `EventsPlugin`     | `AfterResolving(Dispatcher)`                  | Discovers event listeners (honors `should_discover_events` config) |
-| `MigratorPlugin`   | `AfterResolving(Migrator)`                    | Registers migration paths                                          |
-| `GatePlugin`       | `AfterResolving(Gate)`                        | Auto-registers model policies                                      |
-| `ArtisanPlugin`    | `Artisan::starting()`                         | Registers console commands + Tinker namespaces                     |
+| Plugin             | Trigger                         | Responsibility                                  |
+|--------------------|---------------------------------|-------------------------------------------------|
+| `ModulesPlugin`    | Eager                           | Discover `composer.json`, create `ModuleConfig` |
+| `RoutesPlugin`     | `!routesAreCached()`            | Load route files                                |
+| `ViewPlugin`       | `AfterResolving(ViewFactory)`   | Register view namespaces                        |
+| `BladePlugin`      | `AfterResolving(BladeCompiler)` | Register Blade components                       |
+| `TranslatorPlugin` | `AfterResolving(Translator)`    | Register translations                           |
+| `EventsPlugin`     | `AfterResolving(Dispatcher)`    | Discover event listeners                        |
+| `MigratorPlugin`   | `AfterResolving(Migrator)`      | Register migration paths                        |
+| `GatePlugin`       | `AfterResolving(Gate)`          | Register model policies                         |
+| `ArtisanPlugin`    | `Artisan::starting()`           | Register commands                               |
 
-## Key Design Decisions
-
-1. **Unified caching** - All plugin discovery data is stored in a single cache file, keyed by plugin FQCN. This simplifies cache invalidation and reduces filesystem operations.
-2. **Lazy instantiation** - Plugins are only instantiated when their trigger fires. The `$handled` array ensures each plugin's `handle()` runs at most once per request.
-3. **Separation of concerns** - `FinderFactory` now only creates `FinderCollection` instances. The business logic of what to do with discovered files lives in plugins.
-4. **`ModuleFileInfo` decorator** - New wrapper around `SplFileInfo` that provides `module()` and `fullyQualifiedClassName()` helpers, reducing boilerplate in plugins.
-5. **`ModuleRegistry` simplified** - No longer responsible for caching; delegates to `PluginHandler`. The `modules()` method now returns the result of `ModulesPlugin::handle()`.
-
-## Flow Diagram
+## Boot Flow
 
 ```
 ModularServiceProvider::register()
-    │
-    ├─→ Register singletons (ModuleRegistry, FinderFactory, Cache,
-    │                        PluginDataRepository, PluginRegistry, PluginHandler)
-    │
-    ├─→ PluginRegistry::add(plugins...)
-    │
-    └─→ $app->booting(PluginHandler::boot)
-            │
-            └─→ For each registered plugin:
-                    │
-                    └─→ Plugin::boot(handler, app)
-                            │
-                            └─→ Read attributes from plugin class:
-                                    • AfterResolving → $app->afterResolving(callback)
-                                    • OnBoot → handler() immediately
-                                    • No attribute → plugin boots via explicit call
+    ├─ Register singletons
+    ├─ PluginRegistry::add(built-in plugins)
+    └─ $app->booting(PluginHandler::boot)
+            └─ For each plugin:
+                    └─ Plugin::boot(handler, app)
+                            └─ Read attributes, schedule execution
 ```
 
 ## Extensibility
 
-Third-party packages or application code can register custom plugins:
+Register custom plugins in a service provider:
 
 ```php
-PluginRegistry::register(MyCustomPlugin::class);
+public function register(): void
+{
+    PluginRegistry::register(MyPlugin::class);
+}
 ```
 
-The plugin will be automatically integrated into the caching system and can use the attribute-based lifecycle controls.
+Custom plugins:
 
-## Testing Impact
+- Must extend `InterNACHI\Modular\Plugins\Plugin`
+- Are automatically integrated into caching
+- Can use lifecycle attributes
 
-- Tests now use `ModulesCache::class` and `ModulesClear::class` instead of `event:cache`/`event:clear`
-- Event discovery tests assert against the unified `app-modules.php` cache format
-- `AutoDiscoveryHelperTest` renamed to test `FinderFactory` directly
+## Laravel Integration
+
+Modular 3.0 integrates with Laravel's optimize commands via the `optimizes()` method:
+
+- `php artisan optimize` → runs `modules:cache`
+- `php artisan optimize:clear` → runs `modules:clear`
+
+## Migration Checklist
+
+1. Upgrade PHP to 8.3+ and Laravel to 11+
+2. Run `php artisan modules:clear`
+3. Run `composer update internachi/modular`
+4. If using Livewire: `composer require internachi/modular-livewire`
+5. Update any `AutoDiscoveryHelper` references to `FinderFactory`
+6. Remove any `ModularEventServiceProvider` references
