@@ -3,10 +3,11 @@
 namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Foundation\Console\ComponentMakeCommand;
+use InterNACHI\Modularize\ModularizeGeneratorCommand;
 
 class MakeComponent extends ComponentMakeCommand
 {
-	use Modularize;
+	use ModularizeGeneratorCommand;
 	
 	protected function buildClass($name)
 	{

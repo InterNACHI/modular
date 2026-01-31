@@ -5,10 +5,11 @@ namespace InterNACHI\Modular\Console\Commands\Make;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use InterNACHI\Modular\Support\Facades\Modules;
+use InterNACHI\Modularize\ModularizeGeneratorCommand;
 
 class MakeListener extends ListenerMakeCommand
 {
-	use Modularize;
+	use ModularizeGeneratorCommand;
 	
 	protected function buildClass($name)
 	{

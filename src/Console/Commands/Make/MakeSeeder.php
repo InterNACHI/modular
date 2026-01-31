@@ -4,10 +4,11 @@ namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Support\Str;
+use InterNACHI\Modularize\ModularizeGeneratorCommand;
 
 class MakeSeeder extends SeederMakeCommand
 {
-	use Modularize {
+	use ModularizeGeneratorCommand {
 		getPath as getModularPath;
 	}
 	
