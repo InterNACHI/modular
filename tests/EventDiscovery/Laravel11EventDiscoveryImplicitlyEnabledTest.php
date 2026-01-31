@@ -4,9 +4,9 @@ namespace InterNACHI\Modular\Tests\EventDiscovery;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Support\Facades\Event;
-use InterNACHI\Modular\Plugins\EventsPlugin;
 use InterNACHI\Modular\Console\Commands\ModulesCache;
 use InterNACHI\Modular\Console\Commands\ModulesClear;
+use InterNACHI\Modular\Plugins\EventsPlugin;
 use InterNACHI\Modular\Support\Facades\Modules;
 use InterNACHI\Modular\Tests\Concerns\PreloadsAppModules;
 use InterNACHI\Modular\Tests\TestCase;

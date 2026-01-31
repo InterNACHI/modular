@@ -7,6 +7,13 @@ use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Eloquent\Factories\Factory as EloquentFactory;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
+use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
+use InterNACHI\Modular\Console\Commands\Make\MakeModule;
+use InterNACHI\Modular\Console\Commands\ModulesCache;
+use InterNACHI\Modular\Console\Commands\ModulesClear;
+use InterNACHI\Modular\Console\Commands\ModulesList;
+use InterNACHI\Modular\Console\Commands\ModulesSync;
+use InterNACHI\Modular\PluginRegistry;
 use InterNACHI\Modular\Plugins\ArtisanPlugin;
 use InterNACHI\Modular\Plugins\BladePlugin;
 use InterNACHI\Modular\Plugins\EventsPlugin;
@@ -17,13 +24,6 @@ use InterNACHI\Modular\Plugins\ModulesPlugin;
 use InterNACHI\Modular\Plugins\RoutesPlugin;
 use InterNACHI\Modular\Plugins\TranslatorPlugin;
 use InterNACHI\Modular\Plugins\ViewPlugin;
-use InterNACHI\Modular\Console\Commands\Make\MakeMigration;
-use InterNACHI\Modular\Console\Commands\Make\MakeModule;
-use InterNACHI\Modular\Console\Commands\ModulesCache;
-use InterNACHI\Modular\Console\Commands\ModulesClear;
-use InterNACHI\Modular\Console\Commands\ModulesList;
-use InterNACHI\Modular\Console\Commands\ModulesSync;
-use InterNACHI\Modular\PluginRegistry;
 use Livewire\LivewireManager;
 
 class ModularServiceProvider extends ServiceProvider
