@@ -4,6 +4,7 @@
 // this needs to be its own isolated test file.
 
 namespace InterNACHI\Modular\Tests\EventDiscovery {
+	
 	use App\EventDiscoveryImplicitlyEnabledTestProvider;
 	use Illuminate\Support\Facades\Event;
 	use InterNACHI\Modular\Console\Commands\ModulesCache;
@@ -37,7 +38,7 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 			$cache = require $this->app->bootstrapPath('cache/app-modules.php');
 			
 			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[EventsPlugin::class]);
-
+			
 			$this->assertContains(
 				$module->qualify('Listeners\\TestEventListener@handle'),
 				$cache[EventsPlugin::class][$module->qualify('Events\\TestEvent')]
@@ -54,6 +55,7 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 // We need to use an "App" namespace to tell modular that this provider should be deferred to
 
 namespace App {
+	
 	use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 	
 	class EventDiscoveryImplicitlyEnabledTestProvider extends EventServiceProvider

@@ -35,7 +35,7 @@ class Laravel11EventDiscoveryImplicitlyEnabledTest extends TestCase
 		$cache = require $this->app->bootstrapPath('cache/app-modules.php');
 		
 		$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[EventsPlugin::class]);
-
+		
 		$this->assertContains(
 			$module->qualify('Listeners\\TestEventListener').'@handle',
 			$cache[EventsPlugin::class][$module->qualify('Events\\TestEvent')]

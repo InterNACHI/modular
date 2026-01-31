@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
 	<component name="LaravelPluginSettings">
-		<option name="pluginEnabled" value="true" />
-		<option name="useAutoPopup" value="true" />
-		<option name="routerNamespace" value="App\Http\Controllers" />
-		<option name="mainLanguage" value="en" />
+		<option name="pluginEnabled" value="true"/>
+		<option name="useAutoPopup" value="true"/>
+		<option name="routerNamespace" value="App\Http\Controllers"/>
+		<option name="mainLanguage" value="en"/>
 	</component>
 </project>
