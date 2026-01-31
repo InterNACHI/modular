@@ -23,7 +23,7 @@ class BladePluginTest extends TestCase
 
 	public function test_blade_component_can_be_rendered(): void
 	{
-		$html = Blade::render('<x-test-module-alert type="warning">Test message</x-test-module-alert>');
+		$html = Blade::render('<x-test-module::alert type="warning">Test message</x-test-module::alert>');
 
 		$this->assertStringContainsString('alert-warning', $html);
 		$this->assertStringContainsString('Test message', $html);
