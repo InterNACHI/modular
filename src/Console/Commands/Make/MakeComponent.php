@@ -16,7 +16,7 @@ class MakeComponent extends ComponentMakeCommand
 			$view = $this->getView();
 			$class = str_replace(
 				"'{$view}'",
-				"'{$module->name}::{$view}'", 
+				"'{$module->name}::{$view}'",
 				$class
 			);
 		}

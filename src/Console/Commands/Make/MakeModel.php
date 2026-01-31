@@ -3,7 +3,6 @@
 namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Foundation\Console\ModelMakeCommand;
-use Illuminate\Support\Str;
 
 class MakeModel extends ModelMakeCommand
 {
@@ -24,7 +23,7 @@ class MakeModel extends ModelMakeCommand
 		
 		if ($module = $this->module()) {
 			$replacements['{{ factory }}'] = str_replace(
-				'\\Database\\Factories\\', 
+				'\\Database\\Factories\\',
 				'\\'.$module->namespace().'Database\\Factories\\',
 				$replacements['{{ factory }}'],
 			);
