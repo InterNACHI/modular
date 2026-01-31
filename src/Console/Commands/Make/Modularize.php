@@ -50,7 +50,11 @@ trait Modularize
 		if ($module = $this->module()) {
 			$model = str_replace('/', '\\', ltrim($model, '\\/'));
 			
-			if (Str::startsWith($model, $module->namespace())) {
+			if (
+				Str::startsWith($model, $this->rootNamespace())
+				|| Str::startsWith($model, $module->namespace())
+				|| class_exists(Str::start($model, '\\'))
+			) {
 				return $model;
 			}
 			
