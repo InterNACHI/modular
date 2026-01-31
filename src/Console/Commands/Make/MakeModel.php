@@ -3,6 +3,7 @@
 namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Foundation\Console\ModelMakeCommand;
+use Illuminate\Support\Str;
 
 class MakeModel extends ModelMakeCommand
 {
@@ -15,5 +16,20 @@ class MakeModel extends ModelMakeCommand
 		}
 		
 		return $rootNamespace.'\Models';
+	}
+	
+	protected function buildFactoryReplacements()
+	{
+		$replacements = parent::buildFactoryReplacements();
+		
+		if ($module = $this->module()) {
+			$replacements['{{ factory }}'] = str_replace(
+				'\\Database\\Factories\\', 
+				'\\'.$module->namespace().'Database\\Factories\\',
+				$replacements['{{ factory }}'],
+			);
+		}
+		
+		return $replacements;
 	}
 }

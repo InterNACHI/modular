@@ -43,8 +43,6 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$this->mergeConfigFrom("{$this->base_dir}/config/app-modules.php", 'app-modules');
 		
-		// $this->app->singleton(ModulesPlugin::class);
-		
 		$this->app->singleton(ModuleRegistry::class, fn(Application $app) => new ModuleRegistry(
 			modules_path: $this->getModulesBasePath(),
 			modules_loader: static function() use ($app) {
@@ -108,7 +106,6 @@ class ModularServiceProvider extends ServiceProvider
 			BladePlugin::class,
 			EventsPlugin::class,
 			GatePlugin::class,
-			LivewirePlugin::class,
 			MigratorPlugin::class,
 			ModulesPlugin::class,
 			RoutesPlugin::class,
