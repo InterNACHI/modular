@@ -13,7 +13,7 @@ class RoutesPluginTest extends TestCase
 	public function test_module_routes_are_loaded(): void
 	{
 		$routes = Route::getRoutes();
-		$route = $routes->getByName('test-module.index');
+		$route = $routes->getByName('test-module::index');
 
 		$this->assertNotNull($route);
 		$this->assertEquals('test-module', $route->uri());
@@ -21,7 +21,7 @@ class RoutesPluginTest extends TestCase
 
 	public function test_named_route_is_accessible(): void
 	{
-		$this->assertTrue(Route::has('test-module.index'));
+		$this->assertTrue(Route::has('test-module::index'));
 	}
 
 	public function test_route_responds_correctly(): void
