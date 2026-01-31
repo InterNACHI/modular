@@ -31,7 +31,7 @@ class MakeSeeder extends SeederMakeCommand
 		if ($module = $this->module()) {
 			return $module->qualify('Database\Seeders');
 		}
-
+		
 		return parent::rootNamespace();
 	}
 }

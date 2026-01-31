@@ -12,10 +12,6 @@ use ReflectionClass;
 
 abstract class Plugin
 {
-	abstract public function discover(FinderFactory $finders): iterable;
-	
-	abstract public function handle(Collection $data);
-	
 	public static function boot(Closure $handler, Application $app): void
 	{
 		/** @var ReflectionAttribute<HandlesBoot>[] $attributes */
@@ -25,4 +21,8 @@ abstract class Plugin
 			$attributes[0]->newInstance()->boot(static::class, $handler, $app);
 		}
 	}
+	
+	abstract public function discover(FinderFactory $finders): iterable;
+	
+	abstract public function handle(Collection $data);
 }
