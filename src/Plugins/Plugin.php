@@ -14,12 +14,16 @@ abstract class Plugin
 {
 	public static function boot(Closure $handler, Application $app): void
 	{
-		/** @var ReflectionAttribute<HandlesBoot>[] $attributes */
-		$attributes = (new ReflectionClass(static::class))->getAttributes(HandlesBoot::class, ReflectionAttribute::IS_INSTANCEOF);
+		static::firstBootableAttribute()?->newInstance()->boot(static::class, $handler, $app);
+	}
+	
+	/** @return ReflectionAttribute<HandlesBoot>|null */
+	protected static function firstBootableAttribute(): ?ReflectionAttribute
+	{
+		$attributes = (new ReflectionClass(static::class))
+			->getAttributes(HandlesBoot::class, ReflectionAttribute::IS_INSTANCEOF);
 		
-		if (count($attributes)) {
-			$attributes[0]->newInstance()->boot(static::class, $handler, $app);
-		}
+		return $attributes[0] ?? null;
 	}
 	
 	abstract public function discover(FinderFactory $finders): iterable;
