@@ -8,33 +8,24 @@ use InterNACHI\Modular\Tests\TestCase;
 class MigratorPluginTest extends TestCase
 {
 	use PreloadsAppModules;
-
+	
 	public function test_migration_paths_are_registered(): void
 	{
-		$migrator = $this->app['migrator'];
+		$migrator = $this->app->make('migrator');
 		$paths = $migrator->paths();
-
-		$moduleMigrationPath = null;
-		foreach ($paths as $path) {
-			if (str_contains($path, 'test-module/database/migrations')) {
-				$moduleMigrationPath = $path;
-				break;
-			}
-		}
-
-		$this->assertNotNull($moduleMigrationPath, 'Module migration path should be registered');
+		
+		$this->assertTrue(
+			collect($paths)->contains(fn($path) => str_contains($path, 'test-module/database/migrations')),
+			'Module migration path should be registered'
+		);
 	}
-
+	
 	public function test_module_migrations_are_discoverable(): void
 	{
-		$migrator = $this->app['migrator'];
+		$migrator = $this->app->make('migrator');
 		$files = $migrator->getMigrationFiles($migrator->paths());
-
-		$moduleMigrations = array_filter(
-			$files,
-			fn($path) => str_contains($path, 'test-module')
-		);
-
-		$this->assertNotEmpty($moduleMigrations);
+		
+		$this->assertArrayHasKey('2024_04_03_133130_set_up_test_module', $files);
+		$this->assertStringContainsString('app-modules/test-module/database/migrations', $files['2024_04_03_133130_set_up_test_module']);
 	}
 }
