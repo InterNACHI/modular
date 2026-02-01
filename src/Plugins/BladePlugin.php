@@ -18,18 +18,36 @@ class BladePlugin extends Plugin
 	
 	public function discover(FinderFactory $finders): iterable
 	{
-		return $finders
-			->bladeComponentFileFinder()
-			->withModuleInfo()
-			->values()
-			->map(fn(ModuleFileInfo $component) => [
-				'prefix' => $component->module()->name,
-				'fqcn' => $component->fullyQualifiedClassName(),
-			]);
+		return [
+			'files' => $finders
+				->bladeComponentFileFinder()
+				->withModuleInfo()
+				->values()
+				->map(fn(ModuleFileInfo $component) => [
+					'prefix' => $component->module()->name,
+					'fqcn' => $component->fullyQualifiedClassName(),
+				])
+				->toArray(),
+			'directories' => $finders
+				->bladeComponentDirectoryFinder()
+				->withModuleInfo()
+				->values()
+				->map(fn(ModuleFileInfo $component) => [
+					'prefix' => $component->module()->name,
+					'namespace' => $component->module()->qualify('View\\Components'),
+				])
+				->toArray(),
+		];
 	}
 	
 	public function handle(Collection $data)
 	{
-		$data->each(fn(array $row) => $this->blade->component($row['fqcn'], null, $row['prefix']));
+		foreach ($data['files'] as $config) {
+			$this->blade->component($config['fqcn'], null, $config['prefix']);
+		}
+		
+		foreach ($data['directories'] as $config) {
+			$this->blade->componentNamespace($config['namespace'], $config['prefix']);
+		}
 	}
 }
