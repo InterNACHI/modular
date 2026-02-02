@@ -8,8 +8,6 @@ use InterNACHI\Modular\Plugins\Plugin;
 
 class PluginHandler
 {
-	protected array $handled = [];
-	
 	public function __construct(
 		protected PluginRegistry $registry,
 		protected PluginDataRepository $data,
@@ -26,11 +24,6 @@ class PluginHandler
 	/** @param class-string<Plugin> $name */
 	public function handle(string $name, array $parameters = []): mixed
 	{
-		return $this->handled[$name] ??= $this->registry->get($name, $parameters)->handle($this->data->get($name));
-	}
-	
-	public function reset(): void
-	{
-		$this->handled = [];
+		return $this->registry->get($name, $parameters)->handle($this->data->get($name));
 	}
 }

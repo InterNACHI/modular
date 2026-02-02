@@ -13,11 +13,10 @@ class ModulesClear extends Command
 	
 	protected $description = 'Remove the module cache file';
 	
-	public function handle(Cache $cache, PluginDataRepository $data, PluginHandler $handler)
+	public function handle(Cache $cache, PluginDataRepository $data)
 	{
 		$cache->clear();
 		$data->reset();
-		$handler->reset();
 		
 		$this->info('Module cache cleared!');
 	}

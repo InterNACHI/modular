@@ -64,6 +64,17 @@ class ModularServiceProvider extends ServiceProvider
 		$this->app->singleton(PluginRegistry::class);
 		$this->app->singleton(PluginHandler::class);
 		
+		// All plugins are singletons
+		$this->app->singleton(ArtisanPlugin::class);
+		$this->app->singleton(BladePlugin::class);
+		$this->app->singleton(EventsPlugin::class);
+		$this->app->singleton(GatePlugin::class);
+		$this->app->singleton(MigratorPlugin::class);
+		$this->app->singleton(ModulesPlugin::class);
+		$this->app->singleton(RoutesPlugin::class);
+		$this->app->singleton(TranslatorPlugin::class);
+		$this->app->singleton(ViewPlugin::class);
+		
 		// Because of the way migration dependencies are registered (as strings rather than class names),
 		// we need to wire up our dependencies manually for migration-specific features
 		$this->app->singleton(MakeMigration::class, fn(Application $app) => new MigrateMakeCommand($app['migration.creator'], $app['composer']));
