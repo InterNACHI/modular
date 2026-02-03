@@ -5,7 +5,6 @@ namespace InterNACHI\Modular\Console\Commands;
 use Illuminate\Console\Command;
 use InterNACHI\Modular\Support\Cache;
 use InterNACHI\Modular\Support\PluginDataRepository;
-use InterNACHI\Modular\Support\PluginHandler;
 
 class ModulesClear extends Command
 {
