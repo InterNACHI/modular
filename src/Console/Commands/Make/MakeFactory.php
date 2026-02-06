@@ -4,10 +4,11 @@ namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Support\Str;
+use InterNACHI\Modularize\ModularizeGeneratorCommand;
 
 class MakeFactory extends FactoryMakeCommand
 {
-	use Modularize;
+	use ModularizeGeneratorCommand;
 	
 	protected function replaceNamespace(&$stub, $name)
 	{

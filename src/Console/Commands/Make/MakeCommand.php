@@ -4,10 +4,11 @@ namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Support\Str;
+use InterNACHI\Modularize\ModularizeGeneratorCommand;
 
 class MakeCommand extends ConsoleMakeCommand
 {
-	use Modularize;
+	use ModularizeGeneratorCommand;
 	
 	protected function replaceClass($stub, $name)
 	{

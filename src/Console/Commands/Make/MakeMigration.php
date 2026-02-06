@@ -4,10 +4,11 @@ namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Filesystem\Filesystem;
+use InterNACHI\Modularize\ModularizeGeneratorCommand;
 
 class MakeMigration extends MigrateMakeCommand
 {
-	use Modularize;
+	use ModularizeGeneratorCommand;
 	
 	protected function getMigrationPath()
 	{

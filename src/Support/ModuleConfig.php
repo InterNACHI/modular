@@ -10,8 +10,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ModuleConfig implements Arrayable
 {
-	public Collection $namespaces;
-	
 	public static function fromComposerFile(SplFileInfo $composer_file): self
 	{
 		$composer_config = json_decode($composer_file->getContents(), true, 16, JSON_THROW_ON_ERROR);
@@ -32,9 +30,8 @@ class ModuleConfig implements Arrayable
 	public function __construct(
 		public string $name,
 		public string $base_path,
-		?Collection $namespaces = null
+		public Collection $namespaces = new Collection(),
 	) {
-		$this->namespaces = $namespaces ?? new Collection();
 	}
 	
 	public function path(string $to = ''): string

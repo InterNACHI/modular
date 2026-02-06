@@ -2,6 +2,7 @@
 
 namespace InterNACHI\Modular\Tests;
 
+use Database\Factories\WidgetFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
@@ -118,7 +119,7 @@ class ModularServiceProviderTest extends TestCase
 		$module = $this->makeModule();
 		
 		// We'll create a factory and instantiate it
-		$this->artisan('make:model', ['name' => 'Widget', '--factory' => true, '--module' => $module->name]);
+		$this->artisan('make:model', ['name' => 'Widget', '--factory' => true, '--module' => $module->name, '--force' => true]);
 		require $module->path('database/factories/WidgetFactory.php');
 		$factory_class = $module->qualify('Database\\Factories\\WidgetFactory');
 		$factory = new $factory_class();
@@ -130,9 +131,9 @@ class ModularServiceProviderTest extends TestCase
 		);
 		
 		// We'll also confirm that non-app factories are unaffected
-		$this->artisan('make:model', ['name' => 'Widget', '--factory' => true]);
+		$this->artisan('make:model', ['name' => 'Widget', '--factory' => true, '--force' => true]);
 		require database_path('factories/WidgetFactory.php');
-		$factory = new \Database\Factories\WidgetFactory();
+		$factory = new WidgetFactory();
 		
 		$this->assertEquals(
 			'App\\Widget',

@@ -4,10 +4,11 @@ namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Foundation\Console\TestMakeCommand;
 use Illuminate\Support\Str;
+use InterNACHI\Modularize\ModularizeGeneratorCommand;
 
 class MakeTest extends TestMakeCommand
 {
-	use Modularize {
+	use ModularizeGeneratorCommand {
 		getPath as getModularPath;
 	}
 	

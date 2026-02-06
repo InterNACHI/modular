@@ -1,27 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	bootstrap="vendor/autoload.php"
-	colors="true"
-	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
->
-	<coverage processUncoveredFiles="true">
-		<include>
-			<directory suffix=".php">./src</directory>
-		</include>
-	</coverage>
-	<testsuites>
-		<testsuite name="Tests">
-			<directory>./tests</directory>
-		</testsuite>
-	</testsuites>
-	<php>
-		<env name="APP_ENV" value="testing"/>
-		<env name="BCRYPT_ROUNDS" value="4"/>
-		<env name="CACHE_DRIVER" value="array"/>
-		<env name="SESSION_DRIVER" value="array"/>
-		<env name="QUEUE_DRIVER" value="sync"/>
-		<env name="MAIL_DRIVER" value="array"/>
-		<env name="TERMINAL_EMULATOR" value="JetBrains-JediTerm"/>
-	</php>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="vendor/autoload.php" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" cacheDirectory=".phpunit.cache">
+  <testsuites>
+    <testsuite name="Tests">
+      <directory>./tests</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <env name="APP_ENV" value="testing"/>
+    <env name="BCRYPT_ROUNDS" value="4"/>
+    <env name="CACHE_DRIVER" value="array"/>
+    <env name="SESSION_DRIVER" value="array"/>
+    <env name="QUEUE_DRIVER" value="sync"/>
+    <env name="MAIL_DRIVER" value="array"/>
+    <env name="TERMINAL_EMULATOR" value="JetBrains-JediTerm"/>
+  </php>
+  <source>
+    <include>
+      <directory suffix=".php">./src</directory>
+    </include>
+  </source>
 </phpunit>

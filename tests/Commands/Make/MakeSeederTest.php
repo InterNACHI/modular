@@ -14,8 +14,6 @@ class MakeSeederTest extends TestCase
 	
 	public function test_it_overrides_the_default_command(): void
 	{
-		$this->requiresLaravelVersion('9.2.0');
-		
 		$this->artisan('make:seeder', ['--help' => true])
 			->expectsOutputToContain('--module')
 			->assertExitCode(0);
@@ -25,17 +23,12 @@ class MakeSeederTest extends TestCase
 	{
 		$command = MakeSeeder::class;
 		$arguments = ['name' => 'TestSeeder'];
-		$expected_path = version_compare($this->app->version(), '8.0.0', '>=')
-			? 'database/seeders/TestSeeder.php'
-			: 'database/seeds/TestSeeder.php';
+		$expected_path = 'database/seeders/TestSeeder.php';
 		$expected_substrings = [
 			'use Illuminate\Database\Seeder',
 			'class TestSeeder extends Seeder',
+			'namespace Modules\TestModule\Database\Seeders;',
 		];
-		
-		if (version_compare($this->app->version(), '8.0.0', '>=')) {
-			$expected_substrings[] = 'namespace Modules\TestModule\Database\Seeders;';
-		}
 		
 		$this->filesystem()->deleteDirectory($this->getApplicationBasePath().$this->normalizeDirectorySeparators('database/seeds'));
 		$this->filesystem()->deleteDirectory($this->getModulePath('test-module', 'database/seeds'));
@@ -47,17 +40,12 @@ class MakeSeederTest extends TestCase
 	{
 		$command = MakeSeeder::class;
 		$arguments = ['name' => 'TestSeeder'];
-		$expected_path = version_compare($this->app->version(), '8.0.0', '>=')
-			? 'database/seeders/TestSeeder.php'
-			: 'database/seeds/TestSeeder.php';
+		$expected_path = 'database/seeders/TestSeeder.php';
 		$expected_substrings = [
 			'use Illuminate\Database\Seeder',
 			'class TestSeeder extends Seeder',
+			'namespace Database\Seeders;',
 		];
-		
-		if (version_compare($this->app->version(), '8.0.0', '>=')) {
-			$expected_substrings[] = 'namespace Database\Seeders;';
-		}
 		
 		$this->filesystem()->deleteDirectory($this->getApplicationBasePath().$this->normalizeDirectorySeparators('database/seeds'));
 		

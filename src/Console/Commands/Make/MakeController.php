@@ -4,11 +4,12 @@ namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Support\Str;
+use InterNACHI\Modularize\ModularizeGeneratorCommand;
 use InvalidArgumentException;
 
 class MakeController extends ControllerMakeCommand
 {
-	use Modularize;
+	use ModularizeGeneratorCommand;
 	
 	protected function parseModel($model)
 	{

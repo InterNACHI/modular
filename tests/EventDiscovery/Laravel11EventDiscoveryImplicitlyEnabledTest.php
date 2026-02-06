@@ -4,6 +4,9 @@ namespace InterNACHI\Modular\Tests\EventDiscovery;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Support\Facades\Event;
+use InterNACHI\Modular\Console\Commands\ModulesCache;
+use InterNACHI\Modular\Console\Commands\ModulesClear;
+use InterNACHI\Modular\Plugins\EventsPlugin;
 use InterNACHI\Modular\Support\Facades\Modules;
 use InterNACHI\Modular\Tests\Concerns\PreloadsAppModules;
 use InterNACHI\Modular\Tests\TestCase;
@@ -16,8 +19,7 @@ class Laravel11EventDiscoveryImplicitlyEnabledTest extends TestCase
 	{
 		parent::setUp();
 		
-		$this->beforeApplicationDestroyed(fn() => $this->artisan('event:clear'));
-		$this->requiresLaravelVersion('11.0.0');
+		$this->beforeApplicationDestroyed(fn() => $this->artisan(ModulesClear::class));
 	}
 	
 	public function test_it_auto_discovers_event_listeners(): void
@@ -28,16 +30,15 @@ class Laravel11EventDiscoveryImplicitlyEnabledTest extends TestCase
 		
 		// Also check that the events are cached correctly
 		
-		$this->artisan('event:cache');
+		$this->artisan(ModulesCache::class);
 		
-		$cache = require $this->app->getCachedEventsPath();
-		$cached_listeners = collect($cache)->reduce(fn(array $listeners, $row) => array_merge_recursive($listeners, $row), []);
+		$cache = require $this->app->bootstrapPath('cache/app-modules.php');
 		
-		$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cached_listeners);
+		$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[EventsPlugin::class]);
 		
 		$this->assertContains(
 			$module->qualify('Listeners\\TestEventListener').'@handle',
-			$cached_listeners[$module->qualify('Events\\TestEvent')]
+			$cache[EventsPlugin::class][$module->qualify('Events\\TestEvent')]
 		);
 	}
 	
