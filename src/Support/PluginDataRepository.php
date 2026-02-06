@@ -9,7 +9,7 @@ use InterNACHI\Modular\Plugins\Plugin;
 class PluginDataRepository
 {
 	public function __construct(
-		protected array $data = [],
+		protected array $data,
 		protected PluginRegistry $registry,
 		protected FinderFactory $finders,
 	) {
