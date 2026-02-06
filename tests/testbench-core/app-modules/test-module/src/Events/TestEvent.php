@@ -11,4 +11,14 @@ class TestEvent
 	use Dispatchable;
 	use InteractsWithSockets;
 	use SerializesModels;
+	
+	public function __construct(
+		public string $message = '',
+	) {
+	}
+	
+	public function __invoke()
+	{
+		$this->message .= ' (invoked)';
+	}
 }

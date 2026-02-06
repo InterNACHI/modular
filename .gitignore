@@ -4,6 +4,7 @@
 .php_cs.cache
 .php-cs-fixer.cache
 .composer-history
+.phpunit.cache
 
 /vendor*
 /node_modules

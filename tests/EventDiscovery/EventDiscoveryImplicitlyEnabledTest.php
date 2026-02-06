@@ -6,6 +6,9 @@
 namespace InterNACHI\Modular\Tests\EventDiscovery {
 	use App\EventDiscoveryImplicitlyEnabledTestProvider;
 	use Illuminate\Support\Facades\Event;
+	use InterNACHI\Modular\Console\Commands\ModulesCache;
+	use InterNACHI\Modular\Console\Commands\ModulesClear;
+	use InterNACHI\Modular\Plugins\EventsPlugin;
 	use InterNACHI\Modular\Support\Facades\Modules;
 	use InterNACHI\Modular\Tests\Concerns\PreloadsAppModules;
 	use InterNACHI\Modular\Tests\TestCase;
@@ -18,7 +21,7 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 		{
 			parent::setUp();
 			
-			$this->beforeApplicationDestroyed(fn() => $this->artisan('event:clear'));
+			$this->beforeApplicationDestroyed(fn() => $this->artisan(ModulesClear::class));
 		}
 		
 		public function test_it_auto_discovers_event_listeners(): void
@@ -29,18 +32,16 @@ namespace InterNACHI\Modular\Tests\EventDiscovery {
 			
 			// Also check that the events are cached correctly
 			
-			$this->artisan('event:cache');
+			$this->artisan(ModulesCache::class);
 			
-			$cache = require $this->app->getCachedEventsPath();
+			$cache = require $this->app->bootstrapPath('cache/app-modules.php');
 			
-			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[EventDiscoveryImplicitlyEnabledTestProvider::class]);
+			$this->assertArrayHasKey($module->qualify('Events\\TestEvent'), $cache[EventsPlugin::class]);
 			
 			$this->assertContains(
 				$module->qualify('Listeners\\TestEventListener@handle'),
-				$cache[EventDiscoveryImplicitlyEnabledTestProvider::class][$module->qualify('Events\\TestEvent')]
+				$cache[EventsPlugin::class][$module->qualify('Events\\TestEvent')]
 			);
-			
-			$this->artisan('event:clear');
 		}
 		
 		protected function getPackageProviders($app)

@@ -4,10 +4,11 @@ namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Support\Str;
+use InterNACHI\Modularize\ModularizeGeneratorCommand;
 
 class MakeSeeder extends SeederMakeCommand
 {
-	use Modularize {
+	use ModularizeGeneratorCommand {
 		getPath as getModularPath;
 	}
 	
@@ -23,22 +24,13 @@ class MakeSeeder extends SeederMakeCommand
 	
 	protected function replaceNamespace(&$stub, $name)
 	{
-		if ($module = $this->module()) {
-			if (version_compare($this->getLaravel()->version(), '9.6.0', '<')) {
-				$namespace = $module->qualify('Database\Seeders');
-				$stub = str_replace('namespace Database\Seeders;', "namespace {$namespace};", $stub);
-			}
-		}
-		
 		return parent::replaceNamespace($stub, $name);
 	}
 	
 	protected function rootNamespace()
 	{
 		if ($module = $this->module()) {
-			if (version_compare($this->getLaravel()->version(), '9.6.0', '>=')) {
-				return $module->qualify('Database\Seeders');
-			}
+			return $module->qualify('Database\Seeders');
 		}
 		
 		return parent::rootNamespace();

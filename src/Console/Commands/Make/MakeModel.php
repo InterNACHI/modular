@@ -3,10 +3,11 @@
 namespace InterNACHI\Modular\Console\Commands\Make;
 
 use Illuminate\Foundation\Console\ModelMakeCommand;
+use InterNACHI\Modularize\ModularizeGeneratorCommand;
 
 class MakeModel extends ModelMakeCommand
 {
-	use Modularize;
+	use ModularizeGeneratorCommand;
 	
 	protected function getDefaultNamespace($rootNamespace)
 	{
@@ -15,5 +16,20 @@ class MakeModel extends ModelMakeCommand
 		}
 		
 		return $rootNamespace.'\Models';
+	}
+	
+	protected function buildFactoryReplacements()
+	{
+		$replacements = parent::buildFactoryReplacements();
+		
+		if ($module = $this->module()) {
+			$replacements['{{ factory }}'] = str_replace(
+				'\\Database\\Factories\\',
+				'\\'.$module->namespace().'Database\\Factories\\',
+				$replacements['{{ factory }}'],
+			);
+		}
+		
+		return $replacements;
 	}
 }

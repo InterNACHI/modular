@@ -6,25 +6,21 @@ use Illuminate\Filesystem\Filesystem;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeListener;
-use InterNACHI\Modular\Console\Commands\Make\MakeLivewire;
 use InterNACHI\Modular\Console\Commands\Make\MakeModel;
-use InterNACHI\Modular\Support\AutoDiscoveryHelper;
-use InterNACHI\Modular\Support\ModuleRegistry;
+use InterNACHI\Modular\Support\FinderFactory;
+use InterNACHI\Modular\Support\ModuleConfig;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
-use Livewire\Livewire;
-use Livewire\LivewireServiceProvider;
-use Livewire\Mechanisms\Mechanism;
 use Symfony\Component\Finder\SplFileInfo;
 
-class AutoDiscoveryHelperTest extends TestCase
+class FinderFactoryTest extends TestCase
 {
 	use WritesToAppFilesystem;
 	
-	protected $module1;
+	protected ModuleConfig $module1;
 	
-	protected $module2;
+	protected ModuleConfig $module2;
 	
-	protected $helper;
+	protected FinderFactory $factory;
 	
 	protected function setUp(): void
 	{
@@ -32,10 +28,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$this->module1 = $this->makeModule('test-module');
 		$this->module2 = $this->makeModule('test-module-two');
-		$this->helper = new AutoDiscoveryHelper(
-			new ModuleRegistry($this->getApplicationBasePath().'/app-modules', ''),
-			new Filesystem()
-		);
+		$this->factory = new FinderFactory($this->getApplicationBasePath().'/app-modules');
 	}
 	
 	public function test_it_finds_commands(): void
@@ -52,7 +45,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$resolved = [];
 		
-		$this->helper->commandFileFinder()->each(function(SplFileInfo $command) use (&$resolved) {
+		$this->factory->commandFileFinder()->each(function(SplFileInfo $command) use (&$resolved) {
 			$resolved[] = str_replace('\\', '/', $command->getPathname());
 		});
 		
@@ -64,7 +57,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	{
 		$resolved = [];
 		
-		$this->helper->factoryDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
+		$this->factory->factoryDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
 			$resolved[] = str_replace('\\', '/', $directory->getPathname());
 		});
 		
@@ -76,7 +69,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	{
 		$resolved = [];
 		
-		$this->helper->migrationDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
+		$this->factory->migrationDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
 			$resolved[] = str_replace('\\', '/', $directory->getPathname());
 		});
 		
@@ -98,7 +91,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$resolved = [];
 		
-		$this->helper->modelFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
+		$this->factory->modelFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
 			$resolved[] = str_replace('\\', '/', $file->getPathname());
 		});
 		
@@ -121,11 +114,11 @@ class AutoDiscoveryHelperTest extends TestCase
 		$resolved_directories = [];
 		$resolved_files = [];
 		
-		$this->helper->bladeComponentDirectoryFinder()->each(function(SplFileInfo $file) use (&$resolved_directories) {
+		$this->factory->bladeComponentDirectoryFinder()->each(function(SplFileInfo $file) use (&$resolved_directories) {
 			$resolved_directories[] = str_replace('\\', '/', $file->getPathname());
 		});
 		
-		$this->helper->bladeComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved_files) {
+		$this->factory->bladeComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved_files) {
 			$resolved_files[] = str_replace('\\', '/', $file->getPathname());
 		});
 		
@@ -140,7 +133,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	{
 		$resolved = [];
 		
-		$this->helper->routeFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
+		$this->factory->routeFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
 			$resolved[] = str_replace('\\', '/', $file->getPathname());
 		});
 		
@@ -152,7 +145,7 @@ class AutoDiscoveryHelperTest extends TestCase
 	{
 		$resolved = [];
 		
-		$this->helper->viewDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
+		$this->factory->viewDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
 			$resolved[] = str_replace('\\', '/', $directory->getPathname());
 		});
 		
@@ -169,7 +162,7 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$resolved = [];
 		
-		$this->helper->langDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
+		$this->factory->langDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
 			$resolved[] = str_replace('\\', '/', $directory->getPathname());
 		});
 		
@@ -206,52 +199,11 @@ class AutoDiscoveryHelperTest extends TestCase
 			'--module' => $this->module2->name,
 		]);
 		
-		$resolved = $this->helper->listenerDirectoryFinder()
+		$resolved = $this->factory->listenerDirectoryFinder()
 			->map(fn(SplFileInfo $directory) => str_replace('\\', '/', $directory->getPathname()))
 			->all();
 		
 		$this->assertContains($this->module1->path('src/Listeners'), $resolved);
 		$this->assertContains($this->module2->path('src/Listeners'), $resolved);
-	}
-	
-	public function test_it_finds_livewire_component(): void
-	{
-		if (! class_exists(Livewire::class)) {
-			$this->markTestSkipped('Livewire is not installed.');
-		}
-		
-		if (class_exists(Mechanism::class)) {
-			$this->markTestSkipped('Livewire 3 is not yet supported.');
-		}
-		
-		$this->artisan(MakeLivewire::class, [
-			'name' => 'TestComponent',
-			'--module' => $this->module1->name,
-		]);
-		
-		$this->artisan(MakeLivewire::class, [
-			'name' => 'TestComponent',
-			'--module' => $this->module2->name,
-		]);
-		
-		$resolved = [];
-		
-		$this->helper->livewireComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = str_replace('\\', '/', $file->getPathname());
-		});
-		
-		$this->assertContains($this->module1->path('src/Http/Livewire/TestComponent.php'), $resolved);
-		$this->assertContains($this->module2->path('src/Http/Livewire/TestComponent.php'), $resolved);
-	}
-	
-	protected function getPackageProviders($app)
-	{
-		$providers = parent::getPackageProviders($app);
-		
-		if (class_exists(LivewireServiceProvider::class)) {
-			$providers[] = LivewireServiceProvider::class;
-		}
-		
-		return $providers;
 	}
 }

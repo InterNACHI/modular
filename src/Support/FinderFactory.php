@@ -2,17 +2,19 @@
 
 namespace InterNACHI\Modular\Support;
 
-use Illuminate\Filesystem\Filesystem;
-
-class AutoDiscoveryHelper
+class FinderFactory
 {
-	protected string $base_path;
-	
 	public function __construct(
-		protected ModuleRegistry $module_registry,
-		protected Filesystem $filesystem
+		protected string $base_path
 	) {
-		$this->base_path = $module_registry->getModulesPath();
+	}
+	
+	public function moduleComposerFileFinder(): FinderCollection
+	{
+		return FinderCollection::forFiles()
+			->depth('== 1')
+			->name('composer.json')
+			->inOrEmpty($this->base_path);
 	}
 	
 	public function commandFileFinder(): FinderCollection
@@ -92,20 +94,5 @@ class AutoDiscoveryHelper
 		return FinderCollection::forDirectories()
 			->name('Listeners')
 			->inOrEmpty($this->base_path.'/*/src');
-	}
-	
-	public function livewireComponentFileFinder(): FinderCollection
-	{
-		$directory = $this->base_path.'/*/src';
-
-		if (str_contains(config('livewire.class_namespace'), '\\Http\\')) {
-			$directory .= '/Http';
-		}
-
-		$directory .= '/Livewire';
-
-		return FinderCollection::forFiles()
-			->name('*.php')
-			->inOrEmpty($directory);
 	}
 }

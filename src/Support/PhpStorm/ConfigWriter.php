@@ -23,13 +23,13 @@ abstract class ConfigWriter
 	 */
 	protected $module_registry;
 	
-	abstract public function write(): bool;
-	
 	public function __construct($config_path, ModuleRegistry $module_registry)
 	{
 		$this->config_path = $config_path;
 		$this->module_registry = $module_registry;
 	}
+	
+	abstract public function write(): bool;
 	
 	public function handle(): bool
 	{

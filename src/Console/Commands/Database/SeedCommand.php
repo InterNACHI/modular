@@ -3,7 +3,7 @@
 namespace InterNACHI\Modular\Console\Commands\Database;
 
 use Illuminate\Support\Str;
-use InterNACHI\Modular\Console\Commands\Modularize;
+use InterNACHI\Modularize\Modularize;
 
 class SeedCommand extends \Illuminate\Database\Console\Seeds\SeedCommand
 {

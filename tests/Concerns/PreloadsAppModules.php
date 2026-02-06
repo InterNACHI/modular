@@ -3,12 +3,13 @@
 namespace InterNACHI\Modular\Tests\Concerns;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Before;
 
 trait PreloadsAppModules
 {
 	protected static $autoloader_registered = false;
 	
-	/** @before */
+	#[Before]
 	public function prepareTestModule(): void
 	{
 		$src = __DIR__.'/../testbench-core/app-modules';
@@ -19,7 +20,7 @@ trait PreloadsAppModules
 		$fs->copyDirectory($src, $dest);
 	}
 	
-	/** @before */
+	#[Before]
 	public function prepareModuleAutoloader(): void
 	{
 		if (! static::$autoloader_registered) {

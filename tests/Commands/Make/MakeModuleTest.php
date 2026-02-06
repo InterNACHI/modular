@@ -40,13 +40,8 @@ class MakeModuleTest extends TestCase
 		$this->assertEquals('tests/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Tests\\']);
 		$this->assertContains('Modules\\TestModule\\Providers\\TestModuleServiceProvider', $composer_contents['extra']['laravel']['providers']);
 		
-		if (version_compare($this->app->version(), '8.0.0', '>=')) {
-			$this->assertEquals('database/factories/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Database\\Factories\\']);
-			$this->assertEquals('database/seeders/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Database\\Seeders\\']);
-		} else {
-			$this->assertContains('database/factories', $composer_contents['autoload']['classmap']);
-			$this->assertContains('database/seeds', $composer_contents['autoload']['classmap']);
-		}
+		$this->assertEquals('database/factories/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Database\\Factories\\']);
+		$this->assertEquals('database/seeders/', $composer_contents['autoload']['psr-4']['Modules\\TestModule\\Database\\Seeders\\']);
 		
 		$app_composer_file = $this->getApplicationBasePath().'/composer.json';
 		$app_composer_contents = json_decode($fs->get($app_composer_file), true);
@@ -99,17 +94,17 @@ class MakeModuleTest extends TestCase
 		
 		$this->assertTrue($fs->isDirectory($this->getApplicationBasePath().'/app-modules/test-module-two'));
 	}
-
+	
 	public function test_it_does_not_create_an_empty_directory_if_prompt_on_first_module_if_no_custom_namespace_is_set_is_rejected(): void
 	{
 		$fs = $this->filesystem();
-
+		
 		$this->artisan(MakeModule::class, ['name' => 'test-module'])
 			->expectsQuestion('Would you like to cancel and configure your module namespace first?', true)
 			->assertExitCode(0);
-
+		
 		Modules::reload();
-
+		
 		$this->assertFalse($fs->isDirectory($this->getApplicationBasePath().'/app-modules/test-module'));
 	}
 }

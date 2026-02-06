@@ -21,68 +21,26 @@ class MakeModule extends Command
 	
 	protected $description = 'Create a new Laravel module';
 	
-	/**
-	 * This is the base path of the module
-	 *
-	 * @var string
-	 */
-	protected $base_path;
+	protected string $base_path;
 	
-	/**
-	 * This is the PHP namespace for all modules
-	 *
-	 * @var string
-	 */
-	protected $module_namespace;
+	protected string $module_namespace;
 	
-	/**
-	 * This is the composer namespace for all modules
-	 *
-	 * @var string
-	 */
-	protected $composer_namespace;
+	protected string $composer_namespace;
 	
-	/**
-	 * This is the name of the module
-	 *
-	 * @var string
-	 */
-	protected $module_name;
+	protected string $module_name;
 	
-	/**
-	 * This is the module name as a StudlyCase'd name
-	 *
-	 * @var string
-	 */
-	protected $class_name_prefix;
+	protected string $class_name_prefix;
 	
-	/**
-	 * This is the name of the module as a composer package
-	 * i.e. modules/my-module
-	 *
-	 * @var string
-	 */
-	protected $composer_name;
+	protected string $composer_name;
 	
-	/**
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $filesystem;
-	
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry
-	 */
-	protected $module_registry;
-	
-	public function __construct(Filesystem $filesystem, ModuleRegistry $module_registry)
-	{
+	public function __construct(
+		protected Filesystem $filesystem,
+		protected ModuleRegistry $module_registry
+	) {
 		parent::__construct();
-		
-		$this->filesystem = $filesystem;
-		$this->module_registry = $module_registry;
 	}
 	
-	public function handle()
+	public function handle(): int
 	{
 		$this->module_name = Str::kebab($this->argument('name'));
 		$this->class_name_prefix = Str::studly($this->argument('name'));
@@ -94,13 +52,13 @@ class MakeModule extends Command
 		$this->setUpStyles();
 		
 		$this->newLine();
-
+		
 		if ($this->shouldAbortToPublishConfig()) {
 			return 0;
 		}
-
+		
 		$this->ensureModulesDirectoryExists();
-
+		
 		$this->writeStubs();
 		$this->updateCoreComposerConfig();
 		
@@ -144,7 +102,7 @@ class MakeModule extends Command
 		return $this->confirm('Would you like to cancel and configure your module namespace first?', true);
 	}
 	
-	protected function ensureModulesDirectoryExists()
+	protected function ensureModulesDirectoryExists(): void
 	{
 		if (! $this->filesystem->isDirectory($this->base_path)) {
 			$this->filesystem->makeDirectory($this->base_path, 0777, true);
@@ -152,7 +110,7 @@ class MakeModule extends Command
 		}
 	}
 	
-	protected function writeStubs()
+	protected function writeStubs(): void
 	{
 		$this->title('Creating initial module files');
 		
@@ -196,14 +154,7 @@ class MakeModule extends Command
 		$this->newLine();
 	}
 	
-	protected function seedersDirectory(): string
-	{
-		return version_compare($this->getLaravel()->version(), '8.0.0', '>=')
-			? 'seeders'
-			: 'seeds';
-	}
-	
-	protected function updateCoreComposerConfig()
+	protected function updateCoreComposerConfig(): void
 	{
 		$this->title('Updating application composer.json file');
 		
@@ -301,7 +252,7 @@ class MakeModule extends Command
 		return $packages;
 	}
 	
-	protected function setUpStyles()
+	protected function setUpStyles(): void
 	{
 		$formatter = $this->getOutput()->getFormatter();
 		
@@ -310,14 +261,9 @@ class MakeModule extends Command
 		}
 	}
 	
-	protected function title($title)
+	protected function title($title): void
 	{
 		$this->getOutput()->title($title);
-	}
-	
-	public function newLine($count = 1)
-	{
-		$this->getOutput()->newLine($count);
 	}
 	
 	protected function getStubs(): array
@@ -326,23 +272,15 @@ class MakeModule extends Command
 			return $custom_stubs;
 		}
 		
-		$composer_stub = version_compare($this->getLaravel()->version(), '8.0.0', '<')
-			? 'composer-stub-v7.json'
-			: 'composer-stub-latest.json';
-		
 		return [
-			'composer.json' => $this->pathToStub($composer_stub),
+			'composer.json' => $this->pathToStub('composer-stub-latest.json'),
 			'src/Providers/StubClassNamePrefixServiceProvider.php' => $this->pathToStub('ServiceProvider.php'),
-			'tests/Feature/Providers/StubClassNamePrefixServiceProviderTest.php' => $this->pathToStub('ServiceProviderTest.php'),
-			'database/migrations/StubMigrationPrefix_set_up_StubModuleName_module.php' => $this->pathToStub('migration.php'),
 			'routes/StubModuleName-routes.php' => $this->pathToStub('web-routes.php'),
-			'resources/views/index.blade.php' => $this->pathToStub('view.blade.php'),
-			'resources/views/create.blade.php' => $this->pathToStub('view.blade.php'),
-			'resources/views/show.blade.php' => $this->pathToStub('view.blade.php'),
-			'resources/views/edit.blade.php' => $this->pathToStub('view.blade.php'),
+			'resources/views/.gitkeep' => $this->pathToStub('.gitkeep'),
 			'database/factories/.gitkeep' => $this->pathToStub('.gitkeep'),
 			'database/migrations/.gitkeep' => $this->pathToStub('.gitkeep'),
-			'database/'.$this->seedersDirectory().'/.gitkeep' => $this->pathToStub('.gitkeep'),
+			'database/seeders/.gitkeep' => $this->pathToStub('.gitkeep'),
+			'tests/.gitkeep' => $this->pathToStub('.gitkeep'),
 		];
 	}
 	
