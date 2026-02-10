@@ -82,6 +82,7 @@ class ModularServiceProvider extends ServiceProvider
 		
 		$this->registerEloquentFactories();
 		$this->registerDefaultPlugins();
+		$this->app->make(PluginHandler::class)->register($this->app);
 		
 		$this->app->booting(fn() => $this->app->make(PluginHandler::class)->boot($this->app));
 	}

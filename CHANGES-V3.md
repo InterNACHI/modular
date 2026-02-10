@@ -56,9 +56,14 @@ abstract class Plugin
 
 | Attribute                           | Behavior                                    |
 |-------------------------------------|---------------------------------------------|
+| `#[OnRegister]`                     | Execute during `register()` phase           |
 | `#[AfterResolving(Service::class)]` | Defer until service resolved                |
 | `#[OnBoot]`                         | Execute during `booting()` hook             |
 | *(none)*                            | Explicit call via `PluginHandler::handle()` |
+
+Plugins that need to run early (before services are resolved) should use `#[OnRegister]`.
+This is useful for configuration loading, where values must be available before other
+services boot.
 
 ### Built-in Plugins
 
@@ -74,14 +79,17 @@ abstract class Plugin
 | `GatePlugin`       | `AfterResolving(Gate)`          | Register model policies                         |
 | `ArtisanPlugin`    | `Artisan::starting()`           | Register commands                               |
 
-## Boot Flow
+## Lifecycle Flow
 
 ```
 ModularServiceProvider::register()
     ├─ Register singletons
     ├─ PluginRegistry::add(built-in plugins)
+    ├─ PluginHandler::register(app)
+    │       └─ For each plugin with #[OnRegister]:
+    │               └─ Plugin::handle(data)
     └─ $app->booting(PluginHandler::boot)
-            └─ For each plugin:
+            └─ For each plugin with boot attributes:
                     └─ Plugin::boot(handler, app)
                             └─ Read attributes, schedule execution
 ```

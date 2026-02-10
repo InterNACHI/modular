@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added support for auto-aliasing module classes in tinker sessions
+- Added `#[OnRegister]` attribute for plugins that need to run during the registration phase
 
 ## [2.2.0] - 2024-04-05
 
