@@ -98,6 +98,8 @@ Modular will scaffold up a new module for you:
 app-modules/
   my-module/
     composer.json
+    config/
+      my-module.php
     src/
     tests/
     routes/
@@ -143,6 +145,7 @@ should work as expected in most cases:
 - Policies are auto-discovered for your Models
 - Blade components will be auto-discovered
 - Event listeners will be auto-discovered
+- Config files are auto-registered (e.g. `config/my-module.php` → `config('my-module.*')`)
 
 ### Commands
 

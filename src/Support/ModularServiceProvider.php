@@ -16,6 +16,7 @@ use InterNACHI\Modular\Console\Commands\ModulesSync;
 use InterNACHI\Modular\PluginRegistry;
 use InterNACHI\Modular\Plugins\ArtisanPlugin;
 use InterNACHI\Modular\Plugins\BladePlugin;
+use InterNACHI\Modular\Plugins\ConfigPlugin;
 use InterNACHI\Modular\Plugins\EventsPlugin;
 use InterNACHI\Modular\Plugins\GatePlugin;
 use InterNACHI\Modular\Plugins\MigratorPlugin;
@@ -67,6 +68,7 @@ class ModularServiceProvider extends ServiceProvider
 		// All plugins are singletons
 		$this->app->singleton(ArtisanPlugin::class);
 		$this->app->singleton(BladePlugin::class);
+		$this->app->singleton(ConfigPlugin::class);
 		$this->app->singleton(EventsPlugin::class);
 		$this->app->singleton(GatePlugin::class);
 		$this->app->singleton(MigratorPlugin::class);
@@ -114,6 +116,7 @@ class ModularServiceProvider extends ServiceProvider
 		$registry->add(
 			ArtisanPlugin::class,
 			BladePlugin::class,
+			ConfigPlugin::class,
 			EventsPlugin::class,
 			GatePlugin::class,
 			MigratorPlugin::class,

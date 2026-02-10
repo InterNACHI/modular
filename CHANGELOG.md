@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added support for auto-aliasing module classes in tinker sessions
 - Added `#[OnRegister]` attribute for plugins that need to run during the registration phase
+- Added `ConfigPlugin` to auto-load module config files (`config/{module-name}.php`)
+- Added config file scaffold to `make:module` command
 
 ## [2.2.0] - 2024-04-05
 

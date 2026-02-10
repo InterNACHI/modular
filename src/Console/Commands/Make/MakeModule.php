@@ -275,6 +275,7 @@ class MakeModule extends Command
 		return [
 			'composer.json' => $this->pathToStub('composer-stub-latest.json'),
 			'src/Providers/StubClassNamePrefixServiceProvider.php' => $this->pathToStub('ServiceProvider.php'),
+			'config/StubModuleName.php' => $this->pathToStub('config.php'),
 			'routes/StubModuleName-routes.php' => $this->pathToStub('web-routes.php'),
 			'resources/views/.gitkeep' => $this->pathToStub('.gitkeep'),
 			'database/factories/.gitkeep' => $this->pathToStub('.gitkeep'),
