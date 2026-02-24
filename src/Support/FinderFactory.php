@@ -83,7 +83,10 @@ class FinderFactory
 		return FinderCollection::forDirectories()
 			->depth(0)
 			->name('lang')
-			->inOrEmpty($this->base_path.'/*/resources/');
+			->inOrEmpty([
+				$this->base_path.'/*/resources/',
+				$this->base_path.'/*/',
+			]);
 	}
 	
 	public function listenerDirectoryFinder(): FinderCollection
