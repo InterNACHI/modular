@@ -14,7 +14,9 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ModulesSync extends Command
 {
-	protected $signature = 'modules:sync {--no-phpstorm : Do not update PhpStorm config files}';
+	protected $signature = 'modules:sync
+	                        {--no-phpstorm : Do not update PhpStorm config files}
+	                        {--no-phpunit : Do not update phpunit.xml file}';
 	
 	protected $description = 'Sync your project\'s configuration with your current modules';
 	
@@ -32,8 +34,10 @@ class ModulesSync extends Command
 	{
 		$this->filesystem = $filesystem;
 		$this->registry = $registry;
-		
-		$this->updatePhpUnit();
+
+		if (true !== $this->option('no-phpunit')) {
+			$this->updatePhpUnit();
+		}
 		
 		if (true !== $this->option('no-phpstorm')) {
 			$this->updatePhpStormConfig();
