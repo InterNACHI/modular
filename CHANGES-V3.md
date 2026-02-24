@@ -56,15 +56,21 @@ abstract class Plugin
 
 | Attribute                           | Behavior                                    |
 |-------------------------------------|---------------------------------------------|
+| `#[OnRegister]`                     | Execute during `register()` phase           |
 | `#[AfterResolving(Service::class)]` | Defer until service resolved                |
 | `#[OnBoot]`                         | Execute during `booting()` hook             |
 | *(none)*                            | Explicit call via `PluginHandler::handle()` |
+
+Plugins that need to run early (before services are resolved) should use `#[OnRegister]`.
+This is useful for configuration loading, where values must be available before other
+services boot.
 
 ### Built-in Plugins
 
 | Plugin             | Trigger                         | Responsibility                                  |
 |--------------------|---------------------------------|-------------------------------------------------|
 | `ModulesPlugin`    | Eager                           | Discover `composer.json`, create `ModuleConfig` |
+| `ConfigPlugin`     | `OnRegister`                    | Load module config file (see below)             |
 | `RoutesPlugin`     | `!routesAreCached()`            | Load route files                                |
 | `ViewPlugin`       | `AfterResolving(ViewFactory)`   | Register view namespaces                        |
 | `BladePlugin`      | `AfterResolving(BladeCompiler)` | Register Blade components                       |
@@ -74,14 +80,34 @@ abstract class Plugin
 | `GatePlugin`       | `AfterResolving(Gate)`          | Register model policies                         |
 | `ArtisanPlugin`    | `Artisan::starting()`           | Register commands                               |
 
-## Boot Flow
+### Module Config Files
+
+Each module can have a config file at `config/{module-name}.php`. The file **must** be named
+after the module (e.g., `app-modules/orders/config/orders.php`). Config values are then
+accessible via `config('orders.key')`.
+
+```
+app-modules/
+└── orders/
+    └── config/
+        └── orders.php   ← config('orders.*')
+```
+
+This naming convention provides implicit namespacing since Laravel's config system is flat.
+App-level config (in `config/orders.php`) takes precedence over module defaults, following
+the same pattern as `mergeConfigFrom()` in Laravel packages.
+
+## Lifecycle Flow
 
 ```
 ModularServiceProvider::register()
     ├─ Register singletons
     ├─ PluginRegistry::add(built-in plugins)
+    ├─ PluginHandler::register(app)
+    │       └─ For each plugin with #[OnRegister]:
+    │               └─ Plugin::handle(data)
     └─ $app->booting(PluginHandler::boot)
-            └─ For each plugin:
+            └─ For each plugin with boot attributes:
                     └─ Plugin::boot(handler, app)
                             └─ Read attributes, schedule execution
 ```
