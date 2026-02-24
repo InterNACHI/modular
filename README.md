@@ -240,6 +240,12 @@ Both filenames and file contents support a number of placeholders. These include
  - `StubFullyQualifiedTestCaseBase`
  - `StubTestCaseBase`
 
+#### Modules Path Helper
+
+The `modules_path` function returns the fully qualified path to your modules' directory. You may also use the `modules_path` function to generate a fully qualified path to a given file relative to the modules' directory. 
+
+This function works similarly to the existing `app_path` or `storage_path` helpers, allowing you to generate paths relative to the modules' directory effortlessly.
+
 ## Comparison to `nwidart/laravel-modules`
 
 [Laravel Modules](https://nwidart.com/laravel-modules) is a great package that’s been
