@@ -24,10 +24,10 @@
         "internachi/modularize": "^1.1.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.11|^10.0|dev-master|dev-main",
+        "orchestra/testbench": "^9.11|^10.0|^11.0|dev-master|dev-main",
         "friendsofphp/php-cs-fixer": "^3.14",
         "mockery/mockery": "^1.5",
-        "phpunit/phpunit": "^10.5|^11.5",
+        "phpunit/phpunit": "^10.5|^11.5|^12.5|^13.0",
         "ext-json": "*"
     },
     "autoload": {
