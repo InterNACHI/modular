@@ -40,7 +40,9 @@ class MakeCommandTest extends TestCase
 		$arguments = ['name' => 'TestCommand', '--command' => 'foo:bar-baz'];
 		$expected_path = 'src/Console/Commands/TestCommand.php';
 		$expected_substrings = [
-			"signature = 'foo:bar-baz'",
+			$this->isLaravelVersion('13')
+				? "#[Signature('foo:bar-baz')]"
+				: "signature = 'foo:bar-baz'",
 		];
 		
 		$this->assertModuleCommandResults($command, $arguments, $expected_path, $expected_substrings);

@@ -47,11 +47,16 @@ abstract class TestCase extends Orchestra
 	
 	protected function requiresLaravelVersion(string $minimum_version, string $operator = '>=')
 	{
-		if (! version_compare($this->app->version(), $minimum_version, $operator)) {
+		if (! $this->isLaravelVersion($minimum_version, $operator)) {
 			$this->markTestSkipped("Only applies to Laravel {$operator} {$minimum_version}.");
 		}
 		
 		return $this;
+	}
+	
+	protected function isLaravelVersion(string $minimum_version, string $operator = '>='): bool
+	{
+		return version_compare($this->app->version(), $minimum_version, $operator);
 	}
 	
 	protected function getPackageProviders($app)
