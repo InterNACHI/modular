@@ -14,7 +14,7 @@ jobs:
       matrix:
         dependency-version: [ stable, lowest ]
         os: [ ubuntu, windows ]
-        laravel: [ 11.*, 12.* ]
+        laravel: [ 11.*, 12.*, 13.* ]
         php: [ 8.3, 8.4 ]
 
     runs-on: "${{ matrix.os }}-latest"
@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

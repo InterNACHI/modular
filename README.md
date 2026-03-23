@@ -9,12 +9,6 @@
 			alt="Build Status" 
 		/>
 	</a>
-	<a href="https://codeclimate.com/github/InterNACHI/modular/test_coverage" target="_blank">
-		<img 
-			src="https://api.codeclimate.com/v1/badges/dd927802d52f4f75ea6c/test_coverage" 
-			alt="Coverage Status" 
-		/>
-	</a>
 	<a href="https://packagist.org/packages/internachi/modular" target="_blank">
         <img 
             src="https://poser.pugx.org/internachi/modular/v/stable" 
@@ -27,16 +21,10 @@
             alt="MIT Licensed" 
         />
     </a>
-    <a href="https://twitter.com/inxilpro" target="_blank">
+    <a href="https://bsky.app/profile/cmorrell.com" target="_blank">
         <img 
-            src="https://img.shields.io/twitter/follow/inxilpro?style=social" 
-            alt="Follow @inxilpro on Twitter" 
-        />
-    </a>
-    <a href="https://any.dev/@chris" target="_blank">
-        <img 
-            src="https://img.shields.io/mastodon/follow/109584001693739813?domain=https%3A%2F%2Fany.dev&style=social" 
-            alt="Follow @chris@any.dev on Mastodon" 
+            src="https://img.shields.io/bluesky/followers/cmorrell.com" 
+            alt="Follow @cmorrell.com on bsky" 
         />
     </a>
 </div>
