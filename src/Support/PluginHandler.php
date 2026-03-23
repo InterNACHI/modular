@@ -14,6 +14,13 @@ class PluginHandler
 	) {
 	}
 	
+	public function register(Application $app): void
+	{
+		foreach ($this->registry->all() as $class) {
+			$class::register($this->handle(...), $app);
+		}
+	}
+	
 	public function boot(Application $app): void
 	{
 		foreach ($this->registry->all() as $class) {
