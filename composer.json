@@ -33,7 +33,10 @@
     "autoload": {
         "psr-4": {
             "InterNACHI\\Modular\\": "src/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
