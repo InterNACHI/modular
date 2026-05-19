@@ -32,7 +32,8 @@
     },
     "autoload": {
         "psr-4": {
-            "InterNACHI\\Modular\\": "src/"
+            "InterNACHI\\Modular\\": "src/",
+            "InterNACHI\\Modular\\Tests\\Concerns\\": "tests/Concerns/"
         }
     },
     "autoload-dev": {
