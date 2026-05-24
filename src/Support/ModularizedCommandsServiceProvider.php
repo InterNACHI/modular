@@ -12,6 +12,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeChannel;
 use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeController;
+use InterNACHI\Modular\Console\Commands\Make\MakeEnum;
 use InterNACHI\Modular\Console\Commands\Make\MakeEvent;
 use InterNACHI\Modular\Console\Commands\Make\MakeException;
 use InterNACHI\Modular\Console\Commands\Make\MakeFactory;
@@ -38,6 +39,7 @@ class ModularizedCommandsServiceProvider extends ServiceProvider
 		'command.controller.make' => MakeController::class,
 		'command.console.make' => MakeCommand::class,
 		'command.channel.make' => MakeChannel::class,
+		'command.enum.make' => MakeEnum::class,
 		'command.event.make' => MakeEvent::class,
 		'command.exception.make' => MakeException::class,
 		'command.factory.make' => MakeFactory::class,
