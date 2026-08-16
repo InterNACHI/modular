@@ -187,7 +187,7 @@ class MakeModule extends Command
 		
 		$repository_already_exists = collect($definition['repositories'])
 			->contains(function($repository) use ($module_config) {
-				return $repository['url'] === $module_config['url'];
+				return is_array($repository) && ($repository['url'] ?? null) === $module_config['url'];
 			});
 		
 		if (false === $repository_already_exists) {
