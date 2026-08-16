@@ -56,6 +56,35 @@ class MakeModuleTest extends TestCase
 		$this->assertContains($repository, $app_composer_contents['repositories']);
 	}
 	
+	public function test_it_ignores_repositories_without_a_url(): void
+	{
+		$fs = $this->filesystem();
+		$app_composer_file = $this->getApplicationBasePath().'/composer.json';
+		$original = $fs->get($app_composer_file);
+		
+		$definition = json_decode($original, true);
+		$definition['repositories'] = [['packagist.org' => false]];
+		$fs->put($app_composer_file, json_encode($definition));
+		
+		try {
+			$this->artisan(MakeModule::class, [
+				'name' => 'test-module',
+				'--accept-default-namespace' => true,
+			])->assertExitCode(0);
+			
+			$app_composer_contents = json_decode($fs->get($app_composer_file), true);
+			
+			$this->assertContains(['packagist.org' => false], $app_composer_contents['repositories']);
+			$this->assertContains([
+				'type' => 'path',
+				'url' => 'app-modules/*',
+				'options' => ['symlink' => true],
+			], $app_composer_contents['repositories']);
+		} finally {
+			$fs->put($app_composer_file, $original);
+		}
+	}
+	
 	public function test_it_scaffolds_a_new_module_based_on_custom_config(): void
 	{
 		$fs = $this->filesystem();
