@@ -2,8 +2,8 @@
 
 namespace InterNACHI\Modular\Plugins;
 
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Support\Collection;
-use Illuminate\Translation\Translator;
 use InterNACHI\Modular\Plugins\Attributes\AfterResolving;
 use InterNACHI\Modular\Support\FinderFactory;
 use InterNACHI\Modular\Support\ModuleFileInfo;
@@ -31,8 +31,13 @@ class TranslatorPlugin extends Plugin
 	public function handle(Collection $data): void
 	{
 		$data->each(function(array $row) {
-			$this->translator->addNamespace($row['namespace'], $row['path']);
-			$this->translator->addJsonPath($row['path']);
+			if (method_exists($this->translator, 'addNamespace')) {
+				$this->translator->addNamespace($row['namespace'], $row['path']);
+			}
+			
+			if (method_exists($this->translator, 'addJsonPath')) {
+				$this->translator->addJsonPath($row['path']);
+			}
 		});
 	}
 }

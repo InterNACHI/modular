@@ -2,6 +2,7 @@
 
 namespace InterNACHI\Modular\Tests\Plugins;
 
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Facades\Lang;
 use InterNACHI\Modular\Tests\Concerns\PreloadsAppModules;
 use InterNACHI\Modular\Tests\TestCase;
@@ -40,5 +41,40 @@ class TranslatorPluginTest extends TestCase
 			'Hello from JSON',
 			$translator->get('Hello')
 		);
+	}
+	
+	public function test_custom_translators_that_do_not_extend_the_base_translator_are_supported(): void
+	{
+		$this->app->forgetInstance('translator');
+		$this->app->singleton('translator', fn() => new CustomTranslator());
+		
+		$translator = $this->app->make('translator');
+		
+		$this->assertInstanceOf(CustomTranslator::class, $translator);
+	}
+}
+
+class CustomTranslator implements TranslatorContract
+{
+	protected string $locale = 'en';
+	
+	public function get($key, array $replace = [], $locale = null)
+	{
+		return $key;
+	}
+	
+	public function choice($key, $number, array $replace = [], $locale = null)
+	{
+		return $key;
+	}
+	
+	public function getLocale()
+	{
+		return $this->locale;
+	}
+	
+	public function setLocale($locale)
+	{
+		$this->locale = $locale;
 	}
 }
