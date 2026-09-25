@@ -208,6 +208,73 @@ at:
 
 You could access those translations with: `__('demo::messages.welcome');`
 
+### Filament
+
+Filament resources, pages, and widgets can live inside a module. Create a
+[Filament plugin](https://filamentphp.com/docs/5.x/advanced/modular-architecture) in your module
+that discovers the module's Filament classes, and register that plugin in your panel:
+
+```php
+// app-modules/blog/src/BlogPlugin.php
+namespace Modules\Blog;
+
+use Filament\Contracts\Plugin;
+use Filament\Panel;
+
+class BlogPlugin implements Plugin
+{
+    public static function make(): static
+    {
+        return app(static::class);
+    }
+
+    public function getId(): string
+    {
+        return 'blog';
+    }
+
+    public function register(Panel $panel): void
+    {
+        $panel->discoverResources(
+            in: __DIR__.'/Filament/Resources',
+            for: 'Modules\\Blog\\Filament\\Resources',
+        );
+    }
+
+    public function boot(Panel $panel): void
+    {
+    }
+}
+```
+
+```php
+// app/Providers/Filament/AdminPanelProvider.php
+$panel->plugins([
+    \Modules\Blog\BlogPlugin::make(),
+]);
+```
+
+Filament's `make:filament-*` commands don't accept `--module`, but once the plugin is registered they
+will ask where to create the file, and you can pick your module's plugin.
+
+### Livewire
+
+Livewire's `make:livewire` command doesn't support the `--module` option. Create the component
+class in your module manually and register it from your module's service provider:
+
+```php
+use Livewire\Livewire;
+use Modules\Blog\Livewire\EditPost;
+
+public function boot(): void
+{
+    Livewire::component('blog::edit-post', EditPost::class);
+}
+```
+
+You can then render it with `<livewire:blog::edit-post />`, and point the component's `render()`
+method at a module view such as `view('blog::livewire.edit-post')`.
+
 ### Customizing the Default Module Structure
 
 When you call `make:module`, Modular will scaffold some basic boilerplate for you. If you 
