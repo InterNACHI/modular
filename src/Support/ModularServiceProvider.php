@@ -12,6 +12,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeModule;
 use InterNACHI\Modular\Console\Commands\ModulesCache;
 use InterNACHI\Modular\Console\Commands\ModulesClear;
 use InterNACHI\Modular\Console\Commands\ModulesList;
+use InterNACHI\Modular\Console\Commands\ModulesRemove;
 use InterNACHI\Modular\Console\Commands\ModulesSync;
 use InterNACHI\Modular\PluginRegistry;
 use InterNACHI\Modular\Plugins\ArtisanPlugin;
@@ -102,6 +103,7 @@ class ModularServiceProvider extends ServiceProvider
 				ModulesClear::class,
 				ModulesSync::class,
 				ModulesList::class,
+				ModulesRemove::class,
 			]);
 		}
 	}
