@@ -79,24 +79,32 @@ class ModulesRemove extends Command
 		$original_working_dir = getcwd();
 		chdir($this->laravel->basePath());
 
-		$json_file = new JsonFile(Factory::getComposerFile());
-		$definition = $json_file->read();
+		try {
+			$json_file = new JsonFile(Factory::getComposerFile());
+			$definition = $json_file->read();
 
-		$has_changes = false;
+			$has_changes = false;
 
-		foreach (['require', 'require-dev'] as $key) {
-			if (isset($definition[$key][$composer_name])) {
-				unset($definition[$key][$composer_name]);
-				$this->line(" - Removed <info>{$composer_name}</info> from {$key}");
-				$has_changes = true;
+			foreach (['require', 'require-dev'] as $key) {
+				if (isset($definition[$key][$composer_name])) {
+					unset($definition[$key][$composer_name]);
+					$this->line(" - Removed <info>{$composer_name}</info> from {$key}");
+					$has_changes = true;
+
+					// An empty section would be written as a JSON list ("require-dev": []),
+					// which Composer rejects, so we drop the section with its last package
+					if ([] === $definition[$key]) {
+						unset($definition[$key]);
+					}
+				}
 			}
-		}
 
-		if ($has_changes) {
-			$json_file->write($definition);
-			$this->line(" - Wrote to <info>{$json_file->getPath()}</info>");
+			if ($has_changes) {
+				$json_file->write($definition);
+				$this->line(" - Wrote to <info>{$json_file->getPath()}</info>");
+			}
+		} finally {
+			chdir($original_working_dir);
 		}
-
-		chdir($original_working_dir);
 	}
 }
