@@ -143,6 +143,7 @@ We provide a few helper commands:
 - `php artisan modules:clear` — clear the module cache
 - `php artisan modules:sync`  — update project configs (like `phpunit.xml`) with module settings
 - `php artisan modules:list`  — list all modules
+- `php artisan modules:remove` — delete a module and remove it from your `composer.json`
 
 #### Laravel “`make:`” Commands
 
