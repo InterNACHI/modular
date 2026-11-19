@@ -235,10 +235,19 @@ class BlogPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        $panel->discoverResources(
-            in: __DIR__.'/Filament/Resources',
-            for: 'Modules\\Blog\\Filament\\Resources',
-        );
+        $panel
+            ->discoverResources(
+                in: __DIR__.'/Filament/Resources',
+                for: 'Modules\\Blog\\Filament\\Resources',
+            )
+            ->discoverPages(
+                in: __DIR__.'/Filament/Pages',
+                for: 'Modules\\Blog\\Filament\\Pages',
+            )
+            ->discoverWidgets(
+                in: __DIR__.'/Filament/Widgets',
+                for: 'Modules\\Blog\\Filament\\Widgets',
+            );
     }
 
     public function boot(Panel $panel): void
@@ -260,9 +269,12 @@ will ask where to create the file, and you can pick your module's plugin.
 ### Livewire
 
 Livewire's `make:livewire` command doesn't support the `--module` option. Create the component
-class in your module manually and register it from your module's service provider:
+class in your module manually and register it from your module's service provider. Modules created
+with `make:module` already have one, and Laravel loads it through package discovery (it is listed
+under `extra.laravel.providers` in the module's `composer.json`), so there is nothing else to register:
 
 ```php
+// app-modules/blog/src/Providers/BlogServiceProvider.php
 use Livewire\Livewire;
 use Modules\Blog\Livewire\EditPost;
 
